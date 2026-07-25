@@ -1,0 +1,11 @@
+name: causality-nd
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - networkx
+  - pytest
