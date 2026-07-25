@@ -48,7 +48,18 @@ python -m pytest causal_ci/unit -q
   0–7 (frame → assume → identify → data → feature → model → evaluate → test)
   all green; cross-fit AIPW recovers the true ATE; refuters pass on the valid
   pipeline and fire on planted bias
-- **P2 causal CI pyramid** — unit layer done; integration/property/regression next
-- **P3 discovery & evolution** — holiday-regime drift detection (DGP ready)
+- **P2 causal CI pyramid** ✅ — 32 tests across all four layers:
+  unit (DGP sanity, ground-truth recovery, refuters), integration
+  (graph-compiled tests: deleting a back-door edge auto-changes the adjustment
+  set and turns the pinned-bias test red), property (loop invariants across
+  seeds/regimes), regression (pinned ground truths & pipeline outputs)
+- **P3 discovery & evolution** ✅ — EVOLVE station: mechanism-stability monitor
+  detects the holiday drift and localizes it to the notification→app-open
+  mechanism (M), confirms the Y-mechanism invariant, flags the seasonal rain
+  shift as marginal; actuator re-run recovers the holiday truth
+  (+0.1913 vs +0.1910). See `notebooks/nomnom_endtoend/run_holiday_episode.py`
 - **P4 loop/graph engineering integration** — planned
-- **P5 math bridge + Tier-1 gallery** — planned
+- **P5 math bridge + Tier-1 gallery** — in progress: Level 0 (foundations:
+  Bayes by simulation, Simpson's paradox, FWL) and Level 1 (Bayesian inference:
+  conjugacy, MH-from-scratch, and the bridge insight that posteriors never
+  leave rung 1) done; Levels 2–5 and Tier-1 gallery next

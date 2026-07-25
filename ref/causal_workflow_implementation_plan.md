@@ -265,3 +265,15 @@ Dependencies (LR §12): DoWhy (identify/estimate/refute), EconML/DoubleML (nD es
 - Doll, R., & Hill, A. B. (1950). Smoking and carcinoma of the lung. *BMJ*, 2(4682), 739–748. — §5.1.
 
 *Sync note: when this plan adds durable theory or references, mirror them into `literature_review.md` (and vice versa) — the two documents are maintained as one living system.*
+
+---
+
+## Progress Log
+
+| Date | Milestone | Evidence |
+|---|---|---|
+| 2026-07-25 | **P0 done** — conda env `causality-nd` (py3.12), repo layout, artifact contracts with graph-version hashing | `ucl/contracts/artifacts.py`, `environment.yml` |
+| 2026-07-25 | **P1 done** — NomNom DGP (known ground truth), UCL stations 0–7, cross-fit AIPW recovers true ATE (+0.2437 vs +0.2436), all refuters green | `runs/static_pass_report.json` |
+| 2026-07-25 | **P2 done** — causal CI pyramid: 32 tests across unit/integration/property/regression; deleting a back-door edge auto-changes the compiled adjustment set and turns the pinned-bias test red | `causal_ci/` |
+| 2026-07-25 | **P3 done** — EVOLVE station: mechanism-stability monitor detects holiday drift, localizes to the T→M mechanism (degradation +0.116 vs alarm threshold 0.02), Y-mechanism invariant, actuator re-run recovers holiday truth (+0.1913 vs +0.1910) | `runs/holiday_episode_report.json` |
+| 2026-07-25 | **Math bridge Levels 0–1 done** — foundations (Bayes by simulation, Simpson's paradox, FWL) and Bayesian inference (conjugacy, MH-from-scratch, PPC, and the rung-1 ceiling of pure Bayes demonstrated numerically) | `notebooks/math_bridge/level0_foundations.py`, `level1_bayesian_inference.py` |

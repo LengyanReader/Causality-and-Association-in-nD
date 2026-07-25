@@ -1,0 +1,880 @@
+{
+  "baseline_static": {
+    "estimand": {
+      "name": "nomnom_notify_ate",
+      "question": "Do push notifications cause orders on NomNom Eats?",
+      "treatment": "T",
+      "outcome": "Y",
+      "estimand": "ATE",
+      "rung": 2,
+      "population": "all active user-days",
+      "decision_context": "whether to keep, expand, or throttle the notification policy",
+      "subgroup": null
+    },
+    "graph": {
+      "edges": [
+        [
+          "weekend",
+          "T"
+        ],
+        [
+          "weekend",
+          "Y"
+        ],
+        [
+          "rain",
+          "T"
+        ],
+        [
+          "rain",
+          "Y"
+        ],
+        [
+          "payday",
+          "T"
+        ],
+        [
+          "payday",
+          "Y"
+        ],
+        [
+          "U",
+          "W"
+        ],
+        [
+          "W",
+          "T"
+        ],
+        [
+          "U",
+          "Y"
+        ],
+        [
+          "U",
+          "M"
+        ],
+        [
+          "U",
+          "NC"
+        ],
+        [
+          "Z",
+          "T"
+        ],
+        [
+          "T",
+          "M"
+        ],
+        [
+          "M",
+          "Y"
+        ],
+        [
+          "T",
+          "Y"
+        ],
+        [
+          "loyalty",
+          "coupon"
+        ],
+        [
+          "coupon",
+          "Y"
+        ],
+        [
+          "T",
+          "S"
+        ],
+        [
+          "Y",
+          "S"
+        ],
+        [
+          "segment",
+          "Y"
+        ]
+      ],
+      "observed": [
+        "segment",
+        "weekend",
+        "rain",
+        "payday",
+        "W",
+        "Z",
+        "T",
+        "M",
+        "loyalty",
+        "coupon",
+        "Y",
+        "S",
+        "NC"
+      ],
+      "latent": [
+        "U"
+      ],
+      "absent_edges": [
+        [
+          "Z",
+          "Y"
+        ],
+        [
+          "Z",
+          "U"
+        ],
+        [
+          "Z",
+          "M"
+        ],
+        [
+          "T",
+          "NC"
+        ],
+        [
+          "S",
+          "Y"
+        ],
+        [
+          "S",
+          "T"
+        ],
+        [
+          "coupon",
+          "T"
+        ],
+        [
+          "loyalty",
+          "T"
+        ]
+      ],
+      "node_roles": {
+        "T": "treatment",
+        "Y": "outcome",
+        "M": "mediator",
+        "S": "collider",
+        "Z": "instrument",
+        "NC": "negative_control_outcome",
+        "W": "proxy_confounder",
+        "U": "latent_confounder",
+        "coupon": "rdd_assignment",
+        "loyalty": "rdd_running"
+      },
+      "rationale": {
+        "W->T": "platform targets notifications using measured app-use history (hunger proxy)",
+        "U->T (absent)": "true hunger is unobserved; targeting can only use the proxy W",
+        "U->Y": "hunger directly drives orders",
+        "Z->T": "send-time jitter is randomized by the experiment platform",
+        "T->S,Y->S": "engagement score is computed from notifications and orders",
+        "T->NC (absent)": "push notifications cannot drain battery; appetite does correlate"
+      },
+      "version": "7a104e26c07a"
+    },
+    "identification": {
+      "estimand_name": "nomnom_notify_ate",
+      "criterion": "back-door",
+      "identified": true,
+      "adjustment_set": [
+        "W",
+        "payday",
+        "rain",
+        "weekend"
+      ],
+      "instrument": null,
+      "estimand_formula": "E[Y|do(T)] = \u03a3_z E[Y|T, z]\u00b7P(z), z = {W, payday, rain, weekend}",
+      "graph_version": "7a104e26c07a"
+    },
+    "data": {
+      "source": "nomnom.dgp.sample(regime=static, n=20000, seed=0)",
+      "n_rows": 20000,
+      "columns": [
+        "segment",
+        "weekend",
+        "rain",
+        "payday",
+        "W",
+        "Z",
+        "T",
+        "M",
+        "loyalty",
+        "coupon",
+        "Y",
+        "S",
+        "NC"
+      ],
+      "regime": "static",
+      "overlap": {
+        "ps_min_treated": 0.04890021556014955,
+        "ps_max_treated": 0.9865106160717655,
+        "ps_min_control": 0.023715924897202405,
+        "ps_max_control": 0.9620483952330923
+      },
+      "positivity_ok": true,
+      "graph_version": "7a104e26c07a"
+    },
+    "features": {
+      "adjustment_set": [
+        "W",
+        "payday",
+        "rain",
+        "weekend"
+      ],
+      "excluded": {
+        "S": "collider of T and Y - conditioning opens a spurious path",
+        "M": "mediator on the T->Y causal path - adjusting biases the total effect"
+      },
+      "instruments": [
+        "Z"
+      ],
+      "negative_controls": [
+        "NC"
+      ],
+      "graph_version": "7a104e26c07a"
+    },
+    "estimate": {
+      "estimand_name": "nomnom_notify_ate",
+      "estimator": "AIPW cross-fit (DML, GradientBoosting nuisances)",
+      "estimate": 0.24368739830967098,
+      "ci_low": 0.22795706368911178,
+      "ci_high": 0.2594177329302302,
+      "se": 0.008025680928856738,
+      "nuisance_models": {
+        "propensity": "GradientBoostingClassifier",
+        "outcome": "GradientBoostingClassifier(T-augmented)"
+      },
+      "diagnostics": {
+        "e_mean_treated": 0.6243157973877116,
+        "e_mean_control": 0.4553517105898148
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    "evaluation": {
+      "estimand_name": "nomnom_notify_ate",
+      "e_value": 2.7211328015358136,
+      "risk_ratio": 1.6668439902544823,
+      "balance": {
+        "max_abs_smd": 0.018494576228222048
+      },
+      "notes": [],
+      "graph_version": "7a104e26c07a"
+    },
+    "tests": {
+      "refuters": [
+        {
+          "name": "placebo_treatment",
+          "passed": true,
+          "detail": {
+            "estimate": 0.0019173971106387242,
+            "tolerance": 0.013352862026717026
+          }
+        },
+        {
+          "name": "random_common_cause",
+          "passed": true,
+          "detail": {
+            "delta": 2.8814734845949985e-05,
+            "tolerance": 0.008025699193593834
+          }
+        },
+        {
+          "name": "subset_refuter",
+          "passed": true,
+          "detail": {
+            "delta": 0.005279205679367127,
+            "tolerance": 0.018570584099013562
+          }
+        },
+        {
+          "name": "negative_control:NC",
+          "passed": true,
+          "detail": {
+            "estimate": -0.0007982884847726643,
+            "tolerance": 0.014537853418435753
+          }
+        }
+      ],
+      "invariant_checks": [
+        {
+          "name": "invariant2:no_descendant_adjustment",
+          "passed": true,
+          "detail": {
+            "violators": []
+          }
+        },
+        {
+          "name": "invariant3:evaluation_recorded",
+          "passed": true,
+          "detail": {}
+        }
+      ],
+      "all_green": true,
+      "graph_version": "7a104e26c07a"
+    }
+  },
+  "evolution": [
+    {
+      "check": "mechanism_stability:M",
+      "status": "alarm",
+      "metric": 0.11625537727596358,
+      "detail": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5728528565353145,
+        "loss_new": 0.6891082338112781,
+        "degradation": 0.11625537727596358
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "mechanism_stability:NC",
+      "status": "ok",
+      "metric": -0.006155543032334787,
+      "detail": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5753647339700773,
+        "loss_new": 0.5692091909377425,
+        "degradation": -0.006155543032334787
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "mechanism_stability:S",
+      "status": "ok",
+      "metric": 0.005611039205528856,
+      "detail": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5898990277871818,
+        "loss_new": 0.5955100669927107,
+        "degradation": 0.005611039205528856
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "mechanism_stability:T",
+      "status": "ok",
+      "metric": -0.0002560959611537239,
+      "detail": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5697517909834637,
+        "loss_new": 0.56949569502231,
+        "degradation": -0.0002560959611537239
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "mechanism_stability:Y",
+      "status": "ok",
+      "metric": 0.008049662132989965,
+      "detail": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5818185825155661,
+        "loss_new": 0.589868244648556,
+        "degradation": 0.008049662132989965
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:W",
+      "status": "ok",
+      "metric": 1.594721870941027,
+      "detail": {
+        "kind": "marginal",
+        "z": 1.594721870941027
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:Z",
+      "status": "ok",
+      "metric": 0.452547181324223,
+      "detail": {
+        "kind": "marginal",
+        "z": 0.452547181324223
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:loyalty",
+      "status": "ok",
+      "metric": 0.15038246291889568,
+      "detail": {
+        "kind": "marginal",
+        "z": 0.15038246291889568
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:payday",
+      "status": "ok",
+      "metric": 0.20274924765034522,
+      "detail": {
+        "kind": "marginal",
+        "z": 0.20274924765034522
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:rain",
+      "status": "alarm",
+      "metric": 27.587645805205003,
+      "detail": {
+        "kind": "marginal",
+        "z": 27.587645805205003
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:segment",
+      "status": "ok",
+      "metric": 0.10101237550289965,
+      "detail": {
+        "kind": "marginal",
+        "z": 0.10101237550289965
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "marginal_shift:weekend",
+      "status": "ok",
+      "metric": 0.2671178008439811,
+      "detail": {
+        "kind": "marginal",
+        "z": 0.2671178008439811
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "testable_implication:coupon _|_ T",
+      "status": "ok",
+      "metric": 0.831736485212493,
+      "detail": {
+        "pair": "coupon _|_ T",
+        "implied_by": "absent edge coupon-/->T",
+        "r": 0.0021250131716025323,
+        "p_value": 0.831736485212493,
+        "violated": false
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "testable_implication:loyalty _|_ T",
+      "status": "ok",
+      "metric": 0.5366289361419874,
+      "detail": {
+        "pair": "loyalty _|_ T",
+        "implied_by": "absent edge loyalty-/->T",
+        "r": 0.00617990046403198,
+        "p_value": 0.5366289361419874,
+        "violated": false
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    {
+      "check": "negative_control:NC",
+      "status": "ok",
+      "metric": 0.00779895575068976,
+      "detail": {
+        "tolerance": 0.021304438448076054
+      },
+      "graph_version": "7a104e26c07a"
+    }
+  ],
+  "evolution_report": {
+    "drift_detected": true,
+    "localized_mechanism": "M",
+    "stability": {
+      "M": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5728528565353145,
+        "loss_new": 0.6891082338112781,
+        "degradation": 0.11625537727596358
+      },
+      "NC": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5753647339700773,
+        "loss_new": 0.5692091909377425,
+        "degradation": -0.006155543032334787
+      },
+      "S": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5898990277871818,
+        "loss_new": 0.5955100669927107,
+        "degradation": 0.005611039205528856
+      },
+      "T": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5697517909834637,
+        "loss_new": 0.56949569502231,
+        "degradation": -0.0002560959611537239
+      },
+      "W": {
+        "kind": "marginal",
+        "z": 1.594721870941027
+      },
+      "Y": {
+        "kind": "mechanism",
+        "loss_ref_holdout": 0.5818185825155661,
+        "loss_new": 0.589868244648556,
+        "degradation": 0.008049662132989965
+      },
+      "Z": {
+        "kind": "marginal",
+        "z": 0.452547181324223
+      },
+      "loyalty": {
+        "kind": "marginal",
+        "z": 0.15038246291889568
+      },
+      "payday": {
+        "kind": "marginal",
+        "z": 0.20274924765034522
+      },
+      "rain": {
+        "kind": "marginal",
+        "z": 27.587645805205003
+      },
+      "segment": {
+        "kind": "marginal",
+        "z": 0.10101237550289965
+      },
+      "weekend": {
+        "kind": "marginal",
+        "z": 0.2671178008439811
+      }
+    },
+    "implications": [
+      {
+        "pair": "coupon _|_ T",
+        "implied_by": "absent edge coupon-/->T",
+        "r": 0.0021250131716025323,
+        "p_value": 0.831736485212493,
+        "violated": false
+      },
+      {
+        "pair": "loyalty _|_ T",
+        "implied_by": "absent edge loyalty-/->T",
+        "r": 0.00617990046403198,
+        "p_value": 0.5366289361419874,
+        "violated": false
+      }
+    ],
+    "n_alarms": 2
+  },
+  "holiday_pass": {
+    "estimand": {
+      "name": "nomnom_notify_ate",
+      "question": "Do push notifications cause orders on NomNom Eats?",
+      "treatment": "T",
+      "outcome": "Y",
+      "estimand": "ATE",
+      "rung": 2,
+      "population": "all active user-days",
+      "decision_context": "whether to keep, expand, or throttle the notification policy",
+      "subgroup": null
+    },
+    "graph": {
+      "edges": [
+        [
+          "weekend",
+          "T"
+        ],
+        [
+          "weekend",
+          "Y"
+        ],
+        [
+          "rain",
+          "T"
+        ],
+        [
+          "rain",
+          "Y"
+        ],
+        [
+          "payday",
+          "T"
+        ],
+        [
+          "payday",
+          "Y"
+        ],
+        [
+          "U",
+          "W"
+        ],
+        [
+          "W",
+          "T"
+        ],
+        [
+          "U",
+          "Y"
+        ],
+        [
+          "U",
+          "M"
+        ],
+        [
+          "U",
+          "NC"
+        ],
+        [
+          "Z",
+          "T"
+        ],
+        [
+          "T",
+          "M"
+        ],
+        [
+          "M",
+          "Y"
+        ],
+        [
+          "T",
+          "Y"
+        ],
+        [
+          "loyalty",
+          "coupon"
+        ],
+        [
+          "coupon",
+          "Y"
+        ],
+        [
+          "T",
+          "S"
+        ],
+        [
+          "Y",
+          "S"
+        ],
+        [
+          "segment",
+          "Y"
+        ]
+      ],
+      "observed": [
+        "segment",
+        "weekend",
+        "rain",
+        "payday",
+        "W",
+        "Z",
+        "T",
+        "M",
+        "loyalty",
+        "coupon",
+        "Y",
+        "S",
+        "NC"
+      ],
+      "latent": [
+        "U"
+      ],
+      "absent_edges": [
+        [
+          "Z",
+          "Y"
+        ],
+        [
+          "Z",
+          "U"
+        ],
+        [
+          "Z",
+          "M"
+        ],
+        [
+          "T",
+          "NC"
+        ],
+        [
+          "S",
+          "Y"
+        ],
+        [
+          "S",
+          "T"
+        ],
+        [
+          "coupon",
+          "T"
+        ],
+        [
+          "loyalty",
+          "T"
+        ]
+      ],
+      "node_roles": {
+        "T": "treatment",
+        "Y": "outcome",
+        "M": "mediator",
+        "S": "collider",
+        "Z": "instrument",
+        "NC": "negative_control_outcome",
+        "W": "proxy_confounder",
+        "U": "latent_confounder",
+        "coupon": "rdd_assignment",
+        "loyalty": "rdd_running"
+      },
+      "rationale": {
+        "W->T": "platform targets notifications using measured app-use history (hunger proxy)",
+        "U->T (absent)": "true hunger is unobserved; targeting can only use the proxy W",
+        "U->Y": "hunger directly drives orders",
+        "Z->T": "send-time jitter is randomized by the experiment platform",
+        "T->S,Y->S": "engagement score is computed from notifications and orders",
+        "T->NC (absent)": "push notifications cannot drain battery; appetite does correlate"
+      },
+      "version": "7a104e26c07a"
+    },
+    "identification": {
+      "estimand_name": "nomnom_notify_ate",
+      "criterion": "back-door",
+      "identified": true,
+      "adjustment_set": [
+        "W",
+        "payday",
+        "rain",
+        "weekend"
+      ],
+      "instrument": null,
+      "estimand_formula": "E[Y|do(T)] = \u03a3_z E[Y|T, z]\u00b7P(z), z = {W, payday, rain, weekend}",
+      "graph_version": "7a104e26c07a"
+    },
+    "data": {
+      "source": "nomnom.dgp.sample(regime=holiday, n=20000, seed=23)",
+      "n_rows": 20000,
+      "columns": [
+        "segment",
+        "weekend",
+        "rain",
+        "payday",
+        "W",
+        "Z",
+        "T",
+        "M",
+        "loyalty",
+        "coupon",
+        "Y",
+        "S",
+        "NC"
+      ],
+      "regime": "holiday",
+      "overlap": {
+        "ps_min_treated": 0.07674550135078226,
+        "ps_max_treated": 0.9765476707814812,
+        "ps_min_control": 0.030973663779164808,
+        "ps_max_control": 0.9681259159190667
+      },
+      "positivity_ok": true,
+      "graph_version": "7a104e26c07a"
+    },
+    "features": {
+      "adjustment_set": [
+        "W",
+        "payday",
+        "rain",
+        "weekend"
+      ],
+      "excluded": {
+        "S": "collider of T and Y - conditioning opens a spurious path",
+        "M": "mediator on the T->Y causal path - adjusting biases the total effect"
+      },
+      "instruments": [
+        "Z"
+      ],
+      "negative_controls": [
+        "NC"
+      ],
+      "graph_version": "7a104e26c07a"
+    },
+    "estimate": {
+      "estimand_name": "nomnom_notify_ate",
+      "estimator": "AIPW cross-fit (DML, GradientBoosting nuisances)",
+      "estimate": 0.1913211575221408,
+      "ci_low": 0.175455798677846,
+      "ci_high": 0.2071865163664356,
+      "se": 0.008094570838925924,
+      "nuisance_models": {
+        "propensity": "GradientBoostingClassifier",
+        "outcome": "GradientBoostingClassifier(T-augmented)"
+      },
+      "diagnostics": {
+        "e_mean_treated": 0.6179389729921758,
+        "e_mean_control": 0.4545545734591397
+      },
+      "graph_version": "7a104e26c07a"
+    },
+    "evaluation": {
+      "estimand_name": "nomnom_notify_ate",
+      "e_value": 2.363800117355643,
+      "risk_ratio": 1.4989673363520764,
+      "balance": {
+        "max_abs_smd": 0.023214562847085868
+      },
+      "notes": [],
+      "graph_version": "7a104e26c07a"
+    },
+    "tests": {
+      "refuters": [
+        {
+          "name": "placebo_treatment",
+          "passed": true,
+          "detail": {
+            "estimate": -0.0015966008441214313,
+            "tolerance": 0.013355783110202715
+          }
+        },
+        {
+          "name": "random_common_cause",
+          "passed": true,
+          "detail": {
+            "delta": 0.0005755689976768563,
+            "tolerance": 0.008097107960272711
+          }
+        },
+        {
+          "name": "subset_refuter",
+          "passed": true,
+          "detail": {
+            "delta": 0.004161638483821312,
+            "tolerance": 0.01977470701782051
+          }
+        },
+        {
+          "name": "negative_control:NC",
+          "passed": true,
+          "detail": {
+            "estimate": -0.003404102548070709,
+            "tolerance": 0.0147763250823708
+          }
+        }
+      ],
+      "invariant_checks": [
+        {
+          "name": "invariant2:no_descendant_adjustment",
+          "passed": true,
+          "detail": {
+            "violators": []
+          }
+        },
+        {
+          "name": "invariant3:evaluation_recorded",
+          "passed": true,
+          "detail": {}
+        }
+      ],
+      "all_green": true,
+      "graph_version": "7a104e26c07a"
+    }
+  },
+  "holiday_truth": {
+    "ate": 0.19098,
+    "mu1": 0.57548,
+    "mu0": 0.3845,
+    "cate_loyal": 0.2506304591078377,
+    "cate_new": 0.10196146848441044,
+    "regime": "holiday",
+    "n_mc": 200000
+  },
+  "covers_truth": true
+}
