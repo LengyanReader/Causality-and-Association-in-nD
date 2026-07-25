@@ -1,0 +1,40 @@
+{
+  "log": [
+    {
+      "event": "baseline_established",
+      "tag": "static#1",
+      "ate": 0.2365778604813986
+    },
+    {
+      "event": "batch_arrived",
+      "tag": "static#2",
+      "drift_detected": false,
+      "localized_mechanism": null,
+      "n_alarms": 0
+    },
+    {
+      "event": "batch_arrived",
+      "tag": "holiday#1",
+      "drift_detected": true,
+      "localized_mechanism": "M",
+      "n_alarms": 2
+    },
+    {
+      "event": "actuator_rerun",
+      "tag": "holiday#1",
+      "reason": "mechanism drift localized to M",
+      "ate": 0.18829140451053705,
+      "all_green": true
+    }
+  ],
+  "holiday_truth": {
+    "ate": 0.19098,
+    "mu1": 0.57548,
+    "mu0": 0.3845,
+    "cate_loyal": 0.2506304591078377,
+    "cate_new": 0.10196146848441044,
+    "regime": "holiday",
+    "n_mc": 200000
+  },
+  "covers_truth": true
+}
