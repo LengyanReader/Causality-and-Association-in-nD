@@ -232,26 +232,26 @@
     "estimate": {
       "estimand_name": "nomnom_notify_ate",
       "estimator": "AIPW cross-fit (DML, GradientBoosting nuisances)",
-      "estimate": 0.24368739830967098,
-      "ci_low": 0.22795706368911178,
-      "ci_high": 0.2594177329302302,
-      "se": 0.008025680928856738,
+      "estimate": 0.2436938619088251,
+      "ci_low": 0.22796441944061188,
+      "ci_high": 0.2594233043770383,
+      "se": 0.008025225749088379,
       "nuisance_models": {
         "propensity": "GradientBoostingClassifier",
         "outcome": "GradientBoostingClassifier(T-augmented)"
       },
       "diagnostics": {
-        "e_mean_treated": 0.6243157973877116,
-        "e_mean_control": 0.4553517105898148
+        "e_mean_treated": 0.6243172517711706,
+        "e_mean_control": 0.4553459472412759
       },
       "graph_version": "7a104e26c07a"
     },
     "evaluation": {
       "estimand_name": "nomnom_notify_ate",
-      "e_value": 2.7211328015358136,
-      "risk_ratio": 1.6668439902544823,
+      "e_value": 2.721219670404543,
+      "risk_ratio": 1.6668852237491567,
       "balance": {
-        "max_abs_smd": 0.018494576228222048
+        "max_abs_smd": 0.018516657653621017
       },
       "notes": [],
       "graph_version": "7a104e26c07a"
@@ -262,32 +262,32 @@
           "name": "placebo_treatment",
           "passed": true,
           "detail": {
-            "estimate": 0.0019173971106387242,
-            "tolerance": 0.013352862026717026
+            "estimate": 0.0017366215928692305,
+            "tolerance": 0.01334945630025543
           }
         },
         {
           "name": "random_common_cause",
           "passed": true,
           "detail": {
-            "delta": 2.8814734845949985e-05,
-            "tolerance": 0.008025699193593834
+            "delta": 7.515331316970686e-05,
+            "tolerance": 0.00802573374290067
           }
         },
         {
           "name": "subset_refuter",
           "passed": true,
           "detail": {
-            "delta": 0.005279205679367127,
-            "tolerance": 0.018570584099013562
+            "delta": 0.005170238670769184,
+            "tolerance": 0.018545864309190935
           }
         },
         {
           "name": "negative_control:NC",
           "passed": true,
           "detail": {
-            "estimate": -0.0007982884847726643,
-            "tolerance": 0.014537853418435753
+            "estimate": -0.0007938254237971414,
+            "tolerance": 0.014537024799674786
           }
         }
       ],
@@ -313,12 +313,12 @@
     {
       "check": "mechanism_stability:M",
       "status": "alarm",
-      "metric": 0.11625537727596358,
+      "metric": 0.11627160395280589,
       "detail": {
         "kind": "mechanism",
-        "loss_ref_holdout": 0.5728528565353145,
-        "loss_new": 0.6891082338112781,
-        "degradation": 0.11625537727596358
+        "loss_ref_holdout": 0.5728410268165303,
+        "loss_new": 0.6891126307693362,
+        "degradation": 0.11627160395280589
       },
       "graph_version": "7a104e26c07a"
     },
@@ -349,24 +349,24 @@
     {
       "check": "mechanism_stability:T",
       "status": "ok",
-      "metric": -0.0002560959611537239,
+      "metric": -0.0002572769717671397,
       "detail": {
         "kind": "mechanism",
         "loss_ref_holdout": 0.5697517909834637,
-        "loss_new": 0.56949569502231,
-        "degradation": -0.0002560959611537239
+        "loss_new": 0.5694945140116966,
+        "degradation": -0.0002572769717671397
       },
       "graph_version": "7a104e26c07a"
     },
     {
       "check": "mechanism_stability:Y",
       "status": "ok",
-      "metric": 0.008049662132989965,
+      "metric": 0.008068058050757498,
       "detail": {
         "kind": "mechanism",
-        "loss_ref_holdout": 0.5818185825155661,
-        "loss_new": 0.589868244648556,
-        "degradation": 0.008049662132989965
+        "loss_ref_holdout": 0.5818440320346351,
+        "loss_new": 0.5899120900853926,
+        "degradation": 0.008068058050757498
       },
       "graph_version": "7a104e26c07a"
     },
@@ -469,9 +469,9 @@
     {
       "check": "negative_control:NC",
       "status": "ok",
-      "metric": 0.00779895575068976,
+      "metric": 0.007812025025489945,
       "detail": {
-        "tolerance": 0.021304438448076054
+        "tolerance": 0.021304273690712985
       },
       "graph_version": "7a104e26c07a"
     }
@@ -482,9 +482,9 @@
     "stability": {
       "M": {
         "kind": "mechanism",
-        "loss_ref_holdout": 0.5728528565353145,
-        "loss_new": 0.6891082338112781,
-        "degradation": 0.11625537727596358
+        "loss_ref_holdout": 0.5728410268165303,
+        "loss_new": 0.6891126307693362,
+        "degradation": 0.11627160395280589
       },
       "NC": {
         "kind": "mechanism",
@@ -501,8 +501,8 @@
       "T": {
         "kind": "mechanism",
         "loss_ref_holdout": 0.5697517909834637,
-        "loss_new": 0.56949569502231,
-        "degradation": -0.0002560959611537239
+        "loss_new": 0.5694945140116966,
+        "degradation": -0.0002572769717671397
       },
       "W": {
         "kind": "marginal",
@@ -510,9 +510,9 @@
       },
       "Y": {
         "kind": "mechanism",
-        "loss_ref_holdout": 0.5818185825155661,
-        "loss_new": 0.589868244648556,
-        "degradation": 0.008049662132989965
+        "loss_ref_holdout": 0.5818440320346351,
+        "loss_new": 0.5899120900853926,
+        "degradation": 0.008068058050757498
       },
       "Z": {
         "kind": "marginal",
@@ -790,26 +790,26 @@
     "estimate": {
       "estimand_name": "nomnom_notify_ate",
       "estimator": "AIPW cross-fit (DML, GradientBoosting nuisances)",
-      "estimate": 0.1913211575221408,
-      "ci_low": 0.175455798677846,
-      "ci_high": 0.2071865163664356,
-      "se": 0.008094570838925924,
+      "estimate": 0.1912985119597312,
+      "ci_low": 0.17543432075987636,
+      "ci_high": 0.20716270315958601,
+      "se": 0.008093975101966753,
       "nuisance_models": {
         "propensity": "GradientBoostingClassifier",
         "outcome": "GradientBoostingClassifier(T-augmented)"
       },
       "diagnostics": {
-        "e_mean_treated": 0.6179389729921758,
+        "e_mean_treated": 0.6179418605781481,
         "e_mean_control": 0.4545545734591397
       },
       "graph_version": "7a104e26c07a"
     },
     "evaluation": {
       "estimand_name": "nomnom_notify_ate",
-      "e_value": 2.363800117355643,
-      "risk_ratio": 1.4989673363520764,
+      "e_value": 2.3639616141149746,
+      "risk_ratio": 1.4990422739103608,
       "balance": {
-        "max_abs_smd": 0.023214562847085868
+        "max_abs_smd": 0.02319959100394704
       },
       "notes": [],
       "graph_version": "7a104e26c07a"
@@ -820,32 +820,32 @@
           "name": "placebo_treatment",
           "passed": true,
           "detail": {
-            "estimate": -0.0015966008441214313,
-            "tolerance": 0.013355783110202715
+            "estimate": -0.0015989694862500472,
+            "tolerance": 0.013356018218257116
           }
         },
         {
           "name": "random_common_cause",
           "passed": true,
           "detail": {
-            "delta": 0.0005755689976768563,
-            "tolerance": 0.008097107960272711
+            "delta": 0.0005375250835532586,
+            "tolerance": 0.008094570941628127
           }
         },
         {
           "name": "subset_refuter",
           "passed": true,
           "detail": {
-            "delta": 0.004161638483821312,
-            "tolerance": 0.01977470701782051
+            "delta": 0.004170513413990468,
+            "tolerance": 0.01977558354116003
           }
         },
         {
           "name": "negative_control:NC",
           "passed": true,
           "detail": {
-            "estimate": -0.003404102548070709,
-            "tolerance": 0.0147763250823708
+            "estimate": -0.003249129735068317,
+            "tolerance": 0.014769824997229534
           }
         }
       ],

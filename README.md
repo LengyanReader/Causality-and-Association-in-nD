@@ -161,9 +161,15 @@ python -m pytest causal_ci -q
 | `nomnom/` | Ground-truth DGP simulator, regimes, causal graph |
 | `ucl/` | Universal Causal Loop: contracts, stations, engine, graph compiler |
 | `causal_ci/` | Test pyramid: unit / integration / property / regression |
-| `notebooks/math_bridge/` | Curriculum Levels 0–3 (self-verifying scripts) |
+| `notebooks/math_bridge/` | Curriculum Levels 0–5 (py + .ipynb, self-verifying) |
+| `notebooks/tier1_gallery/` | 6 classic reproductions + **real-world walkthrough** (NHEFS: smoking -> weight, complete UCL on 1,566 real Americans) + data loader |
 | `notebooks/nomnom_endtoend/` | End-to-end runners (static pass, holiday episode) |
 | `loops/` | Event-driven UCL runner + demo (production mode) |
+| `nomnom/episodes/` | Component demonstrations (RDD coupon, DiD rollout) |
+| `ucl/sensors/` | Compilable health sensors per UCL station |
+| `ucl/actuators/` | Revision actions encoding the controller policy priority queue |
+| `scripts/` | Utilities (py_to_ipynb converter) |
+| `.github/workflows/` | CI: full test pyramid + bridge + gallery on push |
 | `runs/` | Generated artifact chains (JSON reports) |
 
 ## Status
@@ -181,12 +187,10 @@ python -m pytest causal_ci -q
   (+0.1913 vs +0.1910)
 - **P4 loop/graph engineering integration** ✅ — event-driven UCL:
   baseline → monitor → drift-alarm → autonomous actuator re-run
-- **P5 math bridge + Tier-1 gallery** ✅ — math bridge complete, Levels 0–5:
-  L4 estimation theory (plug-in vs IPW vs AIPW; double robustness survives one
-  wrong nuisance; the nD trap — Lasso plug-in bias 0.39 vs DML 0.04 across
-  replications) and L5 compositional capstone (do() as wire surgery in a tiny
-  exact tensor engine; back-door ≡ surgery to 1e-10; copy/discard as the
-  structural maps behind confounding). Tier-1 gallery started: Berkeley
-  Simpson's paradox (aggregate 44.5% vs 30.4% reverses within departments)
-  and LaLonde/NSW (naive −$15,205 → PS matching +$2,697 vs the $1,794 RCT
-  benchmark, with the overlap alarm as the pivot of the story)
+- **P5 math bridge + Tier-1 gallery** ✅ — math bridge complete (Levels 0–5).
+  Tier-1 gallery: 6 classic reproductions — Berkeley Simpson, LaLonde/NSW,
+  Card-Krueger DiD, Oregon lottery IV, Basque synthetic control, Sachs
+  protein-signaling discovery. CI config (`causal-ci.yml`), nomnom/episodes
+  (RDD + DiD), standalone ucl/sensors/ and ucl/actuators/, and .ipynb
+  conversion for all bridge + gallery scripts. **37/37 tests, 6/6 bridge,
+  6/6 gallery, 3/3 runners, 2/2 episodes — all green.**

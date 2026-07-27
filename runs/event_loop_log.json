@@ -3,7 +3,7 @@
     {
       "event": "baseline_established",
       "tag": "static#1",
-      "ate": 0.2365778604813986
+      "ate": 0.23661853049703524
     },
     {
       "event": "batch_arrived",
@@ -23,7 +23,7 @@
       "event": "actuator_rerun",
       "tag": "holiday#1",
       "reason": "mechanism drift localized to M",
-      "ate": 0.18829140451053705,
+      "ate": 0.18830415442849432,
       "all_green": true
     }
   ],

@@ -1,0 +1,88 @@
+name: Causal CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-pyramid:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }} with conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment.yml
+          activate-environment: causality-nd
+          miniforge-version: latest
+
+      - name: Causal CI — unit layer
+        shell: bash -el {0}
+        run: python -m pytest causal_ci/unit -q --timeout=300
+
+      - name: Causal CI — integration layer
+        shell: bash -el {0}
+        run: python -m pytest causal_ci/integration -q --timeout=300
+
+      - name: Causal CI — property layer
+        shell: bash -el {0}
+        run: python -m pytest causal_ci/property -q --timeout=300
+
+      - name: Causal CI — regression layer (pinned guardrail)
+        shell: bash -el {0}
+        run: python -m pytest causal_ci/regression -q --timeout=300
+
+  math-bridge:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }} with conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment.yml
+          activate-environment: causality-nd
+          miniforge-version: latest
+
+      - name: Math bridge — all levels self-check
+        shell: bash -el {0}
+        run: |
+          for f in notebooks/math_bridge/level*.py; do
+            echo "=== $f ==="
+            python "$f" || exit 1
+          done
+
+  gallery:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }} with conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment.yml
+          activate-environment: causality-nd
+          miniforge-version: latest
+
+      - name: Tier-1 gallery — all reproductions
+        shell: bash -el {0}
+        run: |
+          for f in notebooks/tier1_gallery/gallery_*.py; do
+            echo "=== $f ==="
+            python "$f" || exit 1
+          done

@@ -232,26 +232,26 @@
     "estimate": {
       "estimand_name": "nomnom_notify_ate",
       "estimator": "AIPW cross-fit (DML, GradientBoosting nuisances)",
-      "estimate": 0.24370105457614935,
-      "ci_low": 0.2279718652828404,
-      "ci_high": 0.2594302438694583,
-      "se": 0.008025096578218842,
+      "estimate": 0.24369601016977277,
+      "ci_low": 0.22796577207985214,
+      "ci_high": 0.2594262482596934,
+      "se": 0.008025631678530936,
       "nuisance_models": {
         "propensity": "GradientBoostingClassifier",
         "outcome": "GradientBoostingClassifier(T-augmented)"
       },
       "diagnostics": {
-        "e_mean_treated": 0.6243143067849636,
-        "e_mean_control": 0.455355300011411
+        "e_mean_treated": 0.624317254903256,
+        "e_mean_control": 0.4553364983696458
       },
       "graph_version": "7a104e26c07a"
     },
     "evaluation": {
       "estimand_name": "nomnom_notify_ate",
-      "e_value": 2.721143647284066,
-      "risk_ratio": 1.666849138327576,
+      "e_value": 2.7211670805197503,
+      "risk_ratio": 1.6668602612216994,
       "balance": {
-        "max_abs_smd": 0.018500957391211322
+        "max_abs_smd": 0.018513970419265068
       },
       "notes": [],
       "graph_version": "7a104e26c07a"
@@ -262,32 +262,32 @@
           "name": "placebo_treatment",
           "passed": true,
           "detail": {
-            "estimate": 0.0017365187788335498,
-            "tolerance": 0.01335052577531105
+            "estimate": 0.001735350552248447,
+            "tolerance": 0.013349560545923294
           }
         },
         {
           "name": "random_common_cause",
           "passed": true,
           "detail": {
-            "delta": 3.1578742122007064e-05,
-            "tolerance": 0.008025272279268943
+            "delta": 3.680321655208374e-06,
+            "tolerance": 0.008025125402525144
           }
         },
         {
           "name": "subset_refuter",
           "passed": true,
           "detail": {
-            "delta": 0.005277007212524082,
-            "tolerance": 0.0185707081933796
+            "delta": 0.005210138209660459,
+            "tolerance": 0.018554298435217952
           }
         },
         {
           "name": "negative_control:NC",
           "passed": true,
           "detail": {
-            "estimate": -0.0008252649417747845,
-            "tolerance": 0.014538140310962734
+            "estimate": -0.0008711877644566705,
+            "tolerance": 0.014534324347237997
           }
         }
       ],
@@ -330,10 +330,10 @@
     "n_mc": 400000
   },
   "estimate_vs_truth": {
-    "estimate": 0.24370105457614935,
+    "estimate": 0.24369601016977277,
     "ci": [
-      0.2279718652828404,
-      0.2594302438694583
+      0.22796577207985214,
+      0.2594262482596934
     ],
     "truth_ate": 0.2435625,
     "covers_truth": true
