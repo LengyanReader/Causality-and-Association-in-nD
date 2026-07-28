@@ -48,9 +48,11 @@ overstate the effect.
 ### The Premise: A Controlled World With Known Truth
 
 To make every concept testable, we work with a **simulated dataset**
-whose ground-truth causal effect is known exactly: the NomNom DGP.
-Every estimate in this notebook can be checked against the **true
-ATE computed by Monte Carlo under do(T=1) vs do(T=0)** -- the gold
+whose ground-truth causal effect is known exactly. We call it the
+**NomNom DGP** (Data-Generating Process) — a synthetic world with
+built-in known ground truth, like a flight simulator for causal
+inference. Every estimate can be checked against the **true
+ATE computed by Monte Carlo under $$do(T=1)$$ vs $$do(T=0)$$** — the gold
 standard that real-world data never provides.
 
 ### The Causal Graph: Every Node, Every Arrow
@@ -93,14 +95,131 @@ believe) about how notifications and orders relate. It contains:
 ### The Three Rungs We Will Climb
 
 > **Pearl's ladder of causation** (LR section 3):
-> 1. **Association (seeing):** P(Y|T) -- what naive correlation tells us
-> 2. **Intervention (doing):** P(Y|do(T)) -- the causal effect after
+> 1. **Association (seeing):** $P(Y \mid T)$ -- what naive correlation tells us
+> 2. **Intervention (doing):** P(Y|$do(T)$) -- the causal effect after
 >    graph surgery to remove confounding
-> 3. **Counterfactuals (imagining):** P(Y(0)=0 | T=1, Y=1) -- "was
+> 3. **Counterfactuals (imagining):** P($Y(0)=0$ | T=1, Y=1) -- "was
 >    THIS order CAUSED by the notification?"
 
 This notebook walks all three rungs, with every claim verified against
 ground truth."""),
+
+    # ---- WORKFLOW OVERVIEW DIAGRAM ----
+    (M, """\
+## The Universal Causal Loop -- Overview
+
+The diagram below shows the complete 9-station workflow. Each station is
+one step in the causal pipeline — from framing the question to detecting
+and adapting to a changing world. The detailed walkthrough follows below.
+
+| Station | Core Question | Key Output |
+|---|---|---|
+| **0 — FRAME** | What decision does this inform? | Estimand spec (ATE / ATT / CATE / LATE) |
+| **1 — ASSUME** | What causal structure do we believe? | Versioned DAG with explicit absent edges |
+| **2 — IDENTIFY** | Can the effect be computed from observables? | Adjustment set or proof of non-identifiability |
+| **3 — DATA** | Do the data support identification? | Overlap/positivity report |
+| **4 — FEATURE** | What enters the model — and what must not? | Compiled feature spec (excl. colliders & mediators) |
+| **5 — MODEL** | How do we estimate? | Cross-fit AIPW/DML estimate + confidence interval |
+| **6 — EVALUATE** | How wrong could we be? | E-value, balance diagnostics |
+| **7 — TEST** | Does the machinery refute itself? | Refutation battery (placebo, RCC, subset, NC) |
+| **8 — EVOLVE** | Is the world still the one we modeled? | Mechanism-stability monitor; autonomous actuator |
+"""),
+
+    (C, """import plotly.graph_objects as go
+
+stations = [
+    ("0. FRAME",  "Define estimand",            "#3498db",
+     "What decision does this inform?",
+     "EstimandSpec (ATE/ATT/CATE/LATE)<br>"
+     "Sensor: policy-relevant?<br>"
+     "Actuator: reframe; change rung"),
+    ("1. ASSUME",  "Draw causal DAG",            "#2ecc71",
+     "What causal structure do we believe?",
+     "AssumptionGraph (versioned DAG)<br>"
+     "Sensor: expert review coverage<br>"
+     "Actuator: add/remove edges"),
+    ("2. IDENTIFY","Back-door / IV / front-door","#f39c12",
+     "Is the estimand computable from observables?",
+     "IdentificationProof + adjustment set<br>"
+     "Sensor: ID-algorithm; M-bias warnings<br>"
+     "Actuator: change design; seek instrument"),
+    ("3. DATA",    "Positivity & overlap",       "#e74c3c",
+     "Do the data support identification?",
+     "DataContract + overlap report<br>"
+     "Sensor: positivity violations<br>"
+     "Actuator: reweight; trim; collect more"),
+    ("4. FEATURE", "Exclude colliders/mediators","#9b59b6",
+     "What enters the model? What must not?",
+     "FeatureSpec (incl., excl., instruments)<br>"
+     "Sensor: collider-inclusion alarms<br>"
+     "Actuator: revise feature sets"),
+    ("5. MODEL",   "AIPW / DML estimation",      "#1abc9c",
+     "How do we estimate?",
+     "EstimateBundle + point est. + CI<br>"
+     "Sensor: balance; cross-fit stability<br>"
+     "Actuator: switch estimator; tune nuisances"),
+    ("6. EVALUATE","E-value & balance",           "#e67e22",
+     "How wrong could we be?",
+     "EvaluationReport (E-value, SMD)<br>"
+     "Sensor: E-value below threshold<br>"
+     "Actuator: negative controls; strengthen"),
+    ("7. TEST",    "Refutation battery",          "#34495e",
+     "Does the machinery refute itself?",
+     "CausalTestSuite (4 refuters + invariants)<br>"
+     "Sensor: any refuter firing<br>"
+     "Actuator: trigger assumption revision"),
+    ("8. EVOLVE",  "Drift detection",             "#c0392b",
+     "Is the world still the one we modeled?",
+     "EvolutionLog (mechanism-stability)<br>"
+     "Sensor: mechanism degradation; NC alarms<br>"
+     "Actuator: re-run discovery; re-estimate"),
+]
+
+fig = go.Figure()
+spacing = 3.0
+
+for i, (name, action, color, question, detail) in enumerate(stations):
+    x0, x1 = i * spacing, i * spacing + 2.2
+    fig.add_shape(type="rect", x0=x0, y0=0, x1=x1, y1=1.2,
+        fillcolor=color, line=dict(color="white", width=2), layer="below")
+    fig.add_annotation(x=(x0+x1)/2, y=0.83, text=f"<b>{name}</b>",
+        showarrow=False, font=dict(size=10, color="white"))
+    fig.add_annotation(x=(x0+x1)/2, y=0.35, text=action.replace(" / ", "/<br>"),
+        showarrow=False, font=dict(size=8, color="white"))
+
+for i in range(len(stations) - 1):
+    fig.add_annotation(x=(i+1)*spacing, y=0.6, ax=i*spacing+2.2, ay=0.6,
+        showarrow=True, arrowhead=3, arrowsize=1, arrowwidth=2, arrowcolor="#7f8c8d",
+        text="", xref="x", yref="y", axref="x", ayref="y")
+
+fig.add_annotation(x=1.1, y=-0.4, ax=len(stations)*spacing-1.1, ay=-0.4,
+    showarrow=True, arrowhead=3, arrowsize=1.2, arrowwidth=1.5, arrowcolor="#7f8c8d",
+    text="", xref="x", yref="y", axref="x", ayref="y")
+fig.add_annotation(x=(len(stations)-1)*spacing/2+1.1, y=-0.6,
+    text="<i>feedback: drift detected -> revise graph & re-estimate</i>",
+    showarrow=False, font=dict(size=9, color="#7f8c8d"))
+
+for i, (name, action, color, question, detail) in enumerate(stations):
+    xc = i * spacing + 1.1
+    hover = f"<b>{name}: {question}</b><br><br>{detail}"
+    fig.add_trace(go.Scatter(x=[xc], y=[1.4], mode="markers",
+        marker=dict(size=14, color=color, symbol="triangle-down", line=dict(width=1,color="white")),
+        hovertext=hover, hoverinfo="text",
+        hoverlabel=dict(bgcolor=color, font=dict(size=11,color="white")),
+        showlegend=False))
+
+fig.update_layout(
+    title=dict(text="<b>The Universal Causal Loop (UCL) -- 9 Stations, One Closed Loop</b><br>"
+                    "<sup>Hover over triangles for station details. Forward arrows carry artifacts; dashed loop enables self-evolution.</sup>",
+               font=dict(size=14), x=0.5),
+    xaxis=dict(range=[-0.3, len(stations)*spacing+0.3], showgrid=False, zeroline=False, showticklabels=False),
+    yaxis=dict(range=[-1.0, 1.8], showgrid=False, zeroline=False, showticklabels=False),
+    width=1150, height=420,
+    margin=dict(l=20, r=20, t=80, b=20),
+    plot_bgcolor="white",
+)
+fig.show()
+"""),
 
     # ---- GLOSSARY ----
     (M, """\
@@ -114,11 +233,11 @@ ground truth."""),
 | `T` | Treatment variable (notification sent: 0/1) |
 | `Y` | Outcome variable (order placed: 0/1) |
 | `Y(1)`, `Y(0)` | Potential outcomes: what WOULD happen under T=1 or T=0 |
-| `do(T=1)` | The do-operator (Pearl): graph surgery to set T=1, cutting all incoming arrows |
-| `P(Y|T)` | Conditioning (seeing, rung 1) — passive observation |
-| `P(Y|do(T))` | Intervention (doing, rung 2) — external manipulation |
-| `P(Y(0)=0 \\| T=1, Y=1)` | Counterfactual (imagining, rung 3) — probability the treatment was necessary |
-| `E[Y|do(T=1)]` | Expected outcome under intervention T=1 |
+| `$do(T=1)$` | The do-operator (Pearl): graph surgery to set T=1, cutting all incoming arrows |
+| `$P(Y \mid T)$` | Conditioning (seeing, rung 1) — passive observation |
+| `P(Y|$do(T)$)` | Intervention (doing, rung 2) — external manipulation |
+| `P($Y(0)=0$ \\| T=1, Y=1)` | Counterfactual (imagining, rung 3) — probability the treatment was necessary |
+| `E[Y|$do(T=1)$]` | Expected outcome under intervention T=1 |
 </details>
 
 <details>
@@ -126,8 +245,8 @@ ground truth."""),
 
 | Abbrev. | Full | Meaning |
 |---|---|---|
-| **ATE** | Average Treatment Effect | E[Y(1) - Y(0)] |
-| **ATT** | ATE on the Treated | E[Y(1)-Y(0) \\| T=1] |
+| **ATE** | Average Treatment Effect | E[$Y(1) - Y(0)$] |
+| **ATT** | ATE on the Treated | E[$Y(1)-Y(0)$ \\| T=1] |
 | **CATE** | Conditional ATE | ATE for a subgroup |
 | **SUTVA** | Stable Unit Treatment Value Assumption | No interference; one version of treatment |
 | **DAG** | Directed Acyclic Graph | The causal diagram |
@@ -153,7 +272,7 @@ ground truth."""),
 | **Negative control** | Shares confounders with Y but has no T effect; detects residual confounding | Battery drain NC |
 | **Back-door criterion** | Blocking all non-causal paths between T and Y by conditioning on a set Z | Adjusting for {W, rain, weekend, payday} |
 | **d-separation** | Graphical test for conditional independence; tests which absent edges are falsifiable | |
-| **Ignorability** | {Y(0),Y(1)} independent of T given X — the key identification assumption | Platform targets on W (hunger proxy) |
+| **Ignorability** | $\{Y(0),Y(1)\}$ $\perp T$ given X — the key identification assumption | Platform targets on W (hunger proxy) |
 | **Positivity** | Every unit has non-zero probability of receiving either treatment | Checked at Station 3 |
 </details>
 
@@ -256,8 +375,8 @@ therefore a *missing data problem* -- all methodology is machinery for
 recovering missing counterfactuals using assumptions + data from other units.
 
 **The two great formal frameworks** (LR section 2):
-- **Potential outcomes** (Neyman-Rubin): Y(1), Y(0); ATE = E[Y(1)-Y(0)];
-  identified under ignorability {Y(0),Y(1)} independent of T given X.
+- **Potential outcomes** (Neyman-Rubin): $Y(1)$, $Y(0)$; ATE = E[$Y(1)-Y(0)$];
+  identified under ignorability $\{Y(0),Y(1)\}$ $\perp T$ given X.
 - **Structural Causal Models** (Pearl): DAG + structural equations;
   do-operator = graph surgery; identification via back-door/front-door/IV.
 
@@ -288,7 +407,7 @@ from ucl.engine import run_pass
 print('All imports OK. NomNom world + UCL workflow loaded.')"""),
 
     (C, """\
-# Ground truth: computed by Monte Carlo under do(T=1) vs do(T=0)
+# Ground truth: computed by Monte Carlo under $do(T=1)$ vs $do(T=0)$
 # with common random numbers (the gold standard we check against)
 truth = ground_truth(n_mc=200_000, seed=999)
 truth_h = ground_truth(regime=HOLIDAY, n_mc=200_000, seed=999)
@@ -439,7 +558,7 @@ print()
 # ---- the rung-1 / rung-2 gap, made numerical ----
 naive = df.loc[df["T"] == 1, "Y"].mean() - df.loc[df["T"] == 0, "Y"].mean()
 print(f"P(Y=1|T=1) - P(Y=1|T=0)        = {naive:+.4f}   (rung 1: association)")
-print(f"E[Y|do(T=1)] - E[Y|do(T=0)]    = {truth['ate']:+.4f}   (rung 2: ground truth)")
+print(f"E[Y|$do(T=1)$] - E[Y|$do(T=0)$]    = {truth['ate']:+.4f}   (rung 2: ground truth)")
 print(f"confounding gap                 = {naive - truth['ate']:+.4f}")
 assert naive > truth["ate"] + 0.05, "confounding should be positive and substantial"
 print()
@@ -515,7 +634,7 @@ bias becomes causal bias.
 The orthogonal score (AIPW) solves this:
 
 ```
-psi = mu1(X) - mu0(X) + T*(Y - mu1(X))/e(X) - (1-T)*(Y - mu0(X))/(1-e(X))
+$\psi = \mu_1(X) - \mu_0(X) + rac{T(Y - \mu_1(X))}{e(X)} - rac{(1-T)(Y - \mu_0(X))}{1-e(X)}$
 ```
 
 The correction terms `T*(Y - mu1)/e` and `(1-T)*(Y - mu0)/(1-e)` make
@@ -554,7 +673,7 @@ covariates. Higher = more robust.
 
 ### Covariate balance after IPW
 The standardized mean difference (SMD) of each covariate between
-treatment arms after inverse-probability weighting. |SMD| < 0.1
+treatment arms after inverse-probability weighting. $|	ext{SMD}| < 0.1$
 is the conventional threshold for adequate balance.
 
 <details>
@@ -563,7 +682,7 @@ is the conventional threshold for adequate balance.
 The E-value (VanderWeele & Ding 2017) is defined as:
 
 ```
-E-value = RR + sqrt(RR * (RR - 1))
+E-value = $RR + \sqrt{RR \cdot (RR - 1)}$
 ```
 
 where RR is the observed risk ratio (or its inverse if < 1).
@@ -571,8 +690,8 @@ where RR is the observed risk ratio (or its inverse if < 1).
 **Interpretation:**
 - **E-value = 1**: the effect could be explained away by an unmeasured
   confounder with RR=1 (no confounding) — trivial
-- **E-value > 2**: moderately robust — confounder would need RR >= 2
-- **E-value > 5**: highly robust — confounder would need RR >= 5
+- **E-value > 2**: moderately robust — confounder would need $RR \geq 2$
+- **E-value > 5**: highly robust — confounder would need $RR \geq 5$
 
 **For the CI lower bound:** compute the E-value using the CI bound
 instead of the point estimate. If the CI lower bound E-value is still
@@ -751,7 +870,7 @@ The counterfactual recipe:
 3. **Prediction**: re-run the mechanisms with the SAME noise, different T
 
 Among treated users who ordered: in what fraction was the notification
-actually necessary for the order? That is P(Y_0=0 | T=1, Y=1) --
+actually necessary for the order? That is $P(Y(0)=0 \mid T=1, Y=1)$ --
 a rung-3 quantity, computable only with the SCM and its noise structure.
 
 <details>
@@ -770,7 +889,7 @@ Pearl's three-step recipe (Pearl 2009, Ch. 7):
    distribution to compute the counterfactual outcome Y_{1-t}.
 
 Why rung 3 > rung 2: the ATE = E[Y(1)] - E[Y(0)] averages over ALL
-units. The counterfactual P(Y(0)=0 | T=1, Y=1) conditions on a SPECIFIC
+units. The counterfactual P($Y(0)=0$ | T=1, Y=1) conditions on a SPECIFIC
 subset (treated and ordered) and asks what WOULD have happened. You
 cannot compute this from interventional distributions alone — you need
 the SCM's noise structure to connect the factual and counterfactual
@@ -797,7 +916,7 @@ y1 = dgp._structural(exo, STATIC, dgp.DEFAULT_PARAMS, t_value=np.ones(1, int))["
 y0 = dgp._structural(exo, STATIC, dgp.DEFAULT_PARAMS, t_value=np.zeros(1, int))["Y"]
 ate_sim = y1.mean() - y0.mean()
 
-print(f"P(Y_0=0 | T=1, Y=1)       : {p_necessity:.4f}")
+print(f"$P(Y(0)=0 \mid T=1, Y=1)$       : {p_necessity:.4f}")
 print(f"  (the order was CAUSED by the nudge, "
       f"{p_necessity:.0%} of treated-ordered cases)")
 print(f"Interventional ATE (rung 2) : {ate_sim:+.4f}")
