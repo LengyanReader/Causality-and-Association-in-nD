@@ -22,27 +22,229 @@ M = "markdown"
 C = "code"
 
 CELLS = [
-    # ---- TITLE ----
+    # ---- TITLE + BACKGROUND ----
     (M, """\
 # Causal Science -- The Complete Workflow
 
-**A walkthrough of every station in the Universal Causal Loop**
+**A walkthrough of every station in the Universal Causal Loop on a
+fully verifiable ground-truth dataset.**
 
-NomNom Eats: a food-delivery platform. The business question:
-**Do push notifications cause orders, and for whom?**
+---
 
-We have a known ground-truth data-generating process -- every estimate
-can be checked against reality. The causal graph has everything:
-confounding (latent hunger U, measured proxy W), a mediator (M = app
-open), a collider (S = engagement score), an instrument (Z = send-time
-jitter), and a negative-control outcome (NC = battery drain).
+### The Use Case: NomNom Eats
+
+You are the data science team at **NomNom Eats**, a food-delivery
+platform. The product manager asks:
+
+> *"Do push notifications actually cause users to order, or are
+> we just sending them to people who would order anyway?"*
+
+This is a **causal** question. It cannot be answered by correlating
+clicks with orders, because the platform's targeting algorithm sends
+**more notifications to users it predicts are hungry** -- and hungry
+users order more regardless. The association you measure will
+overstate the effect.
+
+### The Premise: A Controlled World With Known Truth
+
+To make every concept testable, we work with a **simulated dataset**
+whose ground-truth causal effect is known exactly: the NomNom DGP.
+Every estimate in this notebook can be checked against the **true
+ATE computed by Monte Carlo under do(T=1) vs do(T=0)** -- the gold
+standard that real-world data never provides.
+
+### The Causal Graph: Every Node, Every Arrow
+
+The DAG below encodes everything we believe (and everything we DON'T
+believe) about how notifications and orders relate. It contains:
+
+| Component | Nodes | What it means |
+|---|---|---|
+| **Treatment** | T | A push notification was sent |
+| **Outcome** | Y | The user placed an order |
+| **Latent confounder** | U | True hunger (unobserved by the platform) |
+| **Measured proxy** | W | App-use history (the platform can see this) |
+| **Mediator** | M | The user opened the app after the notification |
+| **Collider** | S | Engagement score = f(T, Y) -- a common effect |
+| **Instrument** | Z | Randomized send-time jitter (affects T only) |
+| **Negative control** | NC | Battery drain (shares confounders with Y, but T has no effect on it) |
+| **Other confounders** | rain, weekend, payday | Observed covariates that affect both T and Y |
+
+### The Key Assumptions (Made Explicit)
+
+1. **Ignorability (no unmeasured confounding, given W):** The platform
+   targets notifications using measured app-use W, which is a proxy for
+   true hunger U. Conditioning on W (plus rain, weekend, payday) blocks
+   all back-door paths -- we assume no OTHER common cause of T and Y
+   beyond what W captures. *This is the assumption the E-value will test.*
+
+2. **Positivity:** Every user has some non-zero probability of receiving
+   a notification, regardless of their covariates. (We check this.)
+
+3. **SUTVA:** One user's notification does not affect another user's order.
+
+4. **Consistency:** The observed outcome under T=t equals the potential
+   outcome Y(t). (Standard in all SCM-based work.)
+
+5. **The absent edges are real:** Z does NOT directly affect Y (exclusion
+   restriction), T does NOT affect NC, S is a PURE effect of T and Y
+   (not a cause of either). *These are testable via d-separation.*
+
+### The Three Rungs We Will Climb
 
 > **Pearl's ladder of causation** (LR section 3):
->  1. Association (seeing): P(Y|T)
->  2. Intervention (doing): P(Y|do(T))
->  3. Counterfactuals (imagining): P(Y_T=0=0 | T=1, Y=1)
+> 1. **Association (seeing):** P(Y|T) -- what naive correlation tells us
+> 2. **Intervention (doing):** P(Y|do(T)) -- the causal effect after
+>    graph surgery to remove confounding
+> 3. **Counterfactuals (imagining):** P(Y(0)=0 | T=1, Y=1) -- "was
+>    THIS order CAUSED by the notification?"
 
-This notebook walks all three rungs."""),
+This notebook walks all three rungs, with every claim verified against
+ground truth."""),
+
+    # ---- GLOSSARY ----
+    (M, """\
+## Glossary
+
+<details open>
+<summary><b>Notation & Symbols</b></summary>
+
+| Symbol | Meaning |
+|---|---|
+| `T` | Treatment variable (notification sent: 0/1) |
+| `Y` | Outcome variable (order placed: 0/1) |
+| `Y(1)`, `Y(0)` | Potential outcomes: what WOULD happen under T=1 or T=0 |
+| `do(T=1)` | The do-operator (Pearl): graph surgery to set T=1, cutting all incoming arrows |
+| `P(Y|T)` | Conditioning (seeing, rung 1) — passive observation |
+| `P(Y|do(T))` | Intervention (doing, rung 2) — external manipulation |
+| `P(Y(0)=0 \\| T=1, Y=1)` | Counterfactual (imagining, rung 3) — probability the treatment was necessary |
+| `E[Y|do(T=1)]` | Expected outcome under intervention T=1 |
+</details>
+
+<details>
+<summary><b>Abbreviations</b></summary>
+
+| Abbrev. | Full | Meaning |
+|---|---|---|
+| **ATE** | Average Treatment Effect | E[Y(1) - Y(0)] |
+| **ATT** | ATE on the Treated | E[Y(1)-Y(0) \\| T=1] |
+| **CATE** | Conditional ATE | ATE for a subgroup |
+| **SUTVA** | Stable Unit Treatment Value Assumption | No interference; one version of treatment |
+| **DAG** | Directed Acyclic Graph | The causal diagram |
+| **SCM** | Structural Causal Model | DAG + structural equations |
+| **AIPW** | Augmented Inverse Probability Weighting | Doubly-robust estimator |
+| **DML** | Double/Debiased Machine Learning | Neyman-orthogonal cross-fit estimation (Chernozhukov et al. 2018) |
+| **IPW** | Inverse Probability Weighting | Reweight by 1 / propensity |
+| **SMD** | Standardized Mean Difference | Covariate balance metric; < 0.1 = adequate |
+| **PS** | Propensity Score | P(T=1 \\| covariates) |
+| **CI** | Confidence Interval | 95% CI = estimate +/- 1.96 * SE |
+| **RDD** | Regression Discontinuity Design | Causal identification at a sharp threshold |
+</details>
+
+<details>
+<summary><b>Causal Graph Terms</b></summary>
+
+| Term | Definition | In NomNom |
+|---|---|---|
+| **Confounder** | Common cause of T and Y | Hunger U -> T and U -> Y |
+| **Mediator** | Variable on the T->Y causal path; adjusting for it blocks the effect | App-open M: T->M->Y |
+| **Collider** | Common effect of T and Y; conditioning on it creates spurious association (Berkson's bias) | Engagement S = f(T, Y) |
+| **Instrument** | Affects T, no direct path to Y, independent of confounders | Send-time jitter Z |
+| **Negative control** | Shares confounders with Y but has no T effect; detects residual confounding | Battery drain NC |
+| **Back-door criterion** | Blocking all non-causal paths between T and Y by conditioning on a set Z | Adjusting for {W, rain, weekend, payday} |
+| **d-separation** | Graphical test for conditional independence; tests which absent edges are falsifiable | |
+| **Ignorability** | {Y(0),Y(1)} independent of T given X — the key identification assumption | Platform targets on W (hunger proxy) |
+| **Positivity** | Every unit has non-zero probability of receiving either treatment | Checked at Station 3 |
+</details>
+
+<details>
+<summary><b>Regimes: Static vs Holiday</b></summary>
+
+| Term | Meaning |
+|---|---|
+| **Static regime** | The baseline world: notification -> app-open coefficient = 1.6. Users respond normally to notifications. |
+| **Holiday regime** | The drifted world: notification -> app-open coefficient = 0.4. Users habituate to notifications during holidays. |
+| **What changes** | Only the T->M mechanism. The Y mechanism (order given app-open and hunger) is invariant. The causal structure is unchanged — only one coefficient shifts. Station 8 detects this shift. |
+</details>
+
+<details>
+<summary><b>Sensitivity & Refutation</b></summary>
+
+| Term | Definition |
+|---|---|
+| **E-value** (VanderWeele & Ding 2017) | Minimum strength an unmeasured confounder would need with BOTH T and Y to explain away the effect, conditional on measured covariates. Higher = more robust. |
+| **E-value > 2** | Moderately robust: confounder would need risk ratio >= 2 with both T and Y above the measured covariates. |
+| **Placebo treatment** | Permute T randomly -> estimate should be ~0. Tests the pipeline's ability to detect null effects. |
+| **Random common cause** | Add a random covariate -> estimate should be stable. Tests sensitivity to added noise. |
+| **Subset refuter** | Estimate on 80% of data -> should agree with full sample. Tests stability. |
+| **Negative-control test** | Estimate T->NC effect -> should be null. Residual confounding smoke alarm. |
+| **Mechanism-stability** | Fit P(node|parents) on reference data, test log-loss on new data -> largest degradation = drift locus (invariance principle, Peters et al. 2016). |
+</details>
+"""),
+
+    # ---- DAG VISUALIZATION ----
+    (M, """\
+## The Causal Graph -- Visualized and Explained
+
+The DAG below shows every node and edge. **Each arrow is a causal
+assumption; each absent arrow is a falsifiable claim we can test.**
+
+### Node-by-Node Explanation
+
+**T (Treatment): Push notification.** Binary -- either the user received
+a notification or didn't. The platform sends notifications based on
+observed app-use W (a proxy for true hunger U), plus contextual features
+(rain, weekend, payday) and the randomized jitter Z.
+
+**Y (Outcome): Order placed.** Binary -- user ordered or didn't. Affected
+by hunger (U), the notification (T), app-open (M), context (rain, wknd,
+payday), coupons (D), and user segment (new vs. loyal). The causal effect
+we want is the DIRECT arrow T -> Y, after removing confounding.
+
+**U (Latent confounder): True hunger.** A continuous latent variable
+(Normal). The platform CANNOT see it -- but it drives both the
+targeter's decision (through the proxy W) and the user's order
+behavior. The proxy W is what makes back-door adjustment possible.
+
+**W (Measured proxy): App-use history.** The platform observes past
+app usage, which correlates with hunger: U -> W. Because the platform
+targets on W (W -> T), conditioning on W blocks the confounding path.
+This is the single most important edge for identification.
+
+**M (Mediator): App opened.** Part of the causal chain: notification ->
+app-open -> order. Adjusting for M would BLOCK the mediated effect,
+biasing our estimate of the total effect downward. *Never adjust for
+mediators when estimating total effects.*
+
+**S (Collider): Engagement score.** Computed as a function of both
+notifications received AND orders placed: T -> S <- Y. Conditioning
+on S opens a spurious association between T and Y (Berkson's bias).
+*Never adjust for colliders or their descendants.*
+
+**Z (Instrument): Send-time jitter.** Randomized by the experiment
+platform -- affects notification delivery but has NO direct effect on
+orders, hunger, or anything else. This randomization is what makes
+Z an instrument: it creates exogenous variation in T.
+
+**NC (Negative control): Battery drain.** Correlated with hunger (U)
+but NOT causally affected by notifications. If our adjustment is
+adequate, the estimated T -> NC effect should be null. A non-null
+result is a smoke alarm for residual confounding.
+
+**Coupon (D) and loyalty:** A sharp RDD at loyalty >= 500 assigns a
+free-delivery coupon. This is an additional treatment arm in the DGP
+used to demonstrate regression discontinuity.
+
+### Graph Color Legend
+
+- **Green solid** = the causal effect we estimate (T -> Y)
+- **Red dashed** = confounding paths through latent hunger U
+- **Blue dotted** = the instrument Z (randomized variation in T)
+- **Purple dashed** = mediator M (on the causal path)
+- **Orange dotted** = collider S (NEVER condition on this!)
+- **Gray** = other observed confounders (context variables)"""),
+
+    (C, Path(__file__).resolve().parent.parent / "scripts" / "_dag_viz_cell.py"),
 
     # ---- PART 0: PRINCIPLES & SETUP ----
     (M, """\
@@ -176,7 +378,30 @@ We use the **back-door criterion** (Pearl 1995): form the back-door graph
 by deleting all edges out of the treatment (graph surgery), then find a
 set Z of observed, non-descendant variables that d-separates T from Y.
 
-The compiler does this automatically -- no hand-picking."""),
+The compiler does this automatically -- no hand-picking.
+
+<details>
+<summary><b>Click to expand: How the back-door criterion works</b></summary>
+
+The back-door criterion (Pearl 1995, Def. 3.3.1) has two conditions for a set Z:
+
+1. **No descendant of treatment**: Z must not contain any variable that is
+   a descendant of T (i.e., no mediators or their descendants).
+2. **Blocks all back-door paths**: Z must d-separate T from Y in the
+   *back-door graph* — the DAG with all edges OUT of T deleted.
+
+The compiler (`ucl/graph_utils.py`) implements this by:
+1. Computing the back-door graph via `backdoor_graph()` (edge deletion)
+2. Searching subsets of observed variables for a set satisfying
+   d-separation via networkx's `is_d_separator()`
+3. Excluding descendants of T and colliders from the candidate set
+4. Returning the smallest valid adjustment set
+
+This is Pearl's "graph surgery" made algorithmic — no hand-picking,
+no domain-expert judgment at this step. The DAG already encodes the
+domain knowledge.
+</details>
+"""),
 
     (C, """\
 proof = identify(graph, spec)
@@ -277,7 +502,31 @@ and outcome regression). This lets us use flexible machine learning
 (gradient-boosted trees) without contaminating the causal estimand.
 
 The estimator is also **doubly robust**: consistent if EITHER the
-propensity model OR the outcome model is correctly specified."""),
+propensity model OR the outcome model is correctly specified.
+
+<details>
+<summary><b>Click to expand: Why Neyman orthogonality matters in nD</b></summary>
+
+In high-dimensional settings (p >> n), regularized ML models (Lasso,
+gradient boosting) MUST shrink or regularize to work. That shrinkage
+leaks directly into a naive plug-in estimator — the regularization
+bias becomes causal bias.
+
+The orthogonal score (AIPW) solves this:
+
+```
+psi = mu1(X) - mu0(X) + T*(Y - mu1(X))/e(X) - (1-T)*(Y - mu0(X))/(1-e(X))
+```
+
+The correction terms `T*(Y - mu1)/e` and `(1-T)*(Y - mu0)/(1-e)` make
+the score insensitive to first-order errors in the nuisance functions
+mu1, mu0, and e. Only second-order products of errors remain — and
+with cross-fitting (honest estimation), those vanish at rate 1/sqrt(n).
+
+This is the theorem (Chernozhukov et al. 2018) that lets modern
+machine learning inside causal inference.
+</details>
+"""),
 
     (C, """\
 bundle = model(df, spec, features, seed=0)
@@ -306,7 +555,33 @@ covariates. Higher = more robust.
 ### Covariate balance after IPW
 The standardized mean difference (SMD) of each covariate between
 treatment arms after inverse-probability weighting. |SMD| < 0.1
-is the conventional threshold for adequate balance."""),
+is the conventional threshold for adequate balance.
+
+<details>
+<summary><b>Click to expand: E-value formula and thresholds</b></summary>
+
+The E-value (VanderWeele & Ding 2017) is defined as:
+
+```
+E-value = RR + sqrt(RR * (RR - 1))
+```
+
+where RR is the observed risk ratio (or its inverse if < 1).
+
+**Interpretation:**
+- **E-value = 1**: the effect could be explained away by an unmeasured
+  confounder with RR=1 (no confounding) — trivial
+- **E-value > 2**: moderately robust — confounder would need RR >= 2
+- **E-value > 5**: highly robust — confounder would need RR >= 5
+
+**For the CI lower bound:** compute the E-value using the CI bound
+instead of the point estimate. If the CI lower bound E-value is still
+above 2, the conclusion is robust even under parameter uncertainty.
+
+The E-value does NOT replace domain knowledge — it quantifies the
+debate about unmeasured confounding in a common language.
+</details>
+"""),
 
     (C, """\
 evaluation = evaluate(df, spec, features, bundle)
@@ -372,7 +647,29 @@ reference (static) regime and evaluate the log-loss on the new (holiday)
 batch. The node whose conditional degrades most is the **locus of drift**.
 
 We also run the **testable-implication monitor**: absent edges imply
-(conditional) independencies -- these are tested on the new batch."""),
+(conditional) independencies -- these are tested on the new batch.
+
+<details>
+<summary><b>Click to expand: The invariance principle in causal discovery</b></summary>
+
+Peters, Buhlmann & Meinshausen (2016, JRSS-B) proved: the conditional
+distribution of an effect given its *true causal parents* is invariant
+across environments, while conditioning on any other set is not.
+
+This provides a causal discovery method: search for the set of
+variables that makes the conditional distribution invariant across
+known environments. That set is the set of causal parents.
+
+In the EVOLVE station, we apply this in reverse: given a known DAG,
+we test whether each mechanism P(node | parents) is stable. If a
+mechanism degrades, the DAG's assumption about that node's parents
+may be wrong — or the mechanism genuinely changed (as in the
+holiday regime, where T->M coefficient shifts from 1.6 to 0.4).
+
+This principle bridges causal discovery and monitoring: the same
+stability test that *discovers* causal structure can *monitor* it.
+</details>
+"""),
 
     (C, """\
 df_ref = sample(10_000, regime=STATIC, seed=100).drop(columns=["U"])
@@ -455,7 +752,31 @@ The counterfactual recipe:
 
 Among treated users who ordered: in what fraction was the notification
 actually necessary for the order? That is P(Y_0=0 | T=1, Y=1) --
-a rung-3 quantity, computable only with the SCM and its noise structure."""),
+a rung-3 quantity, computable only with the SCM and its noise structure.
+
+<details>
+<summary><b>Click to expand: The three-step counterfactual algorithm</b></summary>
+
+Pearl's three-step recipe (Pearl 2009, Ch. 7):
+
+**1. Abduction:** Given the factual evidence (T=t, Y=y, X=x), infer the
+   distribution of the exogenous noise variables U. This uses the SCM's
+   structural equations in reverse.
+
+**2. Action:** Modify the SCM by applying do(T = 1 - t). This means
+   deleting the equation for T and fixing T to the counterfactual value.
+
+**3. Prediction:** Re-run the modified SCM with the inferred noise
+   distribution to compute the counterfactual outcome Y_{1-t}.
+
+Why rung 3 > rung 2: the ATE = E[Y(1)] - E[Y(0)] averages over ALL
+units. The counterfactual P(Y(0)=0 | T=1, Y=1) conditions on a SPECIFIC
+subset (treated and ordered) and asks what WOULD have happened. You
+cannot compute this from interventional distributions alone — you need
+the SCM's noise structure to connect the factual and counterfactual
+worlds for the same unit.
+</details>
+"""),
 
     (C, """\
 import nomnom.dgp as dgp
@@ -563,6 +884,8 @@ def build_source(cell_type: str, text: str) -> list[str]:
 def main():
     cells = []
     for ct, source_text in CELLS:
+        if isinstance(source_text, Path):
+            source_text = source_text.read_text(encoding="utf-8")
         cells.append({
             "cell_type": ct,
             "metadata": {},

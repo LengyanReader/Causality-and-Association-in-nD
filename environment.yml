@@ -8,4 +8,14 @@ dependencies:
   - scipy
   - scikit-learn
   - networkx
+  - statsmodels
   - pytest
+  - pip
+  - pip:
+    - causal-learn
+    - causallib
+    - nbformat
+    - nbconvert
+    - jupyter
+    - ipykernel
+    - pytest-timeout

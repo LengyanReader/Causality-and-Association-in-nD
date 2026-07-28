@@ -163,7 +163,7 @@ python -m pytest causal_ci -q
 | `causal_ci/` | Test pyramid: unit / integration / property / regression |
 | `notebooks/math_bridge/` | Curriculum Levels 0–5 (py + .ipynb, self-verifying) |
 | `notebooks/tier1_gallery/` | 6 classic reproductions + **real-world walkthrough** (NHEFS: smoking -> weight, complete UCL on 1,566 real Americans) + data loader |
-| `notebooks/nomnom_endtoend/` | End-to-end runners (static pass, holiday episode) |
+| `notebooks/nomnom_endtoend/` | End-to-end runners (static pass, holiday episode) + **full walkthrough** (`full_causal_workflow.ipynb`) |
 | `loops/` | Event-driven UCL runner + demo (production mode) |
 | `nomnom/episodes/` | Component demonstrations (RDD coupon, DiD rollout) |
 | `ucl/sensors/` | Compilable health sensors per UCL station |
