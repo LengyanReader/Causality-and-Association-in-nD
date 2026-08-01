@@ -10,7 +10,7 @@ and real-data reproductions, all unit-tested against known truth.*
 
 | Demo | Description | Link |
 |---|---|---|
-| **Browser Demo** | Zero-install interactive walkthrough — 12 tabs, glossary sidebar, toggle regimes | [→ Open Demo](https://lengyanreader.github.io/Causality-and-Association-in-nD/demo.html) |
+| **Browser Demo** | Zero-install interactive walkthrough — 12 tabs, glossary sidebar, toggle regimes | [→ Open Demo](https://lengyanreader.github.io/Causality-and-Association-in-nD/demo/) |
 | **Jupyter Notebook** | 37-cell executed notebook: rich markdown, LaTeX, DAG viz, Plotly overview, glossary accordions | [→ View Notebook](notebooks/nomnom_endtoend/full_causal_workflow.ipynb) |
 | **NHEFS Real Data** | Same workflow on 1,566 real Americans: does quitting smoking cause weight gain? | [→ View Notebook](notebooks/tier1_gallery/nhefs_real_world_walkthrough.ipynb) |
 | **Landing Page** | Project overview website | [→ Open Page](https://lengyanreader.github.io/Causality-and-Association-in-nD) |
@@ -117,7 +117,7 @@ conda env create -f environment.yml
 conda activate causality-nd
 
 # Interactive demo (browser)
-# Open the browser demo at docs/demo.html
+# Open the browser demo at docs/demo/
 
 # Jupyter walkthrough
 jupyter notebook notebooks/nomnom_endtoend/full_causal_workflow.ipynb
