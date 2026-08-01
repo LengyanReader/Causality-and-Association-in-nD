@@ -82,6 +82,11 @@ function build(){
 
   if(c.problem_formulation){var pf=c.problem_formulation;
     h+='<div class="callout callout-warn"><b>Diagnosis:</b> '+pf.why_causal+'</div>';
+    if(pf.confounding_breakdown){
+      h+='<div class="card"><ol style="font-size:.9rem;line-height:1.9;margin-left:20px">';
+      for(var j=0;j<pf.confounding_breakdown.length;j++)h+='<li>'+pf.confounding_breakdown[j]+'</li>';
+      h+='</ol></div>';
+    }
     h+='<div class="card"><p><b>What we would do in an ideal world (the '+T('target trial','The hypothetical randomized experiment we would conduct if we could. Observational causal inference is the art of emulating a target trial from non-experimental data.')+'):</b> '+pf.target_trial+'</p></div>';
     h+='<div class="card"><p><b>Our '+T('estimand','The precise causal quantity we aim to estimate. For the ATE: the expected difference in outcomes if everyone were treated vs. if no one were treated.')+':</b> <span class="formula">'+M("\\text{ATE} = E[Y(1) - Y(0)]")+'</span></p>';
     h+='<p>To estimate this from observational data, we need four assumptions:</p>';

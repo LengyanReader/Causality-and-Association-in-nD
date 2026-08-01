@@ -181,7 +181,15 @@ data["content"] = {
     },
     "problem_formulation": {
         "question": "Do push notifications cause users to place orders?",
-        "why_causal": "Here is what happens when we look at the raw data: P(Y|T=1) - P(Y|T=0) is approximately +0.343. This naive difference suggests that notifications increase order probability by ~34 percentage points. But this number conflates TWO things: (a) the actual causal effect of the notification itself (which we will estimate as ~+0.241), and (b) a confounding bias (~+0.102) caused by the fact that the platform selectively sends notifications to users who are already more likely to order (hungry users, proxied by W). The two mechanisms are: (1) hunger U drives the targeting decision through W (U → W → T), so treated users are systematically hungrier; (2) hunger U drives orders directly (U → Y). The net result is that the treated group has a higher baseline order rate even without any causal effect of notifications. This is the confounding gap — and only causal methods (conditioning on W to block the back-door path) can close it.",
+        "why_causal": "Here is what happens when we look at the raw data. The naive difference P(Y|T=1) - P(Y|T=0) is approximately <b>+0.343</b> — suggesting notifications increase order probability by ~34 percentage points. But this number is not the causal effect. It mixes together two fundamentally different things. Here is the breakdown:",
+        "confounding_breakdown": [
+            "<b>The observed naive difference.</b> P(Y|T=1) − P(Y|T=0) ≈ +0.343. If we naively interpret this as causal, we would conclude notifications boost orders by 34 percentage points.",
+            "<b>Component A — the true causal effect.</b> The actual effect of the notification on orders, which we will estimate as ≈ +0.241. This is the quantity we want.",
+            "<b>Component B — confounding bias.</b> The spurious difference caused by the platform's targeting: ≈ +0.102. This is the gap between the naive and causal estimates.",
+            "<b>Why confounding exists — Mechanism 1 (targeting).</b> True hunger U drives app-use W (U → W), and the platform targets notifications based on W (W → T). So treated users are systematically hungrier than untreated users.",
+            "<b>Why confounding exists — Mechanism 2 (outcome).</b> Hunger U also drives orders directly (U → Y). So even without any causal effect of notifications, hungrier (treated) users would order more.",
+            "<b>Net result.</b> The treated group has a higher baseline order rate <i>even without any causal effect of notifications</i>. This is the confounding gap — and only causal methods (conditioning on W to block the back-door path U→W→T ... U→Y) can close it.",
+        ],
         "target_trial": "The idealized experiment we would run if we could: randomly assign notifications to some users and withhold them from others, then measure the difference in order rates. Since we cannot run this experiment (the platform needs to target), we emulate it from observational data using the back-door criterion.",
         "estimand": "ATE = E[Y(1) - Y(0)] — the expected difference in order probability if every user were notified vs. if no user were notified.",
         "assumptions": [
