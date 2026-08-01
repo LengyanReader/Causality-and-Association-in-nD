@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Causality & Association in nD</title>
+<style>
+  :root {
+    --bg: #f8f9fa; --card: #fff; --text: #2c3e50; --muted: #6c757d;
+    --blue: #3498db; --green: #2ecc71; --orange: #f39c12; --red: #e74c3c;
+    --purple: #9b59b6; --teal: #1abc9c; --dark: #34495e;
+    --border: #dee2e6; --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 60px 0 50px; text-align: center; }
+  header h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; }
+  header p { font-size: 1.15rem; opacity: 0.9; max-width: 640px; margin: 0 auto; }
+
+  .strip { display: flex; justify-content: center; gap: 24px; margin: -20px auto 40px; flex-wrap: wrap; }
+  .strip a { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 28px; text-decoration: none; color: var(--text); font-weight: 600; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform .15s,box-shadow .15s; }
+  .strip a:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  .strip .demo { border-color: var(--green); color: var(--green); }
+  .strip .nb   { border-color: var(--blue); color: var(--blue); }
+  .strip .gh   { border-color: var(--dark); color: var(--dark); }
+
+  section { padding: 48px 0; }
+  h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 20px; border-bottom: 3px solid var(--blue); display: inline-block; padding-bottom: 4px; }
+  h3 { font-size: 1.15rem; font-weight: 700; margin: 24px 0 10px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 24px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+  .card h4 { font-size: 1rem; margin-bottom: 6px; }
+  .card p { font-size: 0.92rem; color: var(--muted); }
+  .card .icon { font-size: 1.6rem; margin-bottom: 8px; }
+
+  .arch { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-top: 24px; overflow-x: auto; }
+  .arch table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .arch th { background: #2c3e50; color: white; padding: 8px 12px; text-align: left; }
+  .arch td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .arch tr:hover td { background: #f1f5f9; }
+
+  .colors { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+  .quote { border-left: 4px solid var(--blue); padding: 12px 20px; margin: 20px 0; background: #eaf2f8; border-radius: 0 var(--radius) var(--radius) 0; font-style: italic; }
+
+  footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  code { background: #f1f3f4; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #2c3e50; color: #ecf0f1; padding: 16px 20px; border-radius: var(--radius); overflow-x: auto; font-size: 0.88rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>Causality &amp; Association in nD</h1>
+    <p>
+      A living research + practice project on causal science: literature review,
+      self-evolving workflow (UCL), ground-truth reference world, interactive
+      walkthrough, and real-data reproductions &mdash; all unit-tested against
+      known truth.
+    </p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="strip">
+    <a class="demo" href="https://causality-association-nd.streamlit.app" target="_blank">🚀 Live Demo (Streamlit)</a>
+    <a class="nb" href="https://github.com/LengyanReader/Causality-and-Association-in-nD/blob/main/notebooks/nomnom_endtoend/full_causal_workflow.ipynb" target="_blank">📓 Jupyter Notebook</a>
+    <a class="gh" href="https://github.com/LengyanReader/Causality-and-Association-in-nD" target="_blank">💻 GitHub Repo</a>
+  </div>
+
+  <!-- WHAT IS THIS? -->
+  <section>
+    <h2>What is this?</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">📚</div>
+        <h4>Literature Review</h4>
+        <p>~140 cited references from Hume (1748) to the TARGET Statement (2025) — first principles, frameworks, identification, estimation, discovery, tools, and interdisciplinary bridges.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔄</div>
+        <h4>Universal Causal Loop</h4>
+        <p>9-station self-evolving workflow: FRAME → ASSUME → IDENTIFY → DATA → FEATURE → MODEL → EVALUATE → TEST → EVOLVE. Each station has sensors (health metrics) and actuators (revision actions).</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎯</div>
+        <h4>NomNom Eats Reference World</h4>
+        <p>A ground-truth DGP (Data-Generating Process) with known causal effects — confounders, mediators, colliders, instruments, and negative controls. Every estimate can be checked against truth.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧪</div>
+        <h4>Causal CI/CD Pyramid</h4>
+        <p>37 tests across 4 layers: unit (DGP sanity), integration (graph-compiled consistency), property (loop invariants), and regression (pinned numerical results).</p>
+      </div>
+      <div class="card">
+        <div class="icon">📈</div>
+        <h4>Tier-1 Real-Data Gallery</h4>
+        <p>6 classic reproductions: Berkeley Simpson, LaLonde/NSW, Card-Krueger DiD, Oregon Lottery IV, Basque synthetic control, Sachs discovery — plus NHEFS real-world walkthrough.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📐</div>
+        <h4>Math Bridge</h4>
+        <p>6-level curriculum from basic probability to counterfactuals — each level ends by demonstrating which rung of Pearl's ladder it <em>cannot</em> reach.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK START -->
+  <section>
+    <h2>Quick Start</h2>
+    <pre># 1. Create the environment
+conda env create -f environment.yml
+conda activate causality-nd
+
+# 2. Run the interactive demo
+streamlit run streamlit_app/app.py
+
+# 3. Or open the Jupyter notebook
+jupyter notebook notebooks/nomnom_endtoend/full_causal_workflow.ipynb
+
+# 4. Run the test suite
+python -m pytest causal_ci -q</pre>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section>
+    <h2>Architecture</h2>
+    <div class="arch">
+      <table>
+        <tr><th>Layer</th><th>Path</th><th>Contents</th></tr>
+        <tr><td>📖 Theory</td><td><code>ref/</code></td><td>Living literature review (~140 refs) + implementation plan + progress log</td></tr>
+        <tr><td>🎯 World</td><td><code>nomnom/</code></td><td>Ground-truth DGP simulator, causal graph, environment regimes</td></tr>
+        <tr><td>🔄 Workflow</td><td><code>ucl/</code></td><td>UCL engine: 9 stations, typed artifact contracts, graph compiler</td></tr>
+        <tr><td>🧪 Tests</td><td><code>causal_ci/</code></td><td>37-test pyramid: unit / integration / property / regression</td></tr>
+        <tr><td>📓 Walkthrough</td><td><code>notebooks/</code></td><td>Jupyter notebook (34 cells, executed), math bridge, Tier-1 gallery</td></tr>
+        <tr><td>🚀 App</td><td><code>streamlit_app/</code></td><td>Interactive Streamlit demo with persistent glossary sidebar</td></tr>
+        <tr><td>⚙️ CI/CD</td><td><code>.github/</code></td><td>GitHub Actions: test pyramid, math bridge, gallery on push</td></tr>
+        <tr><td>📋 Docs</td><td><code>docs/</code></td><td>This landing page (GitHub Pages)</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- DESIGN PRINCIPLES -->
+  <section>
+    <h2>Design Principles</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.92rem;">
+      <tr><td style="padding:6px 12px;"><strong>P1</strong></td><td>Assumptions are first-class artifacts — versioned, inspectable DAG with explicit absent edges</td></tr>
+      <tr><td style="padding:6px 12px;"><strong>P2</strong></td><td>The graph is the single source of truth — adjustment sets, test suites, and monitors are <em>compiled</em> from it</td></tr>
+      <tr><td style="padding:6px 12px;"><strong>P3</strong></td><td>Every station has sensors and actuators — quantitative health signals drive revision actions</td></tr>
+      <tr><td style="padding:6px 12px;"><strong>P4</strong></td><td>Refutation is continuous, not episodic — falsification checks run in CI and production</td></tr>
+      <tr><td style="padding:6px 12px;"><strong>P5</strong></td><td>Ground truth where possible, benchmarks where not — methods graduate to real data after synthetic acceptance</td></tr>
+      <tr><td style="padding:6px 12px;"><strong>P6</strong></td><td>Ladder discipline — every query tagged by Pearl's rung; rung-2/3 questions require recorded assumptions</td></tr>
+    </table>
+  </section>
+
+  <!-- DEMOS -->
+  <section>
+    <h2>Demos</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">🚀</div>
+        <h4>Streamlit App</h4>
+        <p>Interactive walkthrough with persistent glossary sidebar, tab navigation, expandable sections, and live metric updates. Deployed on Streamlit Community Cloud.</p>
+        <a href="https://causality-association-nd.streamlit.app" target="_blank" style="color:var(--green);font-weight:600;">Open Demo →</a>
+        <br><small style="color:var(--muted);">Or run locally: <code>streamlit run streamlit_app/app.py</code></small>
+      </div>
+      <div class="card">
+        <div class="icon">📓</div>
+        <h4>Jupyter Notebook</h4>
+        <p>34-cell executed notebook with rich markdown, LaTeX math, DAG visualization, interactive Plotly overview, and glossary accordions. All outputs saved.</p>
+        <a href="https://github.com/LengyanReader/Causality-and-Association-in-nD/blob/main/notebooks/nomnom_endtoend/full_causal_workflow.ipynb" target="_blank" style="color:var(--blue);font-weight:600;">View on GitHub →</a>
+      </div>
+      <div class="card">
+        <div class="icon">🧪</div>
+        <h4>NHEFS Real-World Walkthrough</h4>
+        <p>Complete UCL on 1,566 real Americans: does quitting smoking cause weight gain? (Hernán & Robins 2020 dataset).</p>
+        <a href="https://github.com/LengyanReader/Causality-and-Association-in-nD/blob/main/notebooks/tier1_gallery/nhefs_real_world_walkthrough.ipynb" target="_blank" style="color:var(--blue);font-weight:600;">View on GitHub →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NINE STATIONS -->
+  <section>
+    <h2>The 9 UCL Stations</h2>
+    <div class="arch">
+      <table>
+        <tr><th>#</th><th>Station</th><th>Core Question</th><th>Key Output</th></tr>
+        <tr><td>0</td><td><span class="dot" style="background:var(--blue)"></span>FRAME</td><td>What decision does this inform?</td><td><code>EstimandSpec</code></td></tr>
+        <tr><td>1</td><td><span class="dot" style="background:var(--green)"></span>ASSUME</td><td>What causal structure do we believe?</td><td><code>AssumptionGraph</code></td></tr>
+        <tr><td>2</td><td><span class="dot" style="background:var(--orange)"></span>IDENTIFY</td><td>Is the effect computable from observables?</td><td><code>IdentificationProof</code></td></tr>
+        <tr><td>3</td><td><span class="dot" style="background:var(--red)"></span>DATA</td><td>Do the data support the identification?</td><td><code>DataContract + overlap</code></td></tr>
+        <tr><td>4</td><td><span class="dot" style="background:var(--purple)"></span>FEATURE</td><td>What enters — and what must not?</td><td><code>FeatureSpec (excl. colliders)</code></td></tr>
+        <tr><td>5</td><td><span class="dot" style="background:var(--teal)"></span>MODEL</td><td>How do we estimate?</td><td><code>EstimateBundle + CI</code></td></tr>
+        <tr><td>6</td><td style="color:var(--orange)">EVALUATE</td><td>How wrong could we be?</td><td><code>EvaluationReport (E-value)</code></td></tr>
+        <tr><td>7</td><td><span class="dot" style="background:var(--dark)"></span>TEST</td><td>Does the machinery refute itself?</td><td><code>CausalTestSuite</code></td></tr>
+        <tr><td>8</td><td><span class="dot" style="background:#c0392b"></span>EVOLVE</td><td>Is the world still the one we modeled?</td><td><code>EvolutionLog</code></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <div class="quote">
+    <strong>Association is not causation — and the gap between them is not a philosophical footnote but an engineering problem.</strong><br>
+    Causal knowledge is fragmented (theory in books, estimators in libraries, assumptions in heads). This project makes assumptions into versioned, testable, monitorable artifacts — and builds the machinery to evolve them as the world changes.
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    Causality &amp; Association in nD · <a href="https://github.com/LengyanReader/Causality-and-Association-in-nD" style="color:var(--muted);">GitHub</a><br>
+    Built with Python · Streamlit · Jupyter · NumPy · scikit-learn · networkx
+  </div>
+</footer>
+
+</body>
+</html>
