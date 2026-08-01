@@ -311,7 +311,6 @@ function buildSidebar(){
   h+='<a href="deep_evalue.html" style="color:#fbbf24;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">📖 E-value (first principles)</a>';
   h+='<a href="deep_backdoor.html" style="color:#fbbf24;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">📖 Back-Door Criterion</a>';
   h+='</div>';
-  h+='<p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal operations.<br>Holiday = users habituated to notifications (T→M drops 1.6→0.4).<br><b>Toggle to see how the pipeline performs in each world.</b></p>';
   h+='<div class="regime-badge '+activeRegime+'">WORLD: '+activeRegime.toUpperCase()+'</div>';
   h+='<p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal operations.<br>Holiday = users habituated to notifications (T→M drops 1.6→0.4).<br><b>Toggle to see how the pipeline performs in each world.</b></p>';
   h+='<select onchange="switchRegime(this.value)"><option value="static"'+(activeRegime==="static"?" selected":"")+'>Static (baseline)</option><option value="holiday"'+(activeRegime==="holiday"?" selected":"")+'>Holiday (drifted)</option></select>';
