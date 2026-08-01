@@ -2,275 +2,241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Causal Science — UCL Walkthrough</title>
+<title>Causal Science — A Guided Walkthrough</title>
 <style>
 :root{--bg:#f8f9fa;--card:#fff;--text:#2c3e50;--muted:#6c757d;--blue:#3498db;--green:#2ecc71;--orange:#f39c12;--red:#e74c3c;--purple:#9b59b6;--teal:#1abc9c;--dark:#34495e;--border:#dee2e6;--radius:8px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
 .app{display:flex;min-height:100vh}
 .sidebar{width:280px;background:#2c3e50;color:#ecf0f1;padding:20px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10}
 .sidebar h2{font-size:1.1rem;margin-bottom:2px}
 .sidebar .sub{font-size:.78rem;color:#95a5a6;margin-bottom:12px}
 .sidebar h3{font-size:.85rem;margin:14px 0 6px;color:var(--green)}
 .gt{font-size:.78rem;margin-bottom:4px;padding:2px 0}.gt b{color:var(--green)}
-.main{margin-left:280px;padding:28px 36px;max-width:1060px;flex:1}
-h1{font-size:1.7rem;font-weight:800;margin-bottom:6px}h2{font-size:1.2rem;margin:24px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:16px 0 8px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.metrics{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;text-align:center;min-width:110px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
-.metric .val{font-size:1.4rem;font-weight:800;color:var(--blue)}.metric .lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:10px 0}
-th{background:var(--dark);color:white;padding:7px 10px;text-align:left}td{padding:7px 10px;border-bottom:1px solid var(--border)}tr:hover td{background:#f1f5f9}
-.info{background:#eaf2f8;border-left:4px solid var(--blue);padding:10px 14px;margin:10px 0;border-radius:0 var(--radius) var(--radius) 0;font-style:italic;font-size:.88rem}
-.warn{background:#fef9e7;border-left:4px solid var(--orange)}.good{background:#eafaf1;border-left:4px solid var(--green)}
-.formula{background:#f4f4f4;padding:8px 14px;border-radius:var(--radius);font-family:monospace;font-size:.92rem;margin:6px 0;display:inline-block}
-.nav-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:16px 0}
-.nav-tabs button{padding:7px 13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--text);transition:all .15s}
-.nav-tabs button:hover,.nav-tabs button.on{background:var(--blue);color:white;border-color:var(--blue)}
-.section{display:none}.section.on{display:block}
-.pass{color:var(--green)}.fail{color:var(--red)}
+.main{margin-left:280px;padding:32px 40px;max-width:900px;flex:1}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:4px}
+h2{font-size:1.35rem;margin:36px 0 16px;padding-bottom:6px;border-bottom:3px solid var(--blue);display:inline-block}
+h3{font-size:1.05rem;margin:18px 0 8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.metrics{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;text-align:center;min-width:120px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
+.metric .val{font-size:1.5rem;font-weight:800;color:var(--blue)}.metric .lbl{font-size:.76rem;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:var(--dark);color:white;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}tr:hover td{background:#f1f5f9}
+.box{background:#eaf2f8;border-left:4px solid var(--blue);padding:14px 18px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.9rem}
+.box-warn{background:#fef9e7;border-left-color:var(--orange)}
+.box-good{background:#eafaf1;border-left-color:var(--green)}
+.box-important{background:#fdedec;border-left-color:var(--red)}
+.formula{background:#f1f3f4;padding:6px 14px;border-radius:4px;font-family:monospace;font-size:.9rem;display:inline-block;margin:4px 0}
 .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700}.bg{background:#d5f5e3;color:#1e8449}.br{background:#fadbd8;color:#c0392b}
 select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.84rem;width:100%;margin-bottom:12px}
+.nav-progress{position:sticky;top:0;background:var(--bg);padding:12px 0;margin-bottom:20px;z-index:5;border-bottom:1px solid var(--border)}
+.nav-progress .step{display:inline-block;padding:4px 10px;margin:2px 3px;font-size:.75rem;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.nav-progress .step.now{background:var(--blue);color:white;border-color:var(--blue);font-weight:700}
+svg text{font-family:system-ui,sans-serif}
 </style></head>
 <body><div class="app">
 <aside class="sidebar" id="sidebar"></aside>
-<main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading demo data...</p></main>
+<main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main>
 </div>
 <script>
 var D=null,activeRegime="static";
-var T=[];
-
-fetch("data.json").then(function(r){return r.json()}).then(function(j){
-  D=j;buildAll();
-}).catch(function(e){
-  document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python docs/demo/generate.py</code> to generate the data file.</p><p style="color:var(--muted);font-size:.85rem">'+e.message+'</p></div>';
-});
+fetch("data.json").then(function(r){return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python docs/demo/generate.py</code> then reload.</p></div>'});
 
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
 function cov(re){return re.ci_low<=re.truth&&re.truth<=re.ci_high}
-function getNodePos(nodes,id){for(var i=0;i<nodes.length;i++){if(nodes[i].id===id)return nodes[i]}return null}
-function row(k,v,c){c=c||"";return"<tr><td>"+k+"</td><td"+((c)?" class=\""+c+"\"":"")+"><b>"+v+"</b></td></tr>"}
+function row(k,v,c){c=c||"";return"<tr><td>"+k+"</td><td"+(c?' class="'+c+'"':"")+"><b>"+v+"</b></td></tr>"}
 function badge(v,ok){return'<span class="badge '+(ok?"bg":"br")+'">'+v+'</span>'}
+function getNodePos(ns,id){for(var i=0;i<ns.length;i++)if(ns[i].id===id)return ns[i];return null}
 
-function sdata(id){
-  var rd=r(),cs=D.content.stations;
-  for(var i=0;i<cs.length;i++){if(cs[i].id===id)return{rd:rd,s:cs[i],idx:i+1}}
-  return{rd:rd,s:null,idx:-1}
-}
-
-function buildAll(){
+function build(){
+  if(!D)return;
+  var rd=r(),cs=D.content.stations,c=D.content,h="";
   buildSidebar();
-  var rd=r(),c=D.content,h="";
-  var labels=[];
-  labels.push("Overview");
-  for(var i=0;i<c.stations.length;i++)labels.push(c.stations[i].number+". "+c.stations[i].name);
-  labels.push("Rung 3");labels.push("Summary");
 
-  // Tabs
-  h+='<h1>'+c.title+'</h1><p><b>'+c.subtitle+'</b></p>';
-  h+='<div class="info">Regime: <b>'+activeRegime+'</b> | n: <b>'+rd.n_rows+'</b> | Graph v<b>'+rd.graph_version+'</b> | Truth ATE: <b>'+fmt(rd.truth)+'</b></div>';
-  h+='<div class="nav-tabs">';
-  for(var i=0;i<labels.length;i++)h+='<button id="btn'+i+'" class="'+(i===0?"on":"")+'" onclick="switchTab('+i+')">'+labels[i]+'</button>';
-  h+="</div>";
+  // === PART 0: TITLE ===
+  h+='<h1>'+c.title+'</h1><p style="font-size:1.1rem;color:var(--muted)">'+c.subtitle+'</p>';
+  h+='<div class="nav-progress" id="progress"></div>';
 
-  // Build all section content
-  h+=sec0_overview();
-  for(var i=0;i<c.stations.length;i++)h+=sec_station(c.stations[i]);
-  h+=sec_rung3();
-  h+=sec_summary();
+  // === PART 1: WHY — The Problem ===
+  h+='<h2 id="s1">1. The Problem: Association is not Causation</h2>';
+  h+='<div class="card"><p style="font-size:1.05rem"><i>'+c.background.use_case+'</i></p>';
+  h+='<p>'+c.background.problem+'</p></div>';
 
-  document.getElementById("content").innerHTML=h;
-  switchTab(0); // show overview
-}
-
-function switchTab(i){
-  var btns=document.querySelectorAll(".nav-tabs button");
-  for(var j=0;j<btns.length;j++)btns[j].classList.remove("on");
-  var b=document.getElementById("btn"+i);if(b)b.classList.add("on");
-  var secs=document.querySelectorAll(".section");
-  for(var j=0;j<secs.length;j++)secs[j].classList.remove("on");
-  var s=document.getElementById("sec"+i);if(s)s.classList.add("on");
-}
-
-function buildSidebar(){
-  var h='<h2>Causal Science</h2><div class="sub">UCL Walkthrough</div>';
-  h+='<select onchange="switchRegime(this.value)"><option value="static">Static (baseline)</option><option value="holiday">Holiday (drifted)</option></select>';
-  if(D&&D.content&&D.content.glossary){
-    h+='<h3>Glossary</h3>';
-    for(var i=0;i<D.content.glossary.length;i++){
-      var g=D.content.glossary[i];
-      h+='<div class="gt"><b>'+g.term+'</b> — '+g.def+'</div>';
-    }
-  }
-  document.getElementById("sidebar").innerHTML=h;
-}
-
-function switchRegime(v){activeRegime=v;buildAll()}
-
-// ── SECTION BUILDERS ──
-
-function sec0_overview(){
-  var rd=r(),c=D.content,b=c.background,h="";
-  h+='<div class="section" id="sec0"><div class="card"><p style="font-size:1.05rem"><i>'+b.use_case+'</i></p><p>'+b.problem+'</p></div>';
-  h+='<div class="card"><h3>Ground Truth</h3><p>'+b.premise+'</p>';
-  h+='<div class="metrics">';
-  h+='<div class="metric"><div class="val">'+fmt(D.static.truth)+'</div><div class="lbl">Static ATE</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(D.holiday.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_loyal)+'</div><div class="lbl">CATE (loyal)</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">CATE (new)</div></div></div>';
-  h+='<p>Holiday changes exactly one mechanism: T→M coefficient from 1.6 to 0.4. Station 8 detects this.</p></div>';
-
-  // Problem formulation card
   if(c.problem_formulation){
     var pf=c.problem_formulation;
-    h+='<div class="card"><h3>Problem Formulation</h3>';
-    h+='<p><b>Question:</b> '+pf.question+'</p>';
-    h+='<div class="info warn"><b>Why this is causal (not just associational):</b> '+pf.why_causal+'</div>';
-    h+='<p><b>Target trial:</b> '+pf.target_trial+'</p>';
-    h+='<p><b>Estimand:</b> <span class="formula">'+pf.estimand+'</span></p>';
+    h+='<div class="box box-warn"><b>Why this is a causal question (not just associational):</b><br>'+pf.why_causal+'</div>';
+    h+='<div class="card"><h3>The Target Trial</h3><p>'+pf.target_trial+'</p><p><b>Estimand:</b> <span class="formula">'+pf.estimand+'</span></p>';
     h+='<p><b>Key Assumptions:</b></p><ol>';
     for(var j=0;j<pf.assumptions.length;j++)h+='<li>'+pf.assumptions[j]+'</li>';
-    h+='</ol><p><b>Ladder climbed:</b> '+pf.ladder_climbed+'</p></div>';
+    h+='</ol></div>';
   }
 
-  // DAG visualization
+  // === PART 2: WHAT — The Causal DAG ===
+  h+='<h2 id="s2">2. The Causal Graph: Making Assumptions Visible</h2>';
   if(c.dag){
-    h+='<div class="card"><h3>Causal DAG</h3><p>'+c.dag.description+'</p>';
+    h+='<div class="card"><p>'+c.dag.description+'</p>';
     h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:6px">';
-    // Edges
     for(var j=0;j<c.dag.edges.length;j++){
       var e=c.dag.edges[j],fn=getNodePos(c.dag.nodes,e.from),tn=getNodePos(c.dag.nodes,e.to);
       if(fn&&tn){
         var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
-        h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.7"/>';
-        // Arrowhead for causal target
-        if(e.label==="causal target"){
-          var ax=tn.x-8,ay=tn.y,mx=ax,my=ay;
-          h+='<polygon points="'+tn.x+','+tn.y+' '+(ax-6)+','+(ay-4)+' '+(ax-6)+','+(ay+4)+'" fill="'+e.color+'"/>';
-        }
+        h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
+        if(e.label==="causal target"){h+='<polygon points="'+tn.x+','+tn.y+' '+(tn.x-8)+','+(tn.y-4)+' '+(tn.x-8)+','+(tn.y+4)+'" fill="'+e.color+'"/>'}
       }
     }
-    // Nodes
     for(var j=0;j<c.dag.nodes.length;j++){
       var n=c.dag.nodes[j];
       h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#2c3e50" stroke-width="1.5"/>';
-      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#666":"white")+'">'+n.id+'</text>';
+      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"white")+'">'+n.id+'</text>';
       h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#2c3e50">'+n.label+'</text>';
     }
-    // Legend
     h+='<g transform="translate(10,210)">';
     for(var j=0;j<c.dag.legend.length;j++){
-      var l=c.dag.legend[j];
-      h+='<line x1="'+(j*155)+'" y1="8" x2="'+(j*155+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
-      h+='<text x="'+(j*155+34)+'" y="12" font-size="7" fill="#2c3e50">'+l.label+'</text>';
+      var l=c.dag.legend[j],dx=j*155;
+      h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
+      h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#2c3e50">'+l.label+'</text>';
     }
     h+='</g></svg></div>';
   }
+  h+='<div class="box"><b>Key insight:</b> W (app-use history) is the most important node. The platform targets on W, which is a proxy for true hunger U. Because conditioning on W blocks the confounding path U→W→T ... U→Y, it makes the ATE identifiable. Without W in the adjustment set, we cannot separate the causal effect from confounding.</div>';
 
-  h+='<div class="card"><h3>The 9 UCL Stations</h3><table><tr><th>#</th><th>Station</th><th>Question</th><th>Output</th></tr>';
-  for(var i=0;i<c.stations.length;i++){var s=c.stations[i];h+='<tr><td>'+s.number+'</td><td><b>'+s.emoji+' '+s.name+'</b></td><td>'+s.question+'</td><td><code>'+s.output+'</code></td></tr>'}
-  h+="</table></div></div>";
-  return h;
+  // === PART 3: HOW — The Workflow ===
+  h+='<h2 id="s3">3. The Workflow: From Question to Answer</h2>';
+  h+='<p>The 9-station Universal Causal Loop takes us from a causal question to a verified answer — and keeps checking as the world changes.</p>';
+
+  // Ground truth baseline
+  h+='<div class="card"><h3>Ground Truth (for verification)</h3><p>'+c.background.premise+'</p>';
+  h+='<div class="metrics">';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.truth)+'</div><div class="lbl">Static ATE</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.holiday.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_loyal)+'</div><div class="lbl">CATE (loyal users)</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">CATE (new users)</div></div>';
+  h+='</div></div>';
+
+  // Station narratives
+  for(var i=0;i<cs.length;i++)h+=stationCard(cs[i],rd);
+
+  // === PART 4: SENSITIVITY ===
+  h+='<h2 id="s4">4. Sensitivity: How Wrong Could We Be?</h2>';
+  if(c.evalue_deep_dive){
+    var ev=c.evalue_deep_dive;
+    h+='<div class="card"><h3>The E-value: Quantifying Robustness to Unmeasured Confounding</h3>';
+    h+='<div class="box box-important"><b>Definition (VanderWeele & Ding, 2017):</b> '+ev.definition+'</div>';
+    h+='<p><span class="formula">'+ev.formula+'</span></p><p>'+ev.intuition+'</p>';
+    h+='<table><tr><th>E-value</th><th>Interpretation</th></tr>';
+    for(var j=0;j<ev.thresholds.length;j++){var t=ev.thresholds[j].split(": ");h+='<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td></tr>'}
+    h+='</table><p style="font-size:.84rem;color:var(--muted)">'+ev.ci_bound_note+'</p>';
+    h+='<div class="box">'+ev.example+'</div></div>';
+  }
+
+  // === PART 5: EVOLUTION ===
+  h+='<h2 id="s5">5. Evolution: The Loop Closes</h2>';
+  h+='<div class="card"><p>The 8th station is what makes the UCL a <b>loop</b> rather than a pipeline. In production, the world changes — user behavior drifts, mechanisms shift. The workflow must detect this and adapt.</p>';
+  if(D.evolve){
+    var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
+    h+='<table><tr><th>Node</th><th>Log-loss Degradation</th><th>Status (alarm='+al+')</th></tr>';
+    for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
+    h+='</table><p><b>Drift localized to: <code>'+D.evolve.worst+'</code></b> — the notification→app-open mechanism. This is exactly the one mechanism that changed in the holiday DGP (coefficient 1.6→0.4). The Y (order) mechanism is confirmed invariant.</p>';
+  }
+  if(D.actuator&&c.actuator_section){
+    h+='<div class="box box-good"><b>'+c.actuator_section.title+':</b> '+c.actuator_section.explanation+'</div>';
+    h+='<table>'+row("Holiday ATE (re-estimated)",fmt(D.actuator.ate))+row("Holiday Truth",fmt(D.actuator.truth))+row("CI Covers Truth",badge(String(D.actuator.covers),D.actuator.covers))+row("All Refuters Green",badge(String(D.actuator.all_green),D.actuator.all_green))+'</table>';
+  }
+  h+='</div>';
+
+  // === PART 6: COUNTERFACTUALS ===
+  h+='<h2 id="s6">6. Counterfactuals: Beyond "What Works" to "Was It This One?"</h2>';
+  if(c.rung3_section){
+    h+='<div class="card"><div class="box box-important"><b>Rung 3 vs Rung 2:</b> '+c.rung3_section.explanation+'</div>';
+    if(D.rung3){
+      h+='<table>'+row("P(Y(0)=0 | T=1, Y=1) — Probability of Necessity",fmt(D.rung3.p_necessity)+" (Rung 3)")+row("ATE (same exogenous draws)",fmt(D.rung3.ate_sim)+" (Rung 2)")+row("Ground truth ATE",fmt(D.static.truth))+'</table>';
+      h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of users who were notified AND ordered would NOT have ordered without the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+' percentage points) is the average over ALL users — these are fundamentally different quantities.</p>';
+    }
+    h+='<table><tr><th>Step</th><th>What it does</th></tr><tr><td><b>1. Abduction</b></td><td>Infer each unit\'s exogenous noise (U) from their observed data — "given what we saw, what must the noise have been?"</td></tr><tr><td><b>2. Action</b></td><td>Apply the counterfactual intervention: do(T = 1 - T_factual) — "what if we flipped the treatment?"</td></tr><tr><td><b>3. Prediction</b></td><td>Re-run the structural equations with the SAME inferred noise but the DIFFERENT treatment — "what would have happened to THIS unit?"</td></tr></table></div>';
+  }
+
+  // === SUMMARY ===
+  h+='<h2 id="s7">7. Summary: The Complete Causal Science Workflow</h2>';
+  h+='<div class="card"><table><tr><th>Stage</th><th>What We Did</th><th>Result</th></tr>';
+  h+='<tr><td><b>1. Frame</b></td><td>Define the causal question as an estimand</td><td>ATE = E[Y(1)-Y(0)] at rung 2</td></tr>';
+  h+='<tr><td><b>2. Graph</b></td><td>Encode assumptions in a DAG</td><td>Graph v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-variable adjustment set</td></tr>';
+  h+='<tr><td><b>3. Identify</b></td><td>Back-door criterion via graph surgery</td><td>'+rd.criterion+': '+(rd.adjustment_set||[]).join(", ")+'</td></tr>';
+  h+='<tr><td><b>4. Data</b></td><td>Check positivity & measure confounding gap</td><td>Positivity OK, rung-1 gap = '+fmt(rd.gap||0)+'</td></tr>';
+  h+='<tr><td><b>5. Estimate</b></td><td>Cross-fit AIPW/DML (Neyman-orthogonal)</td><td>'+fmt(rd.ate)+' ['+fmt(rd.ci_low)+', '+fmt(rd.ci_high)+'] vs truth '+fmt(rd.truth)+'</td></tr>';
+  h+='<tr><td><b>6. Evaluate</b></td><td>E-value sensitivity analysis</td><td>E-value = '+rd.e_value.toFixed(2)+' (moderately robust)</td></tr>';
+  h+='<tr><td><b>7. Test</b></td><td>Refutation battery (4 stress tests)</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td></tr>';
+  h+='<tr><td><b>8. Evolve</b></td><td>Mechanism-stability monitor + actuator</td><td>Drift localized to M; holiday truth recovered</td></tr>';
+  h+='<tr><td><b>Counterfactual</b></td><td>Abduction-action-prediction on SCM</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'% probability of necessity</td></tr></table>';
+  h+='<div class="box box-good"><b>Every claim verified against known ground truth. The loop is closed — and stays closed.</b></div></div>';
+
+  document.getElementById("content").innerHTML=h;
+  buildProgress();
 }
 
-function sec_station(s){
-  var sd=sdata(s.id),rd=sd.rd,si=sd.idx,h="";
-  h+='<div class="section" id="sec'+si+'"><div class="card">';
-  h+='<h3>Station '+s.number+' — '+s.name+': '+s.question+'</h3>';
-  h+='<div class="info">'+s.explanation+'</div>';
-  if(s.formula)h+='<div class="formula">'+s.formula+'</div>';
+function stationCard(s,rd){
+  var h='<div class="card"><h3>Station '+s.number+' — '+s.emoji+' '+s.name+'</h3>';
+  h+='<p style="color:var(--muted)"><i>'+s.question+'</i></p>';
+  if(s.explanation)h+='<div class="box">'+s.explanation+'</div>';
+  if(s.formula)h+='<p><span class="formula">'+s.formula+'</span></p>';
 
-  if(s.id==="frame"){
-    h+='<table>'+row("Estimand",rd.estimand||"ATE (rung 2)")+row("Treatment",rd.treatment||"T (push notification)")+row("Outcome",rd.outcome||"Y (order placed)")+row("Population",rd.population||"all active user-days")+'</table>';
+  if(s.id==="data"){
+    h+='<table>'+row("Sample size",rd.n_rows)+row("Positivity check",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
+    h+='<table><tr><th>Contrast</th><th>Value</th><th>Rung</th></tr>';
+    h+='<tr><td>Naive: P(Y|T=1) - P(Y|T=0)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1 — seeing</td></tr>';
+    h+='<tr><td>Causal: E[Y|do(T=1)] - E[Y|do(T=0)]</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2 — doing</td></tr>';
+    h+='<tr><td><b>Confounding gap</b></td><td><b style="color:var(--red)">'+fmt(rd.gap||0)+'</b></td><td>—</td></tr></table>';
   }
   if(s.id==="assume"){
-    h+='<table>'+row("Graph version","<code>"+rd.graph_version+"</code>")+row("Edges","20 (observed: 13, latent: 1)")+row("Absent edges","8 (the falsifiable part)")+'</table>';
+    h+='<table>'+row("Graph version","<code>"+rd.graph_version+"</code>")+row("Observed nodes / edges","13 / 20")+row("Absent edges (falsifiable)","8")+'</table>';
   }
   if(s.id==="identify"){
     h+='<table>'+row("Criterion",rd.criterion)+row("Identified",badge("true",true))+'<tr><td><b>Adjustment set</b></td><td><code>'+(rd.adjustment_set||[]).join(", ")+'</code></td></tr></table>';
   }
-  if(s.id==="data"){
-    h+='<table>'+row("Rows",rd.n_rows)+row("Positivity",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
-    h+='<table><tr><th>Quantity</th><th>Value</th><th>Rung</th></tr>';
-    h+='<tr><td>P(Y|T=1)-P(Y|T=0) (naive)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1 — association</td></tr>';
-    h+='<tr><td>E[Y|do(T=1)]-E[Y|do(T=0)] (truth)</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2 — intervention</td></tr>';
-    h+='<tr><td><b>Confounding gap</b></td><td><b style="color:var(--red)">'+fmt(rd.gap||0)+'</b></td><td>—</td></tr></table>';
-  }
   if(s.id==="feature"){
-    h+='<table>'+row("In adjustment","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded","M (mediator), S (collider)")+row("Instruments","Z (send-time jitter)")+row("Neg. controls","NC (battery drain)")+'</table>';
+    h+='<table>'+row("In adjustment","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded (never adjust)","M (mediator), S (collider)")+row("Instruments","Z")+row("Negative controls","NC")+'</table>';
   }
   if(s.id==="model"){
     h+='<p style="font-size:.84rem;color:var(--muted)">Estimator: '+rd.estimator+'</p>';
     h+='<div class="metrics"><div class="metric"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE (AIPW/DML)</div></div>';
-    h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
+    h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+', '+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
     h+='<div class="metric"><div class="val">'+fmt(rd.truth)+'</div><div class="lbl">Ground Truth</div></div>';
-    h+='<div class="metric"><div class="val">'+(cov(rd)?"PASS":"FAIL")+'</div><div class="lbl">CI Covers</div></div></div>';
+    h+='<div class="metric"><div class="val">'+(cov(rd)?"✓":"✗")+'</div><div class="lbl">CI Covers</div></div></div>';
   }
   if(s.id==="evaluate"){
     h+='<div class="metrics"><div class="metric"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div>';
     h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
     h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">Max |SMD|</div></div></div>';
-    h+='<p>E-value ~'+rd.e_value.toFixed(1)+': unmeasured confounder needs RR >='+rd.e_value.toFixed(1)+' with both T and Y to explain away effect. '+(s.metrics?("Thresholds: "+s.metrics["SMD threshold"]):"")+'</p>';
-    if(c.evalue_deep_dive){
-      var ev=c.evalue_deep_dive;
-      h+='<div class="info good"><b>E-value Deep Dive</b><br>'+ev.definition+'</div>';
-      h+='<div class="formula">'+ev.formula+'</div>';
-      h+='<p>'+ev.intuition+'</p>';
-      h+='<table><tr><th>E-value Range</th><th>Interpretation</th></tr>';
-      for(var j=0;j<ev.thresholds.length;j++){var t=ev.thresholds[j].split(":");h+='<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td></tr>'}
-      h+='</table><p style="font-size:.84rem;color:var(--muted)">'+ev.ci_bound_note+'</p>';
-      h+='<div class="info">'+ev.example+'</div>';
-    }
+    h+='<p>E-value '+rd.e_value.toFixed(1)+': confounder needs RR >='+rd.e_value.toFixed(1)+' to explain away the effect.</p>';
   }
   if(s.id==="test"){
-    h+='<table><tr><th>Refuter</th><th>Result</th><th>Detail</th></tr>';
-    if(rd.refuters)for(var j=0;j<rd.refuters.length;j++){var rf=rd.refuters[j];h+='<tr><td>'+rf.name+'</td><td class="'+(rf.passed?"pass":"fail")+'">'+(rf.passed?"PASS":"FAIL")+'</td><td>'+rf.detail+'</td></tr>'}
+    h+='<table><tr><th>Refuter</th><th>Result</th><th>What it checks</th></tr>';
+    var names=["Placebo treatment","Random common cause","Subset refuter","Negative control (NC)"];
+    var checks=["Pipeline returns ~0 when T is random","Estimate is stable under added noise","80% sample agrees with full data","T→NC effect is ~null (residual confounding alarm)"];
+    for(var j=0;j<4;j++){h+='<tr><td>'+names[j]+'</td><td class="'+(rd.all_green?"pass":"fail")+'">'+(rd.all_green?"PASS":"FAIL")+'</td><td style="font-size:.82rem;color:var(--muted)">'+checks[j]+'</td></tr>'}
     h+='</table><p>'+badge("ALL GREEN: "+rd.all_green,rd.all_green)+'</p>';
   }
-  if(s.id==="evolve"){
-    if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
-      h+='<table><tr><th>Node</th><th>Holiday Degradation</th><th>Status</th></tr>';
-      for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
-      h+='</table><p><b>Drift localized to: <code>'+D.evolve.worst+'</code></b> — the T→M mechanism (exactly what changed in the DGP, coefficient 1.6→0.4).</p>';
-    }
-    if(D.actuator){
-      h+='<div class="card good"><h3>'+D.content.actuator_section.title+'</h3><p>'+D.content.actuator_section.explanation+'</p>';
-      h+='<table>'+row("Holiday ATE",fmt(D.actuator.ate))+row("Holiday Truth",fmt(D.actuator.truth))+row("CI Covers",badge(String(D.actuator.covers),D.actuator.covers))+row("All Green",badge(String(D.actuator.all_green),D.actuator.all_green))+'</table></div>';
-    }
-  }
-  h+="</div></div>";
+  h+="</div>";
   return h;
 }
 
-function sec_rung3(){
-  var si=D.content.stations.length+1,h="";
-  h+='<div class="section" id="sec'+si+'"><div class="card"><h3>'+D.content.rung3_section.title+'</h3>';
-  h+='<div class="info">'+D.content.rung3_section.explanation+'</div>';
-  if(D.rung3){
-    h+='<table>'+row("P(Y(0)=0 | T=1, Y=1)",fmt(D.rung3.p_necessity)+" (Rung 3)")+row("ATE (same draws)",fmt(D.rung3.ate_sim)+" (Rung 2)")+row("Ground truth ATE",fmt(D.static.truth))+'</table>';
-    h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered outcomes were CAUSED by the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+'%) averages over everyone — fundamentally different quantities.</p>';
-  }
-  h+='<table><tr><th>Step</th><th>Action</th></tr><tr><td>1. Abduction</td><td>Infer exogenous noise from factual evidence</td></tr><tr><td>2. Action</td><td>Intervene: do(T = 1 - T_factual)</td></tr><tr><td>3. Prediction</td><td>Re-run mechanisms with SAME noise, different T</td></tr></table></div></div>';
-  return h;
+function buildProgress(){
+  var steps=["1. Problem","2. Causal Graph","3. Workflow","4. Sensitivity","5. Evolution","6. Counterfactuals","7. Summary"];
+  var h="";for(var i=0;i<steps.length;i++)h+='<a href="#s'+(i+1)+'" class="step">'+steps[i]+'</a>';
+  document.getElementById("progress").innerHTML=h;
 }
 
-function sec_summary(){
-  var rd=r(),si=D.content.stations.length+2,h="";
-  h+='<div class="section" id="sec'+si+'"><div class="card"><h3>Summary — The Complete Workflow</h3><table><tr><th>Station</th><th>Result</th></tr>';
-  h+='<tr><td>0 — FRAME</td><td>ATE at rung 2 (intervention)</td></tr>';
-  h+='<tr><td>1 — ASSUME</td><td>Graph v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-variable adj.</td></tr>';
-  h+='<tr><td>2 — IDENTIFY</td><td>'+rd.criterion+': '+(rd.adjustment_set||[]).join(", ")+'</td></tr>';
-  h+='<tr><td>3 — DATA</td><td>Positivity OK, gap '+fmt(rd.gap||0)+'</td></tr>';
-  h+='<tr><td>4 — FEATURE</td><td>Collider & mediator excluded</td></tr>';
-  h+='<tr><td>5 — MODEL</td><td>'+fmt(rd.ate)+' ['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+'] vs '+fmt(rd.truth)+'</td></tr>';
-  h+='<tr><td>6 — EVALUATE</td><td>E-value: '+rd.e_value.toFixed(2)+', |SMD|='+rd.max_smd.toFixed(4)+'</td></tr>';
-  h+='<tr><td>7 — TEST</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td></tr>';
-  h+='<tr><td>8 — EVOLVE</td><td>Drift: '+(D.evolve?D.evolve.worst:"M")+', actuator recovered truth</td></tr>';
-  h+='<tr><td>Rung 3</td><td>Necessity: ~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'%</td></tr></table>';
-  h+='<p><b>Every claim verified against ground truth. The loop is closed.</b></p></div></div>';
-  return h;
+function buildSidebar(){
+  var h='<h2>Causal Science</h2><div class="sub">A Guided Walkthrough</div>';
+  h+='<select onchange="switchRegime(this.value)"><option value="static">Static (baseline)</option><option value="holiday">Holiday (drifted)</option></select>';
+  if(D&&D.content&&D.content.glossary){
+    h+='<h3>Glossary</h3>';
+    for(var i=0;i<D.content.glossary.length;i++){var g=D.content.glossary[i];h+='<div class="gt"><b>'+g.term+'</b> — '+g.def+'</div>'}
+  }
+  document.getElementById("sidebar").innerHTML=h;
 }
+function switchRegime(v){activeRegime=v;build()}
 </script>
 </body>
 </html>
