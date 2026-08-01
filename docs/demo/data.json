@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.2279,
+    "ci_low": 0.228,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019027149540877036, 'tolerance': 0.013352818877741422}"
+        "detail": "{'estimate': 0.0019097365033971193, 'tolerance': 0.013344479743217307}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 7.46967002534793e-05, 'tolerance': 0.008025355374315219}"
+        "detail": "{'delta': 1.1149680613053992e-05, 'tolerance': 0.008025024978398835}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.0052773385222261715, 'tolerance': 0.018570765956647403}"
+        "detail": "{'delta': 0.005236358502999305, 'tolerance': 0.018555877797173125}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008100244537165862, 'tolerance': 0.014538934348733754}"
+        "detail": "{'estimate': -0.0008913718500789668, 'tolerance': 0.014536144072840786}"
       }
     ],
     "naive": 0.3467,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004341344344933572, 'tolerance': 0.013361699021842864}"
+        "detail": "{'estimate': 0.004349959822486568, 'tolerance': 0.013360596592756558}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012436750388833961, 'tolerance': 0.007932283456215676}"
+        "detail": "{'delta': 0.001257529576243338, 'tolerance': 0.007932055076684815}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005062657787171604, 'tolerance': 0.01833447765306866}"
+        "detail": "{'delta': 0.005080544342135479, 'tolerance': 0.018335142938568447}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004444703757617063, 'tolerance': 0.014166558614732403}"
+        "detail": "{'estimate': -0.004390171331507612, 'tolerance': 0.014173890747015737}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0083,
+      "M": 0.0082,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -126,6 +126,242 @@
   "rung3": {
     "p_necessity": 0.371,
     "ate_sim": 0.243
+  },
+  "data_preview": {
+    "columns": [
+      "T",
+      "Y",
+      "M",
+      "S",
+      "NC",
+      "Z",
+      "W",
+      "rain",
+      "weekend",
+      "payday"
+    ],
+    "rows": [
+      [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.8878138705484344,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.8587983812244652,
+        0.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        -1.3940876172165275,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0723257148880691,
+        1.0,
+        1.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.11850051800566953,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.10075032739265802,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.733857652334848,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.9710662043918802,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.24599800522527326,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.5517182467846319,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "shape": {
+      "n_rows": 20000,
+      "n_cols": 13
+    },
+    "column_descriptions": {
+      "T": "Treatment: notification sent (0/1)",
+      "Y": "Outcome: order placed (0/1)",
+      "M": "Mediator: app opened (0/1)",
+      "S": "Collider: engagement score (0/1)",
+      "NC": "Neg. control: battery drain (0/1)",
+      "Z": "Instrument: send-time jitter (0/1)",
+      "W": "Measured proxy: app-use history (cont.)",
+      "rain": "Confounder: raining? (0/1)",
+      "weekend": "Confounder: weekend? (0/1)",
+      "payday": "Confounder: payday? (0/1)"
+    }
+  },
+  "data_flow": {
+    "stations": [
+      {
+        "id": "raw",
+        "label": "Raw DGP Sample",
+        "shape": "20,000 x 13",
+        "desc": "Observational data from<br>NomNom DGP.<br>T is confounded by U via W.",
+        "x": 10,
+        "y": 55,
+        "color": "#3498db"
+      },
+      {
+        "id": "adjust",
+        "label": "Adjustment Set",
+        "shape": "20,000 x 4",
+        "desc": "Filter to back-door set:<br>{W, rain, weekend, payday}.<br>Exclude M (mediator),<br>S (collider).",
+        "x": 210,
+        "y": 55,
+        "color": "#9b59b6"
+      },
+      {
+        "id": "ps",
+        "label": "Propensity Model",
+        "shape": "e(X) vector",
+        "desc": "Fit P(T=1 | X) via<br>gradient boosting.<br>Output: propensity<br>score per row.",
+        "x": 410,
+        "y": 55,
+        "color": "#f39c12"
+      },
+      {
+        "id": "outcome",
+        "label": "Outcome Model",
+        "shape": "mu1, mu0 vectors",
+        "desc": "Fit E[Y | T, X] via<br>gradient boosting.<br>Predict under both<br>T=1 and T=0.",
+        "x": 410,
+        "y": 155,
+        "color": "#1abc9c"
+      },
+      {
+        "id": "aipw",
+        "label": "AIPW Score",
+        "shape": "psi vector",
+        "desc": "Compute orthogonal<br>score per row.<br>Cross-fit to avoid<br>overfitting bias.",
+        "x": 610,
+        "y": 105,
+        "color": "#2ecc71"
+      },
+      {
+        "id": "ate",
+        "label": "ATE Estimate",
+        "shape": "scalar",
+        "desc": "ATE = mean(psi).<br>SE = sd(psi)/sqrt(n).<br>95% CI via normal<br>approximation.",
+        "x": 790,
+        "y": 105,
+        "color": "#2ecc71"
+      }
+    ],
+    "arrows": [
+      {
+        "from": "raw",
+        "to": "adjust"
+      },
+      {
+        "from": "adjust",
+        "to": "ps"
+      },
+      {
+        "from": "adjust",
+        "to": "outcome"
+      },
+      {
+        "from": "ps",
+        "to": "aipw"
+      },
+      {
+        "from": "outcome",
+        "to": "aipw"
+      },
+      {
+        "from": "aipw",
+        "to": "ate"
+      }
+    ]
   },
   "content": {
     "title": "Causal Science — The Complete Workflow",

@@ -104,6 +104,71 @@ data["rung3"] = {
     "ate_sim": round(y1.mean() - y0.mean(), 4),
 }
 
+# ── Data preview: sample rows from the DGP ──
+df_sample = dgp_sample(10, seed=42).drop(columns=["U"])
+df_cols = ["T", "Y", "M", "S", "NC", "Z", "W", "rain", "weekend", "payday"]
+data["data_preview"] = {
+    "columns": df_cols,
+    "rows": [list(df_sample.loc[i, df_cols].values) for i in range(10)],
+    "shape": {"n_rows": 20000, "n_cols": 13},
+    "column_descriptions": {
+        "T": "Treatment: notification sent (0/1)",
+        "Y": "Outcome: order placed (0/1)",
+        "M": "Mediator: app opened (0/1)",
+        "S": "Collider: engagement score (0/1)",
+        "NC": "Neg. control: battery drain (0/1)",
+        "Z": "Instrument: send-time jitter (0/1)",
+        "W": "Measured proxy: app-use history (cont.)",
+        "rain": "Confounder: raining? (0/1)",
+        "weekend": "Confounder: weekend? (0/1)",
+        "payday": "Confounder: payday? (0/1)",
+    },
+}
+
+# ── Data flow diagram: how data transforms through the UCL ──
+data["data_flow"] = {
+    "stations": [
+        {
+            "id": "raw", "label": "Raw DGP Sample", "shape": "20,000 x 13",
+            "desc": "Observational data from<br>NomNom DGP.<br>T is confounded by U via W.",
+            "x": 10, "y": 55, "color": "#3498db"
+        },
+        {
+            "id": "adjust", "label": "Adjustment Set", "shape": "20,000 x 4",
+            "desc": "Filter to back-door set:<br>{W, rain, weekend, payday}.<br>Exclude M (mediator),<br>S (collider).",
+            "x": 210, "y": 55, "color": "#9b59b6"
+        },
+        {
+            "id": "ps", "label": "Propensity Model", "shape": "e(X) vector",
+            "desc": "Fit P(T=1 | X) via<br>gradient boosting.<br>Output: propensity<br>score per row.",
+            "x": 410, "y": 55, "color": "#f39c12"
+        },
+        {
+            "id": "outcome", "label": "Outcome Model", "shape": "mu1, mu0 vectors",
+            "desc": "Fit E[Y | T, X] via<br>gradient boosting.<br>Predict under both<br>T=1 and T=0.",
+            "x": 410, "y": 155, "color": "#1abc9c"
+        },
+        {
+            "id": "aipw", "label": "AIPW Score", "shape": "psi vector",
+            "desc": "Compute orthogonal<br>score per row.<br>Cross-fit to avoid<br>overfitting bias.",
+            "x": 610, "y": 105, "color": "#2ecc71"
+        },
+        {
+            "id": "ate", "label": "ATE Estimate", "shape": "scalar",
+            "desc": "ATE = mean(psi).<br>SE = sd(psi)/sqrt(n).<br>95% CI via normal<br>approximation.",
+            "x": 790, "y": 105, "color": "#2ecc71"
+        },
+    ],
+    "arrows": [
+        {"from": "raw", "to": "adjust"},
+        {"from": "adjust", "to": "ps"},
+        {"from": "adjust", "to": "outcome"},
+        {"from": "ps", "to": "aipw"},
+        {"from": "outcome", "to": "aipw"},
+        {"from": "aipw", "to": "ate"},
+    ],
+}
+
 # ── Content sections (explanatory text, formulas, background) ──
 data["content"] = {
     "title": "Causal Science — The Complete Workflow",
