@@ -275,7 +275,7 @@ data["content"] = {
             "id": "identify", "number": 2, "name": "IDENTIFY", "emoji": "🔍",
             "question": "Can the effect be computed from observables?",
             "output": "IdentificationProof",
-            "explanation": "Identification is the central methodological question — a separate, prior step to estimation. We use the back-door criterion (Pearl 1995): delete all edges out of T (graph surgery), then find an observed set Z that d-separates T from Y. The adjustment set is compiled from the DAG by graph surgery — no hand-picking. W is in (blocks confounding), M and S are correctly excluded (mediator and collider — never adjust).",
+            "explanation": "Identification is the central methodological question — a separate, prior step to estimation. <b>(1) Form the back-door graph:</b> delete all edges OUT of T (T→M, T→Y, T→S). <b>(2) Search:</b> test subsets of observed non-descendant variables for d-separation of T and Y. <b>(3) Compile:</b> return the smallest valid set. W is in (blocks U→W→T ... U→Y), M and S are correctly excluded (mediator and collider — never adjust).",
             "formula": "E[Y|do(T)] = Σ_z E[Y | T, z] · P(z)  for z in adjustment set",
         },
         {
@@ -298,7 +298,7 @@ data["content"] = {
             "id": "model", "number": 5, "name": "MODEL", "emoji": "🧮",
             "question": "How do we estimate?",
             "output": "EstimateBundle + CI",
-            "explanation": "We use AIPW (Augmented Inverse Probability Weighting) with 2-fold cross-fitting — the DML recipe (Chernozhukov et al. 2018). Key properties: (1) Neyman orthogonality — the score function is insensitive to first-order nuisance errors, letting flexible ML (gradient boosting) handle nuisances without contaminating the causal estimand. (2) Double robustness — consistent if EITHER the propensity OR the outcome model is correctly specified.",
+            "explanation": "<b>(1) Cross-fit:</b> split data into 2 folds. Fit propensity P(T|X) and outcome E[Y|T,X] on fold 1; evaluate on fold 2. <b>(2) Compute the AIPW score:</b> psi = (mu1-mu0) + T(Y-mu1)/e - (1-T)(Y-mu0)/(1-e). <b>(3) Estimate the ATE:</b> ATE = mean(psi), SE = sd(psi)/sqrt(n). <b>Key property — Neyman orthogonality:</b> the score function is insensitive to first-order nuisance errors, so flexible ML (gradient boosting) handles nuisances without contaminating the causal estimand. <b>Double robustness:</b> consistent if EITHER the propensity OR the outcome model is correctly specified.",
             "formula": "ψ = (μ₁ - μ₀) + T(Y - μ₁)/e - (1-T)(Y - μ₀)/(1-e)",
         },
         {
