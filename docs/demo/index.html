@@ -74,6 +74,31 @@ function build(){
     h+='<li><b>Ignorability:</b> no unmeasured confounders beyond W</li><li><b>Positivity:</b> 0&lt;P(T=1|X)&lt;1</li><li><b>SUTVA:</b> no interference</li><li><b>Consistency:</b> Y = T*Y(1)+(1-T)*Y(0)</li></ol></div>';}
   h+='<h2 id="s2"><span class="cn">2</span> The Causal Graph <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
   if(c.dag){
+    h+='<div class="card"><p>'+c.dag.description+'</p>';
+    h+='<div class="dagwrap"><div class="dagbar"><button onclick="dagZoomIn()">+</button><button onclick="dagZoomOut()">-</button><button onclick="dagReset()">1:1</button><span style="font-size:.75rem;color:var(--muted);padding:4px 8px">Click nodes for details</span></div><div id="dagpopup" class="dagpop"></div>';
+    h+='<svg id="dagsvg" viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white">';
+    for(var j=0;j<c.dag.edges.length;j++){var e=c.dag.edges[j],fn=np(c.dag.nodes,e.from),tn=np(c.dag.nodes,e.to);
+      if(fn&&tn){var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
+      var w=(e.label==="causal target"?3:1.6);
+      var dx=tn.x-fn.x,dy=tn.y-fn.y,len=Math.sqrt(dx*dx+dy*dy);
+      if(len>0){dx/=len;dy/=len}
+      var ax=tn.x-dx*17,ay=tn.y-dy*17;  // start of arrowhead, at node boundary
+      var bx=tn.x-dx*24,by=tn.y-dy*24;  // line endpoint before arrowhead
+      h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="'+e.color+'" stroke-width="'+w+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
+      // Arrowhead triangle: tip at node boundary, base 7px back
+      var tipx=ax,tipy=ay;
+      var perpx=-dy,perpy=dx;
+      var basex=ax-dx*7,basey=ay-dy*7;
+      h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(basex+perpx*3.5).toFixed(1)+','+(basey+perpy*3.5).toFixed(1)+' '+(basex-perpx*3.5).toFixed(1)+','+(basey-perpy*3.5).toFixed(1)+'" fill="'+e.color+'"/>';}}
+    for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
+      h+='<g class="dagn" data-nid="'+n.id+'"><circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
+      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text></g>';}
+    h+='<g transform="translate(10,210)">';
+    for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
+      h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
+      h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#1a1a2e">'+l.label+'</text>';}
+    h+='</g></svg></div></div>';}
     h+='<div class="card"><h3>A Gentle Introduction</h3>';
     h+='<p>Imagine you are an analyst at NomNom Eats, staring at a spreadsheet with 20,000 rows and 13 columns. Each row is a user-day: whether they received a notification (T), whether they ordered (Y), their app usage history (W), the weather, the day of the week, and a dozen other variables. You are asked: <i>"Do notifications cause orders?"</i></p>';
     h+='<p>The spreadsheet alone cannot answer this. Correlation is not causation. You need a <b>theory</b> — a story about how these variables relate to each other. The causal graph is that theory, made visible.</p>';
@@ -101,31 +126,6 @@ function build(){
     h+='<li><b>Z (jitter):</b> Randomized by the experiment platform — affects whether a notification is delivered but has no other path to Y. A valid instrument for IV estimation if needed.</li>';
     h+='<li><b>NC (battery):</b> Correlated with U (more app use → more battery drain) but NOT caused by T. If our adjustment is correct, the T→NC effect should be zero — a non-zero result is a smoke alarm for residual confounding.</li></ul></div>';
 
-    h+='<div class="card"><p>'+c.dag.description+'</p>';
-    h+='<div class="dagwrap"><div class="dagbar"><button onclick="dagZoomIn()">+</button><button onclick="dagZoomOut()">-</button><button onclick="dagReset()">1:1</button><span style="font-size:.75rem;color:var(--muted);padding:4px 8px">Click nodes for details</span></div><div id="dagpopup" class="dagpop"></div>';
-    h+='<svg id="dagsvg" viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white">';
-    for(var j=0;j<c.dag.edges.length;j++){var e=c.dag.edges[j],fn=np(c.dag.nodes,e.from),tn=np(c.dag.nodes,e.to);
-      if(fn&&tn){var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
-      var w=(e.label==="causal target"?3:1.6);
-      var dx=tn.x-fn.x,dy=tn.y-fn.y,len=Math.sqrt(dx*dx+dy*dy);
-      if(len>0){dx/=len;dy/=len}
-      var ax=tn.x-dx*17,ay=tn.y-dy*17;  // start of arrowhead, at node boundary
-      var bx=tn.x-dx*24,by=tn.y-dy*24;  // line endpoint before arrowhead
-      h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="'+e.color+'" stroke-width="'+w+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
-      // Arrowhead triangle: tip at node boundary, base 7px back
-      var tipx=ax,tipy=ay;
-      var perpx=-dy,perpy=dx;
-      var basex=ax-dx*7,basey=ay-dy*7;
-      h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(basex+perpx*3.5).toFixed(1)+','+(basey+perpy*3.5).toFixed(1)+' '+(basex-perpx*3.5).toFixed(1)+','+(basey-perpy*3.5).toFixed(1)+'" fill="'+e.color+'"/>';}}
-    for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
-      h+='<g class="dagn" data-nid="'+n.id+'"><circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
-      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
-      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text></g>';}
-    h+='<g transform="translate(10,210)">';
-    for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
-      h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
-      h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#1a1a2e">'+l.label+'</text>';}
-    h+='</g></svg></div></div>';}
   h+='<div class="callout"><b>Key insight:</b> W is the most important node. The platform targets on W (proxy for U). Conditioning on W blocks the back-door path, making the ATE identifiable. <b>Without W, the ATE is not identified.</b></div>';
   h+='<h2 id="s3"><span class="cn">3</span> The Estimation</h2>';
   h+='<p>The 9-station UCL. The DAG is our single source of truth - everything is compiled from it.</p>';
