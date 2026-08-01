@@ -130,10 +130,15 @@ function build(){
   h+='<h2 id="s3"><span class="cn">3</span> The Estimation</h2>';
   h+='<p>The 9-station UCL. The DAG is our single source of truth - everything is compiled from it.</p>';
   if(c.data_preview){var dp=c.data_preview;
-    h+='<div class="card"><h3>What the Data Looks Like</h3><p>'+dp.shape.n_rows+' observations, '+dp.shape.n_cols+' variables. First 10 rows:</p>';
-    h+='<div style="overflow-x:auto"><table style="font-size:.74rem"><tr>';for(var j=0;j<dp.columns.length;j++)h+='<th>'+dp.columns[j]+'</th>';h+='</tr>';
-    for(var j=0;j<dp.rows.length;j++){h+='<tr>';for(var k=0;k<dp.rows[j].length;k++){var v=dp.rows[j][k];h+='<td>'+(typeof v==="number"?v.toFixed(2):v)+'</td>'}h+='</tr>'}
-    h+='</table></div></div>';}
+    h+='<div class="card"><h3>A Look at the Raw Data</h3>';
+    h+='<p>The NomNom DGP produces '+dp.shape.n_rows+' rows and '+dp.shape.n_cols+' columns. Each row is one user-day. Here is a sample of 5 rows:</p>';
+    h+='<div style="overflow-x:auto"><table style="font-size:.78rem"><tr>';
+    for(var j=0;j<dp.columns.length;j++)h+='<th title="'+((dp.column_descriptions||{})[dp.columns[j]]||"")+'">'+dp.columns[j]+'</th>';h+='</tr>';
+    for(var j=0;j<5&&j<dp.rows.length;j++){h+='<tr>';for(var k=0;k<dp.rows[j].length;k++){var v=dp.rows[j][k];var hl=(dp.columns[k]==="T"&&v===1)||(dp.columns[k]==="Y"&&v===1);h+='<td style="'+(hl?"background:#d5f5e3;font-weight:700":"")+'">'+(typeof v==="number"?(v<10?v.toFixed(2):v.toFixed(1)):v)+'</td>'}h+='</tr>'}
+    h+='</table></div>';
+    h+='<div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:10px;font-size:.8rem">';
+    h+='<div><b>T,Y,M,S,NC</b> = treatment, outcome, mediator, collider, neg.control (all 0/1)<br><b>Z</b> = instrument (0/1) | <b>W</b> = app-use proxy (continuous)<br><b>rain,weekend,payday</b> = confounders (0/1)</div>';
+    h+='<div><b>Green cells</b> = T=1 or Y=1. Notice T and Y co-occur in raw data (confounding, not causation).<br>Hover column headers for descriptions.</div></div></div>';}
   h+='<div class="card"><h3>Ground Truth (for verification)</h3><p>'+c.background.premise+'</p>';
   h+='<div class="metrics"><div class="metric'+(activeRegime==="static"?" hl":"")+'"><div class="val">'+fmt(D.static.truth)+'</div><div class="lbl">Static ATE</div></div>';
   h+='<div class="metric'+(activeRegime==="holiday"?" hl":"")+'"><div class="val">'+fmt(D.holiday.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
