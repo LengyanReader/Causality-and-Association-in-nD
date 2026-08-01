@@ -70,7 +70,7 @@ function sc(k){var cs=D.content.stations;for(var i=0;i<cs.length;i++)if(cs[i].id
 
 function build(){
   if(!D)return;
-  var rd=r(),c=D.content,rs=activeRegime==="holiday"?D.holiday:D.static,h="";
+  var rd=r(),c=D.content,cs=c.stations,h="";
   buildSidebar();
 
   h+='<h1>Causal Science — A Guided Walkthrough</h1>';
@@ -119,11 +119,10 @@ function build(){
   // Ground truth
   h+='<div class="card"><p>We work with a '+T('DGP (Data-Generating Process)','A synthetic world with known structural equations and known ground truth. Like a flight simulator for causal inference: we can compute the exact ATE by Monte Carlo under do(T=1) vs do(T=0), and check every estimate against it.')+' — every estimate below can be checked against the <b>true ATE</b>:</p>';
   h+='<div class="metrics">';
-  var ds=D.static,dh=D.holiday;
-  h+='<div class="metric'+(activeRegime==="static"?" highlight":"")+'"><div class="val">'+fmt(ds.truth)+'</div><div class="lbl">Static ATE</div></div>';
-  h+='<div class="metric'+(activeRegime==="holiday"?" highlight":"")+'"><div class="val">'+fmt(dh.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(ds.cate_loyal)+'</div><div class="lbl">Loyal users</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(ds.cate_new)+'</div><div class="lbl">New users</div></div>';
+  h+='<div class="metric'+(activeRegime==="static"?" highlight":"")+'"><div class="val">'+fmt(D.static.truth)+'</div><div class="lbl">Static ATE</div></div>';
+  h+='<div class="metric'+(activeRegime==="holiday"?" highlight":"")+'"><div class="val">'+fmt(D.holiday.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_loyal)+'</div><div class="lbl">Loyal users</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">New users</div></div>';
   h+='</div></div>';
 
   // Station cards

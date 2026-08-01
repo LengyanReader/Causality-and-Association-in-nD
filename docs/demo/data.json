@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0017178243460753428, 'tolerance': 0.013350627999052954}"
+        "detail": "{'estimate': 0.002099632401334544, 'tolerance': 0.013347140586464627}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 4.2133380428938105e-05, 'tolerance': 0.008025547861622451}"
+        "detail": "{'delta': 8.710638517456237e-06, 'tolerance': 0.008025234022454726}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005287663625789751, 'tolerance': 0.018570728732511737}"
+        "detail": "{'delta': 0.005185840957989463, 'tolerance': 0.01854627898324599}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.00087728617712051, 'tolerance': 0.014534511484436297}"
+        "detail": "{'estimate': -0.0008843224734394104, 'tolerance': 0.014536029996283156}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
+    "ci_low": 0.1769,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004336461516306002, 'tolerance': 0.01336139450520143}"
+        "detail": "{'estimate': 0.004345073438479507, 'tolerance': 0.013361771160355928}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.001212195138074773, 'tolerance': 0.007932326585718937}"
+        "detail": "{'delta': 0.0012430838807431233, 'tolerance': 0.007932765708134091}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005099174193746586, 'tolerance': 0.018335054951559748}"
+        "detail": "{'delta': 0.005074191141870021, 'tolerance': 0.01833521916397139}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004343604063881062, 'tolerance': 0.014174981808858567}"
+        "detail": "{'estimate': -0.004529167091964568, 'tolerance': 0.014166838748118587}"
       }
     ],
     "naive": 0.297,
