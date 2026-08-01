@@ -1,8 +1,0 @@
-panel
-numpy
-pandas
-scipy
-scikit-learn
-networkx
-matplotlib
-plotly

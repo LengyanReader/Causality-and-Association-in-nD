@@ -10,7 +10,7 @@ and real-data reproductions, all unit-tested against known truth.*
 
 | Demo | Description | Link |
 |---|---|---|
-| **Panel App** | Reactive walkthrough — only re-computes what changed. Sidebar glossary, tabs, LaTeX | `panel serve panel_app/app.py --auto` |
+| **Browser Demo** | Zero-install interactive walkthrough — 12 tabs, glossary sidebar, toggle regimes | [→ Open Demo](https://lengyanreader.github.io/Causality-and-Association-in-nD/demo.html) |
 | **Jupyter Notebook** | 37-cell executed notebook: rich markdown, LaTeX, DAG viz, Plotly overview, glossary accordions | [→ View Notebook](notebooks/nomnom_endtoend/full_causal_workflow.ipynb) |
 | **NHEFS Real Data** | Same workflow on 1,566 real Americans: does quitting smoking cause weight gain? | [→ View Notebook](notebooks/tier1_gallery/nhefs_real_world_walkthrough.ipynb) |
 | **Landing Page** | Project overview website | [→ Open Page](https://lengyanreader.github.io/Causality-and-Association-in-nD) |
@@ -117,7 +117,7 @@ conda env create -f environment.yml
 conda activate causality-nd
 
 # Interactive demo (browser)
-panel serve panel_app/app.py --auto
+# Open the browser demo at docs/demo.html
 
 # Jupyter walkthrough
 jupyter notebook notebooks/nomnom_endtoend/full_causal_workflow.ipynb
@@ -159,7 +159,7 @@ Causality-and-Association-in-nD/
 │   ├── math_bridge/             6-level self-verifying curriculum (Levels 0–5)
 │   ├── tier1_gallery/           6 classic reproductions + NHEFS real-world walkthrough
 │   └── nomnom_endtoend/         Full-walkthrough Jupyter notebook + end-to-end runners
-├── panel_app/                   Reactive Panel demo — only re-computes what changed
+├── docs/                        GitHub Pages: landing page + interactive browser demo
 ├── loops/                       Event-driven UCL runner
 ├── scripts/                     Notebook builder, .ipynb converter
 ├── docs/                        GitHub Pages landing page
