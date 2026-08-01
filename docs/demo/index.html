@@ -41,7 +41,7 @@ svg text{font-family:system-ui,sans-serif}
 </div>
 <script>
 var D=null,activeRegime="static";
-fetch("data.json").then(function(r){return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python docs/demo/generate.py</code> then reload.</p></div>'});
+fetch("data.json?v=4").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;try{build()}catch(e){document.getElementById("content").innerHTML='<div class="card"><h3>Error building page</h3><p>'+e.message+'</p></div>'}}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data</h3><p>Run <code>python docs/demo/generate.py</code> to generate <code>docs/demo/data.json</code>.</p><p style="color:var(--muted);font-size:.85rem">'+e.message+'</p></div>'});
 
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
