@@ -4,25 +4,20 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Causal Science — A Guided Walkthrough</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
 var dagZoom=1;
 function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
 function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
 function dagReset(){dagZoom=1;updateDagZoom()}
-function updateDagZoom(){var s=document.getElementById('dagsvg');if(s)s.style.transform='scale('+dagZoom+')'}
+function updateDagZoom(){var s=document.getElementById("dagsvg");if(s)s.style.transform="scale("+dagZoom+")"}
 function dagShowPopup(ev,nodeId){
-  var popup=document.getElementById('dagpopup');
-  if(!popup)return;
-  var nd=null;
-  if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
+  var p=document.getElementById("dagpopup");if(!p)return;
+  var nd=null;if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
   if(!nd||!nd.detail)return;
-  popup.innerHTML='<div style='text-align:right;margin-bottom:4px'><button onclick="document.getElementById('dagpopup').classList.remove('on')" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem">x</button></div>'+nd.detail;
-  popup.classList.add('on');
-  popup.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+'px';
-  popup.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+'px';
+  p.innerHTML="<div style='text-align:right;margin-bottom:4px'><button onclick='document.getElementById(\"dagpopup\").classList.remove(\"show\")' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem'>x</button></div>"+nd.detail;
+  p.classList.add("show");p.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+"px";p.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+"px";
 }
-document.addEventListener('click',function(e){var p=document.getElementById('dagpopup');if(p&&!e.target.closest('.dag-node')&&!e.target.closest('.dag-popup'))p.classList.remove('on')});
+document.addEventListener("click",function(e){var p=document.getElementById("dagpopup");if(p&&!e.target.closest(".dag-node")&&!e.target.closest(".dag-popup"))p.classList.remove("show")});
 </script>
 <style>
 :root{--bg:#fafbfc;--card:#fff;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--teal:#0d9488;--dark:#0f172a;--border:#e2e8f0;--radius:10px}
@@ -74,7 +69,7 @@ code{font-size:.88em;background:#f1f5f9;padding:1px 5px;border-radius:3px}
 .dag-toolbar button{width:30px;height:30px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:1.1rem;line-height:1;color:var(--text)}
 .dag-toolbar button:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
 .dag-popup{display:none;position:fixed;background:var(--dark);color:#e2e8f0;padding:16px 20px;border-radius:var(--radius);max-width:400px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.84rem;line-height:1.55}
-.dag-popup.on{display:block}
+.dag-popup.show{display:block}
 .dag-node{cursor:pointer}
 .dag-node:hover{filter:brightness(1.15)}
 .dag-popup b{color:#34d399}
@@ -137,9 +132,9 @@ function build(){
       h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
       if(e.label==="causal target")h+='<polygon points="'+tn.x+','+tn.y+' '+(tn.x-8)+','+(tn.y-4)+' '+(tn.x-8)+','+(tn.y+4)+'" fill="'+e.color+'"/>';}}
     for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
-      h+='<g class="dag-node" onclick="dagShowPopup(event,'"+'+n.id+'+"')">'; h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+      h+='<g class="dag-node" onclick="dagShowPopup(event,''+n.id+'')">';h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
       h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
-      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text>'; h+='</g>';}
+      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text>';h+='</g>';}
     h+='<g transform="translate(10,210)">';
     for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
       h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
@@ -359,19 +354,15 @@ var dagZoom=1;
 function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
 function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
 function dagReset(){dagZoom=1;updateDagZoom()}
-function updateDagZoom(){var s=document.getElementById('dagsvg');if(s)s.style.transform='scale('+dagZoom+')'}
+function updateDagZoom(){var s=document.getElementById("dagsvg");if(s)s.style.transform="scale("+dagZoom+")"}
 function dagShowPopup(ev,nodeId){
-  var popup=document.getElementById('dagpopup');
-  if(!popup)return;
-  var nd=null;
-  if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
+  var p=document.getElementById("dagpopup");if(!p)return;
+  var nd=null;if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
   if(!nd||!nd.detail)return;
-  popup.innerHTML='<div style='text-align:right;margin-bottom:4px'><button onclick="document.getElementById('dagpopup').classList.remove('on')" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem">x</button></div>'+nd.detail;
-  popup.classList.add('on');
-  popup.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+'px';
-  popup.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+'px';
+  p.innerHTML="<div style='text-align:right;margin-bottom:4px'><button onclick='document.getElementById(\"dagpopup\").classList.remove(\"show\")' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem'>x</button></div>"+nd.detail;
+  p.classList.add("show");p.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+"px";p.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+"px";
 }
-document.addEventListener('click',function(e){var p=document.getElementById('dagpopup');if(p&&!e.target.closest('.dag-node')&&!e.target.closest('.dag-popup'))p.classList.remove('on')});
+document.addEventListener("click",function(e){var p=document.getElementById("dagpopup");if(p&&!e.target.closest(".dag-node")&&!e.target.closest(".dag-popup"))p.classList.remove("show")});
 </script>
 </body>
 </html>
