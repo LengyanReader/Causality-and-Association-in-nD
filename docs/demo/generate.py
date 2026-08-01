@@ -109,14 +109,14 @@ data["content"] = {
     "title": "Causal Science — The Complete Workflow",
     "subtitle": "NomNom Eats: Do push notifications cause user orders?",
     "background": {
-        "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: *\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"*",
+        "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: <i>\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"</i>",
         "problem": "This is a causal question. The platform's targeting algorithm sends more notifications to users it predicts are hungry — and hungry users order more regardless. The naive association overstates the true effect due to confounding.",
         "premise": "We work with the NomNom DGP (Data-Generating Process) — a synthetic world with known ground truth, like a flight simulator for causal inference. Every estimate is checked against the true ATE computed by Monte Carlo under do(T=1) vs do(T=0).",
         "rungs": "Pearl's ladder of causation: (1) Association: P(Y|T), (2) Intervention: P(Y|do(T)), (3) Counterfactuals: P(Y(0)=0 | T=1, Y=1). This walkthrough climbs all three.",
     },
     "problem_formulation": {
         "question": "Do push notifications cause users to place orders?",
-        "why_causal": "The platform's targeting algorithm sends more notifications to users it predicts are hungry (based on app-use history W). But hunger (U) also drives orders directly. So the observed association P(Y|T=1) - P(Y|T=0) mixes the causal effect of notifications with the confounding effect of hunger. Only a causal analysis can separate them.",
+        "why_causal": "Here is what happens when we look at the raw data: P(Y|T=1) - P(Y|T=0) is approximately +0.343. This naive difference suggests that notifications increase order probability by ~34 percentage points. But this number conflates TWO things: (a) the actual causal effect of the notification itself (which we will estimate as ~+0.241), and (b) a confounding bias (~+0.102) caused by the fact that the platform selectively sends notifications to users who are already more likely to order (hungry users, proxied by W). The two mechanisms are: (1) hunger U drives the targeting decision through W (U → W → T), so treated users are systematically hungrier; (2) hunger U drives orders directly (U → Y). The net result is that the treated group has a higher baseline order rate even without any causal effect of notifications. This is the confounding gap — and only causal methods (conditioning on W to block the back-door path) can close it.",
         "target_trial": "The idealized experiment we would run if we could: randomly assign notifications to some users and withhold them from others, then measure the difference in order rates. Since we cannot run this experiment (the platform needs to target), we emulate it from observational data using the back-door criterion.",
         "estimand": "ATE = E[Y(1) - Y(0)] — the expected difference in order probability if every user were notified vs. if no user were notified.",
         "assumptions": [
@@ -260,6 +260,16 @@ data["content"] = {
         "title": "Station 8b — ACTUATOR: Autonomous Re-Estimation",
         "explanation": "The drift detection fires the actuator: re-run the full UCL pass on the new regime with zero human intervention. The same graph, the same identification, the same estimation pipeline — applied to a regime where one mechanism changed. No human re-specified anything. The loop closed: detect → localize → re-estimate → verify.",
     },
+    "references": [
+        {"short": "Pearl (1995)", "full": "Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669-688.", "url": "https://doi.org/10.1093/biomet/82.4.669"},
+        {"short": "Pearl (2009)", "full": "Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press.", "url": "https://doi.org/10.1017/CBO9780511803161"},
+        {"short": "Hernan & Robins (2020)", "full": "Hernan, M. A. & Robins, J. M. (2020). <i>Causal Inference: What If</i>. Chapman & Hall/CRC.", "url": "https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/"},
+        {"short": "Chernozhukov et al. (2018)", "full": "Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. <i>The Econometrics Journal</i>, 21(1), C1-C68.", "url": "https://doi.org/10.1111/ectj.12097"},
+        {"short": "VanderWeele & Ding (2017)", "full": "VanderWeele, T. J. & Ding, P. (2017). Sensitivity analysis in observational research: Introducing the E-value. <i>Annals of Internal Medicine</i>, 167(4), 268-274.", "url": "https://doi.org/10.7326/M16-2607"},
+        {"short": "Peters et al. (2016)", "full": "Peters, J., Buhlmann, P., & Meinshausen, N. (2016). Causal inference by using invariant prediction: identification and confidence intervals. <i>JRSS-B</i>, 78(5), 947-1012.", "url": "https://doi.org/10.1111/rssb.12167"},
+        {"short": "Imbens & Rubin (2015)", "full": "Imbens, G. W. & Rubin, D. B. (2015). <i>Causal Inference for Statistics, Social, and Biomedical Sciences</i>. Cambridge University Press.", "url": "https://doi.org/10.1017/CBO9781139025751"},
+        {"short": "Hernan & Robins (2016)", "full": "Hernan, M. A. & Robins, J. M. (2016). Using big data to emulate a target trial when a randomized trial is not available. <i>American Journal of Epidemiology</i>, 183(8), 758-764.", "url": "https://doi.org/10.1093/aje/kwv254"},
+    ],
     "glossary": [
         {"term": "ATE", "def": "Average Treatment Effect: E[Y(1) - Y(0)]"},
         {"term": "do(T=1)", "def": "The do-operator (Pearl): graph surgery that sets T=1, cutting all incoming arrows"},

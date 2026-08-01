@@ -179,6 +179,18 @@ function build(){
   h+='<tr><td>8. Counterfactual</td><td>Probability of necessity</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'%</td></tr></table>';
   h+='<div class="callout callout-good"><b>Every claim verified against known ground truth. The loop is closed — and stays closed as the world changes.</b></div></div>';
 
+  // References
+  if(c.references){
+    h+='<h2>References</h2><div class="card" style="font-size:.84rem">';
+    for(var i=0;i<c.references.length;i++){
+      var ref=c.references[i];
+      h+='<p style="margin-bottom:6px"><b>'+ref.short+'</b> — '+ref.full;
+      if(ref.url)h+=' <a href="'+ref.url+'" target="_blank" style="font-size:.78rem;color:var(--blue)">[link]</a>';
+      h+='</p>';
+    }
+    h+='</div>';
+  }
+
   document.getElementById("content").innerHTML=h;
 }
 

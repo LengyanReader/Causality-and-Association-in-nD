@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.228,
+    "ci_low": 0.2279,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.002099632401334544, 'tolerance': 0.013347140586464627}"
+        "detail": "{'estimate': 0.0019027149540877036, 'tolerance': 0.013352818877741422}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 8.710638517456237e-06, 'tolerance': 0.008025234022454726}"
+        "detail": "{'delta': 7.46967002534793e-05, 'tolerance': 0.008025355374315219}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005185840957989463, 'tolerance': 0.01854627898324599}"
+        "detail": "{'delta': 0.0052773385222261715, 'tolerance': 0.018570765956647403}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008843224734394104, 'tolerance': 0.014536029996283156}"
+        "detail": "{'estimate': -0.0008100244537165862, 'tolerance': 0.014538934348733754}"
       }
     ],
     "naive": 0.3467,
@@ -51,8 +51,8 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.1769,
-    "ci_high": 0.208,
+    "ci_low": 0.177,
+    "ci_high": 0.2081,
     "se": 0.0079,
     "truth": 0.191,
     "mu1": 0.5755,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004345073438479507, 'tolerance': 0.013361771160355928}"
+        "detail": "{'estimate': 0.004341344344933572, 'tolerance': 0.013361699021842864}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012430838807431233, 'tolerance': 0.007932765708134091}"
+        "detail": "{'delta': 0.0012436750388833961, 'tolerance': 0.007932283456215676}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005074191141870021, 'tolerance': 0.01833521916397139}"
+        "detail": "{'delta': 0.005062657787171604, 'tolerance': 0.01833447765306866}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004529167091964568, 'tolerance': 0.014166838748118587}"
+        "detail": "{'estimate': -0.004444703757617063, 'tolerance': 0.014166558614732403}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0082,
+      "M": 0.0083,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.008
+      "Y": 0.0081
     },
     "worst": "M",
     "alarm": 0.02
@@ -131,14 +131,14 @@
     "title": "Causal Science — The Complete Workflow",
     "subtitle": "NomNom Eats: Do push notifications cause user orders?",
     "background": {
-      "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: *\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"*",
+      "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: <i>\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"</i>",
       "problem": "This is a causal question. The platform's targeting algorithm sends more notifications to users it predicts are hungry — and hungry users order more regardless. The naive association overstates the true effect due to confounding.",
       "premise": "We work with the NomNom DGP (Data-Generating Process) — a synthetic world with known ground truth, like a flight simulator for causal inference. Every estimate is checked against the true ATE computed by Monte Carlo under do(T=1) vs do(T=0).",
       "rungs": "Pearl's ladder of causation: (1) Association: P(Y|T), (2) Intervention: P(Y|do(T)), (3) Counterfactuals: P(Y(0)=0 | T=1, Y=1). This walkthrough climbs all three."
     },
     "problem_formulation": {
       "question": "Do push notifications cause users to place orders?",
-      "why_causal": "The platform's targeting algorithm sends more notifications to users it predicts are hungry (based on app-use history W). But hunger (U) also drives orders directly. So the observed association P(Y|T=1) - P(Y|T=0) mixes the causal effect of notifications with the confounding effect of hunger. Only a causal analysis can separate them.",
+      "why_causal": "Here is what happens when we look at the raw data: P(Y|T=1) - P(Y|T=0) is approximately +0.343. This naive difference suggests that notifications increase order probability by ~34 percentage points. But this number conflates TWO things: (a) the actual causal effect of the notification itself (which we will estimate as ~+0.241), and (b) a confounding bias (~+0.102) caused by the fact that the platform selectively sends notifications to users who are already more likely to order (hungry users, proxied by W). The two mechanisms are: (1) hunger U drives the targeting decision through W (U → W → T), so treated users are systematically hungrier; (2) hunger U drives orders directly (U → Y). The net result is that the treated group has a higher baseline order rate even without any causal effect of notifications. This is the confounding gap — and only causal methods (conditioning on W to block the back-door path) can close it.",
       "target_trial": "The idealized experiment we would run if we could: randomly assign notifications to some users and withhold them from others, then measure the difference in order rates. Since we cannot run this experiment (the platform needs to target), we emulate it from observational data using the back-door criterion.",
       "estimand": "ATE = E[Y(1) - Y(0)] — the expected difference in order probability if every user were notified vs. if no user were notified.",
       "assumptions": [
@@ -512,6 +512,48 @@
       "title": "Station 8b — ACTUATOR: Autonomous Re-Estimation",
       "explanation": "The drift detection fires the actuator: re-run the full UCL pass on the new regime with zero human intervention. The same graph, the same identification, the same estimation pipeline — applied to a regime where one mechanism changed. No human re-specified anything. The loop closed: detect → localize → re-estimate → verify."
     },
+    "references": [
+      {
+        "short": "Pearl (1995)",
+        "full": "Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669-688.",
+        "url": "https://doi.org/10.1093/biomet/82.4.669"
+      },
+      {
+        "short": "Pearl (2009)",
+        "full": "Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press.",
+        "url": "https://doi.org/10.1017/CBO9780511803161"
+      },
+      {
+        "short": "Hernan & Robins (2020)",
+        "full": "Hernan, M. A. & Robins, J. M. (2020). <i>Causal Inference: What If</i>. Chapman & Hall/CRC.",
+        "url": "https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/"
+      },
+      {
+        "short": "Chernozhukov et al. (2018)",
+        "full": "Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. <i>The Econometrics Journal</i>, 21(1), C1-C68.",
+        "url": "https://doi.org/10.1111/ectj.12097"
+      },
+      {
+        "short": "VanderWeele & Ding (2017)",
+        "full": "VanderWeele, T. J. & Ding, P. (2017). Sensitivity analysis in observational research: Introducing the E-value. <i>Annals of Internal Medicine</i>, 167(4), 268-274.",
+        "url": "https://doi.org/10.7326/M16-2607"
+      },
+      {
+        "short": "Peters et al. (2016)",
+        "full": "Peters, J., Buhlmann, P., & Meinshausen, N. (2016). Causal inference by using invariant prediction: identification and confidence intervals. <i>JRSS-B</i>, 78(5), 947-1012.",
+        "url": "https://doi.org/10.1111/rssb.12167"
+      },
+      {
+        "short": "Imbens & Rubin (2015)",
+        "full": "Imbens, G. W. & Rubin, D. B. (2015). <i>Causal Inference for Statistics, Social, and Biomedical Sciences</i>. Cambridge University Press.",
+        "url": "https://doi.org/10.1017/CBO9781139025751"
+      },
+      {
+        "short": "Hernan & Robins (2016)",
+        "full": "Hernan, M. A. & Robins, J. M. (2016). Using big data to emulate a target trial when a randomized trial is not available. <i>American Journal of Epidemiology</i>, 183(8), 758-764.",
+        "url": "https://doi.org/10.1093/aje/kwv254"
+      }
+    ],
     "glossary": [
       {
         "term": "ATE",
