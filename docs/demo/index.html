@@ -6,40 +6,48 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
-:root{--bg:#f8f9fa;--card:#fff;--text:#2c3e50;--muted:#6c757d;--blue:#3498db;--green:#2ecc71;--orange:#f39c12;--red:#e74c3c;--purple:#9b59b6;--teal:#1abc9c;--dark:#34495e;--border:#dee2e6;--radius:8px}
+:root{--bg:#fafbfc;--card:#fff;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--teal:#0d9488;--dark:#0f172a;--border:#e2e8f0;--radius:10px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.75}
 .app{display:flex;min-height:100vh}
-.sidebar{width:280px;background:#2c3e50;color:#ecf0f1;padding:20px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10}
-.sidebar h2{font-size:1.1rem;margin-bottom:2px}
-.sidebar .sub{font-size:.78rem;color:#95a5a6;margin-bottom:12px}
-.sidebar h3{font-size:.85rem;margin:14px 0 6px;color:var(--green)}
-.gt{font-size:.78rem;margin-bottom:4px;padding:2px 0}.gt b{color:var(--green)}
-.regime-badge{display:block;text-align:center;background:var(--blue);color:white;padding:8px;border-radius:6px;margin-bottom:12px;font-weight:700;font-size:.85rem}
-.main{margin-left:280px;padding:32px 40px;max-width:900px;flex:1}
-h1{font-size:1.9rem;font-weight:800;margin-bottom:4px}
-h2{font-size:1.35rem;margin:36px 0 16px;padding-bottom:6px;border-bottom:3px solid var(--blue);display:inline-block}
-h3{font-size:1.05rem;margin:18px 0 8px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.metrics{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;text-align:center;min-width:120px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
-.metric .val{font-size:1.5rem;font-weight:800;color:var(--blue)}.metric .lbl{font-size:.76rem;color:var(--muted);margin-top:3px}
-.metric.diff .val{color:#e74c3c}
-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
-th{background:var(--dark);color:white;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}tr:hover td{background:#f1f5f9}
-.box{background:#eaf2f8;border-left:4px solid var(--blue);padding:14px 18px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.9rem}
-.box-warn{background:#fef9e7;border-left-color:var(--orange)}
-.box-good{background:#eafaf1;border-left-color:var(--green)}
-.box-important{background:#fdedec;border-left-color:var(--red)}
-.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700}.bg{background:#d5f5e3;color:#1e8449}.br{background:#fadbd8;color:#c0392b}
-select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.84rem;width:100%;margin-bottom:12px}
-.nav-progress{position:sticky;top:0;background:var(--bg);padding:12px 0;margin-bottom:20px;z-index:5;border-bottom:1px solid var(--border)}
-.nav-progress .step{display:inline-block;padding:4px 10px;margin:2px 3px;font-size:.75rem;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);text-decoration:none}
-.nav-progress .step:hover{background:var(--blue);color:white}
-.formula{background:#f1f3f4;padding:8px 14px;border-radius:4px;display:inline-block;margin:4px 0}
+.sidebar{width:270px;background:var(--dark);color:#e2e8f0;padding:20px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10}
+.sidebar h2{font-size:1.05rem;margin-bottom:2px;color:#fff}
+.sidebar .sub{font-size:.75rem;color:#94a3b8;margin-bottom:14px}
+.sidebar h3{font-size:.8rem;margin:14px 0 6px;color:#34d399}
+.gt{font-size:.74rem;margin-bottom:3px;padding:1px 0;line-height:1.45}.gt b{color:#34d399}
+.regime-badge{display:block;text-align:center;padding:8px;border-radius:6px;margin-bottom:12px;font-weight:700;font-size:.82rem}
+.regime-badge.static{background:#059669;color:#fff}
+.regime-badge.holiday{background:#d97706;color:#fff}
+.main{margin-left:270px;padding:36px 44px;max-width:860px;flex:1}
+h1{font-size:2rem;font-weight:800;margin-bottom:6px;letter-spacing:-.5px}
+h2{font-size:1.25rem;margin:44px 0 14px;padding-bottom:6px;border-bottom:3px solid var(--blue)}
+h3{font-size:1.02rem;margin:18px 0 8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin:18px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.metrics{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;text-align:center;min-width:130px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.metric .val{font-size:1.5rem;font-weight:800;color:var(--blue)}
+.metric .lbl{font-size:.74rem;color:var(--muted);margin-top:3px}
+.metric.highlight{border:2px solid var(--green)}.metric.highlight .val{color:var(--green)}
+.metric.warn{border:2px solid var(--orange)}.metric.warn .val{color:var(--orange)}
+table{width:100%;border-collapse:collapse;font-size:.86rem;margin:12px 0}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left;font-size:.8rem}
+td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700}.bg{background:#d1fae5;color:#065f46}.br{background:#fee2e2;color:#991b1b}
+.callout{background:#eff6ff;border-left:4px solid var(--blue);padding:14px 18px;margin:16px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.9rem}
+.callout-warn{background:#fffbeb;border-left-color:var(--orange)}
+.callout-good{background:#ecfdf5;border-left-color:var(--green)}
+.callout-red{background:#fef2f2;border-left-color:var(--red)}
+select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;width:100%;margin-bottom:10px;background:var(--card)}
 .term{color:var(--blue);font-weight:600;border-bottom:1px dotted var(--blue);cursor:help;position:relative}
-.term:hover::after{content:attr(data-tip);position:absolute;bottom:24px;left:0;background:#2c3e50;color:white;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:400;white-space:nowrap;z-index:100;pointer-events:none}
+.term:hover::after{content:attr(data-tip);position:absolute;bottom:22px;left:0;background:var(--dark);color:#fff;padding:6px 10px;border-radius:4px;font-size:.75rem;font-weight:400;white-space:nowrap;z-index:100;pointer-events:none;max-width:320px;white-space:normal}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:4px 0}
+.step-box{background:#f8fafc;border:1px dashed var(--border);border-radius:var(--radius);padding:14px 18px;margin:10px 0;font-size:.85rem}
+.step-box b{color:var(--blue)}
+.chapter-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--blue);color:#fff;border-radius:50%;font-size:.85rem;font-weight:800;margin-right:8px;flex-shrink:0}
 svg text{font-family:system-ui,sans-serif}
+a{color:var(--blue);text-decoration:none}
+pre{background:var(--dark);color:#e2e8f0;padding:14px 18px;border-radius:var(--radius);overflow-x:auto;font-size:.82rem;margin:12px 0}
+code{font-size:.88em;background:#f1f5f9;padding:1px 5px;border-radius:3px}
 </style></head>
 <body><div class="app">
 <aside class="sidebar" id="sidebar"></aside>
@@ -47,174 +55,185 @@ svg text{font-family:system-ui,sans-serif}
 </div>
 <script>
 var D=null,activeRegime="static";
-fetch("data.json?v=5").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;try{build()}catch(e){document.getElementById("content").innerHTML='<div class="card"><h3>Error</h3><p>'+e.message+'</p></div>'}}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data</h3><p>Run <code>python docs/demo/generate.py</code>.</p><p>'+e.message+'</p></div>'});
+fetch("data.json?v=6").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
 
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
 function cov(re){return re.ci_low<=re.truth&&re.truth<=re.ci_high}
-function row(k,v,c){c=c||"";return"<tr><td>"+k+"</td><td"+(c?' class="'+c+'"':"")+"><b>"+v+"</b></td></tr>"}
+function row(k,v){return'<tr><td>'+k+'</td><td><b>'+v+'</b></td></tr>'}
 function badge(v,ok){return'<span class="badge '+(ok?"bg":"br")+'">'+v+'</span>'}
 function nodePos(ns,id){for(var i=0;i<ns.length;i++)if(ns[i].id===id)return ns[i];return null}
 function T(abbr,tip){return'<span class="term" data-tip="'+tip+'">'+abbr+'</span>'}
-function TeX(s){try{return katex.renderToString(s,{throwOnError:false})}catch(e){return'<code>'+s+'</code>'}}
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+function DM(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:true})}catch(e){return'<code>'+s+'</code>'}}
+function sc(k){var cs=D.content.stations;for(var i=0;i<cs.length;i++)if(cs[i].id===k)return cs[i];return null}
 
 function build(){
   if(!D)return;
-  var rd=r(),cs=D.content.stations,c=D.content,rs=activeRegime==="holiday"?D.holiday:D.static,h="";
+  var rd=r(),c=D.content,rs=activeRegime==="holiday"?D.holiday:D.static,h="";
   buildSidebar();
 
-  h+='<h1>'+c.title+'</h1><p style="font-size:1.1rem;color:var(--muted)">'+c.subtitle+'</p>';
-  h+='<div class="nav-progress"><span class="step" style="background:var(--green);color:white;font-weight:700">Regime: '+activeRegime.toUpperCase()+'</span> ';
-  h+='<a href="#s1" class="step">1. Problem</a> <a href="#s2" class="step">2. Graph</a> <a href="#s3" class="step">3. Workflow</a> <a href="#s4" class="step">4. Sensitivity</a> <a href="#s5" class="step">5. Evolution</a> <a href="#s6" class="step">6. Counterfactuals</a> <a href="#s7" class="step">7. Summary</a></div>';
+  h+='<h1>Causal Science — A Guided Walkthrough</h1>';
+  h+='<p style="font-size:1.05rem;color:var(--muted);margin-bottom:8px">NomNom Eats: Does sending push notifications <i>cause</i> users to order?</p>';
 
-  // ── PART 1: THE PROBLEM ──
-  h+='<h2 id="s1">1. The Problem: '+T('Association ≠ Causation','Pearl: The three rungs of the ladder of causation are strictly distinct. No amount of rung-1 (associational) data alone answers rung-2 (interventional) questions without causal assumptions.')+'</h2>';
-  h+='<div class="card"><p style="font-size:1.05rem"><i>'+c.background.use_case+'</i></p><p>'+c.background.problem+'</p></div>';
+  // ── CHAPTER 1: THE QUESTION ──
+  h+='<h2><span class="chapter-num">1</span> The Question</h2>';
+  h+='<div class="card"><p style="font-size:1.02rem"><i>'+c.background.use_case+'</i></p><p>'+c.background.problem+'</p></div>';
 
   if(c.problem_formulation){var pf=c.problem_formulation;
-    h+='<div class="box box-warn"><b>Why this is causal:</b><br>'+pf.why_causal+'</div>';
-    h+='<div class="card"><h3>The Target Trial (what we would randomize if we could)</h3><p>'+pf.target_trial+'</p>';
-    h+='<p><b>'+T('Estimand','The precise quantity we want to estimate. For causal questions, this must be expressed in terms of potential outcomes Y(1), Y(0).')+':</b> <span class="formula">'+TeX("\\text{ATE} = E[Y(1) - Y(0)]")+'</span></p>';
-    h+='<p><b>Key Assumptions:</b></p><ol>';
-    h+='<li>'+T('Ignorability','No unmeasured confounding: {Y(0),Y(1)} ⟂ T | X. The observed covariates X block all back-door paths.')+': {Y(0),Y(1)} ⊥ T | {W,rain,weekend,payday}</li>';
-    h+='<li>'+T('Positivity','Every unit must have a non-zero probability of receiving either treatment: 0 < P(T=1|X=x) < 1 for all x.')+': 0 < P(T=1|X) < 1 for all X</li>';
-    h+='<li>'+T('SUTVA','Stable Unit Treatment Value Assumption: (1) no interference between units, (2) only one version of each treatment level.')+': no interference, one treatment version</li>';
-    h+='<li>'+T('Consistency','The observed outcome under T=t equals the potential outcome Y(t). This links the counterfactual world to the observed world.')+': Y_obs = T·Y(1) + (1-T)·Y(0)</li>';
-    h+='</ol></div>';
-    h+='<p>The ladder we climb: '+T('Rung 1','Association: P(Y|T) — seeing')+' → '+T('Rung 2','Intervention: P(Y|do(T)) — doing')+' → '+T('Rung 3','Counterfactuals: P(Y(0)=0|T=1,Y=1) — imagining')+'</p>';
-  }
+    h+='<div class="callout callout-warn"><b>Diagnosis:</b> '+pf.why_causal+'</div>';
+    h+='<div class="card"><p><b>What we would do in an ideal world (the '+T('target trial','The hypothetical randomized experiment we would conduct if we could. Observational causal inference is the art of emulating a target trial from non-experimental data.')+'):</b> '+pf.target_trial+'</p></div>';
+    h+='<div class="card"><p><b>Our '+T('estimand','The precise causal quantity we aim to estimate. For the ATE: the expected difference in outcomes if everyone were treated vs. if no one were treated.')+':</b> <span class="formula">'+M("\\text{ATE} = E[Y(1) - Y(0)]")+'</span></p>';
+    h+='<p>To estimate this from observational data, we need four assumptions:</p>';
+    h+='<ol style="font-size:.88rem">';
+    h+='<li><b>'+T('Ignorability','All common causes of T and Y are measured. Formally: {Y(0),Y(1)} is independent of T given the covariates X.')+':</b> no unmeasured confounders beyond what W captures</li>';
+    h+='<li><b>'+T('Positivity','Every unit has non-zero probability of receiving either treatment level. If P(T=1|X=x)=0 for some x, we cannot estimate the effect for that subgroup.')+':</b> 0 &lt; P(T=1 | X) &lt; 1 for all covariate patterns</li>';
+    h+='<li><b>'+T('SUTVA','Stable Unit Treatment Value Assumption: no interference between units, and only one version of each treatment level.')+':</b> one user\'s notification does not affect another\'s order</li>';
+    h+='<li><b>'+T('Consistency','The observed outcome when T=t equals the potential outcome Y(t). This links the counterfactual world to the observed data.')+':</b> the observed outcome equals the potential outcome under the received treatment</li>';
+    h+='</ol></div>';}
 
-  // ── PART 2: THE CAUSAL GRAPH ──
-  h+='<h2 id="s2">2. The '+T('Causal Graph','A Directed Acyclic Graph (DAG) where nodes are variables and arrows represent direct causal relationships. Each arrow is an assumption; each absent arrow is a falsifiable claim.')+': Making Assumptions Visible</h2>';
+  // ── CHAPTER 2: THE GRAPH ──
+  h+='<h2><span class="chapter-num">2</span> The '+T('Causal Graph','A Directed Acyclic Graph (DAG). Nodes are variables; arrows are direct causal relationships. Every arrow is an assumption; every absent arrow is a falsifiable claim.')+'</h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';
-    h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:6px">';
+    h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:8px">';
     for(var j=0;j<c.dag.edges.length;j++){var e=c.dag.edges[j],fn=nodePos(c.dag.nodes,e.from),tn=nodePos(c.dag.nodes,e.to);
       if(fn&&tn){var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
       h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
       if(e.label==="causal target")h+='<polygon points="'+tn.x+','+tn.y+' '+(tn.x-8)+','+(tn.y-4)+' '+(tn.x-8)+','+(tn.y+4)+'" fill="'+e.color+'"/>';}}
     for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
-      h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#2c3e50" stroke-width="1.5"/>';
-      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"white")+'">'+n.id+'</text>';
-      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#2c3e50">'+n.label+'</text>';}
+      h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
+      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text>';}
     h+='<g transform="translate(10,210)">';
-    for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*155;
+    for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
       h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
-      h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#2c3e50">'+l.label+'</text>';}
+      h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#1a1a2e">'+l.label+'</text>';}
     h+='</g></svg></div>';}
-  h+='<div class="box"><b>Key insight:</b> W (app-use history) is the most important node. The platform targets on W, a proxy for true hunger U. Conditioning on W '+T('blocks the confounding path','The back-door path U→W→T ... U→Y is open in the original DAG. By conditioning on W, we d-separate T from Y along this path, making the ATE identified.')+' U→W→T ... U→Y, making the ATE '+T('identifiable','An estimand is identified if it can be expressed solely in terms of observable quantities — i.e., there exists a formula mapping observed data to the causal quantity.')+'.</div>';
+  h+='<div class="callout"><b>The key to identification:</b> W (app-use history) is a proxy for the unobserved hunger U. Because the platform targets notifications <i>using only W</i>, conditioning on W '+T('blocks the back-door path','A back-door path is a non-causal association path between T and Y that starts with an arrow INTO T. Blocking it requires conditioning on a set of variables that d-separates T from Y in the back-door graph.')+' from U to T to Y. Without W, the ATE is not identifiable.</div>';
 
-  // ── PART 3: WORKFLOW ──
-  h+='<h2 id="s3">3. The Workflow: From Question to Answer</h2>';
-  h+='<p>With the graph in hand, we walk the 9-station '+T('Universal Causal Loop (UCL)','A closed-loop control system for causal inference: each station has sensors (health metrics) and actuators (revision actions). The EVOLVE station feeds back to ASSUME, making the workflow self-correcting.')+'.</p>';
-  h+='<div class="card"><h3>Ground Truth (computed by Monte Carlo under intervention)</h3><p>'+c.background.premise+'</p>';
+  // ── CHAPTER 3: THE ESTIMATION ──
+  h+='<h2><span class="chapter-num">3</span> The Estimation</h2>';
+  h+='<p>Now we walk through each station of the '+T('Universal Causal Loop','A 9-station workflow that transforms a causal question into a verified, monitored answer. Each station has sensors (what could go wrong) and actuators (what to do about it).')+'. The graph from Chapter 2 is our single source of truth — everything is compiled from it.</p>';
+
+  // Ground truth
+  h+='<div class="card"><p>We work with a '+T('DGP (Data-Generating Process)','A synthetic world with known structural equations and known ground truth. Like a flight simulator for causal inference: we can compute the exact ATE by Monte Carlo under do(T=1) vs do(T=0), and check every estimate against it.')+' — every estimate below can be checked against the <b>true ATE</b>:</p>';
   h+='<div class="metrics">';
-  var dstatic=D.static,dhol=D.holiday;
-  h+='<div class="metric'+(activeRegime!=="static"?' diff':'')+'"><div class="val">'+fmt(dstatic.truth)+'</div><div class="lbl">Static ATE</div></div>';
-  h+='<div class="metric'+(activeRegime!=="holiday"?' diff':'')+'"><div class="val">'+fmt(dhol.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(dstatic.cate_loyal)+'</div><div class="lbl">CATE (loyal)</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(dstatic.cate_new)+'</div><div class="lbl">CATE (new)</div></div></div>';
-  h+='<p style="font-size:.82rem;color:var(--muted)">Holiday changes T→M from 1.6 to 0.4. The <b style="color:var(--red)">red</b> metric above is the regime NOT currently active.</p></div>';
+  var ds=D.static,dh=D.holiday;
+  h+='<div class="metric'+(activeRegime==="static"?" highlight":"")+'"><div class="val">'+fmt(ds.truth)+'</div><div class="lbl">Static ATE</div></div>';
+  h+='<div class="metric'+(activeRegime==="holiday"?" highlight":"")+'"><div class="val">'+fmt(dh.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(ds.cate_loyal)+'</div><div class="lbl">Loyal users</div></div>';
+  h+='<div class="metric"><div class="val">'+fmt(ds.cate_new)+'</div><div class="lbl">New users</div></div>';
+  h+='</div></div>';
 
-  for(var i=0;i<cs.length;i++)h+=stationCard(cs[i],rd);
+  // Station cards
+  for(var i=0;i<cs.length;i++)h+=buildStation(cs[i],rd);
 
-  // ── PART 4: SENSITIVITY ──
-  h+='<h2 id="s4">4. Sensitivity: '+T('How Wrong Could We Be?','An estimate without a sensitivity analysis is an open-loop claim. The E-value quantifies the minimum strength an unmeasured confounder would need to explain away the observed effect.')+'</h2>';
-  if(c.evalue_deep_dive){var ev=c.evalue_deep_dive;
-    h+='<div class="card"><h3>The '+T('E-value','E-value (VanderWeele & Ding, 2017, Annals of Internal Medicine): quantifies robustness to unmeasured confounding. Larger = more robust.')+'</h3>';
-    h+='<div class="box box-important">'+ev.definition+'</div>';
-    h+='<p><span class="formula">'+TeX("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p><p>'+ev.intuition+'</p>';
-    h+='<p>Our estimate: '+T('E-value','E-value > 2 means an unmeasured confounder would need RR >= 2 with both T and Y — moderately robust.')+' = <b>'+rd.e_value.toFixed(2)+'</b> (risk ratio = '+rd.risk_ratio.toFixed(2)+')</p>';
-    h+='<table><tr><th>E-value Range</th><th>Interpretation</th></tr>';
-    for(var j=0;j<ev.thresholds.length;j++){var t=ev.thresholds[j].split(": ");h+='<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td></tr>'}
-    h+='</table><p style="font-size:.84rem;color:var(--muted)">'+ev.ci_bound_note+'</p>';
-    h+='<div class="box">'+ev.example+'</div></div>';}
+  // ── CHAPTER 4: SENSITIVITY ──
+  h+='<h2><span class="chapter-num">4</span> How Wrong Could We Be?</h2>';
+  h+='<div class="card"><p>We estimated an effect. But what if we missed a confounder? The '+T('E-value','VanderWeele & Ding (2017): the minimum strength of association an unmeasured confounder would need to have with BOTH the treatment and the outcome to fully explain away the observed effect, conditional on the measured covariates.')+' answers this quantitatively.</p>';
+  h+='<div class="callout callout-red">'+c.evalue_deep_dive.definition+'</div>';
+  h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p>';
+  h+='<p>For our '+activeRegime+' regime: <b>E-value = '+rd.e_value.toFixed(2)+'</b> (risk ratio = '+rd.risk_ratio.toFixed(2)+')</p>';
+  h+='<table><tr><th>E-value</th><th>What it means</th></tr>';
+  var evt=c.evalue_deep_dive.thresholds;
+  for(var j=0;j<evt.length;j++){var p=evt[j].split(": ");h+='<tr><td><b>'+p[0]+'</b></td><td>'+p[1]+'</td></tr>'}
+  h+='</table><p style="font-size:.84rem;color:var(--muted)">'+c.evalue_deep_dive.ci_bound_note+'</p>';
+  h+='<div class="callout">'+c.evalue_deep_dive.example+'</div></div>';
 
-  // ── PART 5: EVOLUTION ──
-  h+='<h2 id="s5">5. Evolution: The Loop Closes</h2>';
-  h+='<div class="card"><p>The 8th station makes the UCL a <b>loop</b> rather than a pipeline. Using the '+T('invariance principle','Peters, Buhlmann & Meinshausen (2016): a correctly specified causal mechanism has a stable conditional distribution P(effect|causes) across environments. If it degrades on new data, the DAG or mechanism has changed.')+', we detect when the world drifts.</p>';
+  // ── CHAPTER 5: DRIFT DETECTION ──
+  h+='<h2><span class="chapter-num">5</span> When the World Changes</h2>';
+  h+='<div class="card"><p><b>Here\'s where the two regimes matter.</b></p>';
+  h+='<p>The <b>Static regime</b> is the baseline — notifications work normally. The <b>Holiday regime</b> is what happens during the holidays: users become habituated to notifications and the T→M coefficient drops from 1.6 to 0.4.</p>';
+  h+='<p>This is '+T('distribution shift','The data distribution changes from what the model was trained on. In causal terms: a mechanism P(node|parents) changed while the causal structure stayed the same.')+' — a real production problem. The EVOLVE station detects it with the '+T('mechanism-stability monitor','Fits P(node|parents) on reference data, then evaluates log-loss on new data. The node with the largest degradation is the locus of drift. Based on the invariance principle (Peters et al. 2016).')+':</p>';
   if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
-    h+='<table><tr><th>Node</th><th>Log-loss '+T('Degradation','The increase in negative log-likelihood when evaluating P(node|parents) on new data vs. training data. Larger = the mechanism fits less well — a sign of drift.')+'</th><th>Status (alarm='+al+')</th></tr>';
-    for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
-    h+='</table><p><b>Drift localized to: <code>'+D.evolve.worst+'</code></b> — the notification→app-open mechanism (coefficient 1.6→0.4).</p>';}
+    h+='<table><tr><th>Node</th><th>Log-loss increase</th><th>Status (threshold='+al+')</th></tr>';
+    for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?'<span class="badge br">DRIFT</span>':'<span class="badge bg">OK</span>')+'</td></tr>'}
+    h+='</table><p><b>Detected:</b> the T→M mechanism changed — <i>exactly</i> what we planted in the DGP. The Y mechanism is confirmed invariant.</p>';}
   if(D.actuator&&c.actuator_section){
-    h+='<div class="box box-good"><b>'+c.actuator_section.title+':</b> '+c.actuator_section.explanation+'</div>';
-    h+='<table>'+row("Holiday ATE (re-estimated)",fmt(D.actuator.ate))+row("Holiday Truth",fmt(D.actuator.truth))+row("CI Covers Truth",badge(String(D.actuator.covers),D.actuator.covers))+row("All Refuters Green",badge(String(D.actuator.all_green),D.actuator.all_green))+'</table>';}
+    h+='<p>Once drift is detected, the '+T('actuator','The automated response: re-run the full UCL pass on the new data batch, under the same graph, with zero human intervention. The loop closes itself.')+' fires — it re-runs the pipeline on the holiday data:</p>';
+    h+='<table>'+row("Holiday ATE (re-estimated)",fmt(D.actuator.ate))+row("Holiday Truth",fmt(D.actuator.truth))+row("CI Covers",badge(String(D.actuator.covers),D.actuator.covers))+row("All Green",badge(String(D.actuator.all_green),D.actuator.all_green))+'</table>';}
   h+='</div>';
 
-  // ── PART 6: COUNTERFACTUALS ──
-  h+='<h2 id="s6">6. Counterfactuals: Beyond Averages</h2>';
-  if(c.rung3_section){
-    h+='<div class="card"><div class="box box-important"><b>Rung 3 vs Rung 2:</b> '+c.rung3_section.explanation+'</div>';
-    if(D.rung3){
-      h+='<table>'+row("P(Y(0)=0 | T=1, Y=1)",fmt(D.rung3.p_necessity)+" (Rung 3)")+row("ATE (same draws)",fmt(D.rung3.ate_sim)+" (Rung 2)")+row("Ground truth ATE",fmt(D.static.truth))+'</table>';
-      h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered users would NOT have ordered without the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+'%) is the average over ALL users.</p>';}
-    h+='<p>The three-step '+T('abduction-action-prediction','Pearl 2009, Ch.7: (1) Abduction: infer the unit\'s exogenous noise from observed data. (2) Action: modify the SCM by do(T=1-T_factual). (3) Prediction: re-run the modified SCM with the SAME inferred noise.')+' recipe:</p>';
-    h+='<table><tr><th>Step</th><th>What it does</th></tr><tr><td><b>1. Abduction</b></td><td>Infer each unit\'s exogenous noise (U) from observed data — "what must the noise have been to produce what we saw?"</td></tr><tr><td><b>2. Action</b></td><td>Apply '+TeX("do(T=1-T_{\\text{factual}})")+' — "what if we flipped the treatment?"</td></tr><tr><td><b>3. Prediction</b></td><td>Re-run structural equations with SAME noise, DIFFERENT T — "what would have happened to THIS unit?"</td></tr></table></div>';}
+  // ── CHAPTER 6: COUNTERFACTUALS ──
+  h+='<h2><span class="chapter-num">6</span> Was <i>This</i> Order Caused by the Notification?</h2>';
+  h+='<div class="card"><p>The ATE tells us the <i>average</i> effect. But we want to know about individual users. '+T('Counterfactuals','Questions about what WOULD have happened to a specific unit under a different treatment. These live on rung 3 of Pearl\'s ladder and require the SCM\'s full noise structure — interventional distributions alone are insufficient.')+' answer: "Would this user have ordered <i>without</i> the notification?"</p>';
+  if(D.rung3){
+    h+='<table>'+row("P(Y(0)=0 | T=1, Y=1)",fmt(D.rung3.p_necessity)+" (Rung 3)")+row("ATE (same draws)",fmt(D.rung3.ate_sim)+" (Rung 2)")+row("Ground truth ATE",fmt(D.static.truth))+'</table>';
+    h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of users who were notified AND ordered would <b>not</b> have ordered without the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+'%) averages over everyone — fundamentally different quantities.</p>';}
+  h+='<p>The three-step recipe:</p>';
+  h+='<table><tr><th>Step</th><th>What we do</th></tr>';
+  h+='<tr><td><b>1. Abduction</b></td><td>Given what we observed (T, Y, and covariates), infer the most likely value of the unobserved noise U for each user.</td></tr>';
+  h+='<tr><td><b>2. Action</b></td><td>Apply '+M("do(T=1-T_{\\text{factual}})")+' — "what if we flipped the treatment for this user?"</td></tr>';
+  h+='<tr><td><b>3. Prediction</b></td><td>Re-run the structural equations with the SAME inferred noise but the DIFFERENT treatment.</td></tr></table></div>';
 
-  // ── PART 7: SUMMARY ──
-  h+='<h2 id="s7">7. Summary: The Complete Workflow</h2>';
-  h+='<div class="card"><table><tr><th>Stage</th><th>What We Did</th><th>Result for '+activeRegime+' regime</th></tr>';
-  h+='<tr><td><b>1. Frame</b></td><td>Define estimand</td><td>ATE = E[Y(1)-Y(0)] at rung 2</td></tr>';
-  h+='<tr><td><b>2. Graph</b></td><td>Encode assumptions in DAG</td><td>v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-variable adj.</td></tr>';
-  h+='<tr><td><b>3. Identify</b></td><td>Back-door via graph surgery</td><td>'+rd.criterion+': '+(rd.adjustment_set||[]).join(", ")+'</td></tr>';
-  h+='<tr><td><b>4. Data</b></td><td>Check positivity, measure gap</td><td>Positivity OK, rung-1 gap = '+fmt(rd.gap||0)+'</td></tr>';
-  h+='<tr><td><b>5. Estimate</b></td><td>AIPW/DML cross-fit</td><td>'+fmt(rd.ate)+' ['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+'] vs '+fmt(rd.truth)+'</td></tr>';
-  h+='<tr><td><b>6. Evaluate</b></td><td>E-value sensitivity</td><td>E-value = '+rd.e_value.toFixed(2)+' (moderately robust)</td></tr>';
-  h+='<tr><td><b>7. Test</b></td><td>4 refuters + invariants</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td></tr>';
-  h+='<tr><td><b>8. Evolve</b></td><td>Mechanism-stability + actuator</td><td>Drift: M; holiday truth recovered</td></tr>';
-  h+='<tr><td><b>Counterfactual</b></td><td>Abduction-action-prediction</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'% necessity</td></tr></table>';
-  h+='<div class="box box-good"><b>Every claim verified against known ground truth. The loop is closed — and stays closed.</b></div></div>';
+  // ── SUMMARY ──
+  h+='<h2><span class="chapter-num">7</span> What We Learned</h2>';
+  h+='<div class="card"><table><tr><th>Step</th><th>What we did</th><th>Result ('+activeRegime+' regime)</th></tr>';
+  h+='<tr><td>1. Frame</td><td>Defined the estimand</td><td>ATE = E[Y(1)-Y(0)]</td></tr>';
+  h+='<tr><td>2. Graph</td><td>Encoded assumptions in a DAG</td><td>v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-variable adj.</td></tr>';
+  h+='<tr><td>3. Identify</td><td>Back-door criterion via graph surgery</td><td>'+(rd.adjustment_set||[]).join(", ")+'</td></tr>';
+  h+='<tr><td>4. Estimate</td><td>AIPW/DML cross-fit</td><td><b>'+fmt(rd.ate)+'</b> ['+fmt(rd.ci_low)+', '+fmt(rd.ci_high)+'] vs truth '+fmt(rd.truth)+'</td></tr>';
+  h+='<tr><td>5. Evaluate</td><td>E-value sensitivity</td><td>'+rd.e_value.toFixed(2)+' (moderately robust)</td></tr>';
+  h+='<tr><td>6. Test</td><td>4 refuters</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td></tr>';
+  h+='<tr><td>7. Evolve</td><td>Detect drift, re-estimate</td><td>Holiday truth recovered</td></tr>';
+  h+='<tr><td>8. Counterfactual</td><td>Probability of necessity</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'%</td></tr></table>';
+  h+='<div class="callout callout-good"><b>Every claim verified against known ground truth. The loop is closed — and stays closed as the world changes.</b></div></div>';
 
   document.getElementById("content").innerHTML=h;
 }
 
-function stationCard(s,rd){
+function buildStation(s,rd){
   var h='<div class="card"><h3>Station '+s.number+' — '+s.emoji+' '+s.name+'</h3>';
-  h+='<p style="color:var(--muted)"><i>'+s.question+'</i></p>';
-  if(s.explanation)h+='<div class="box">'+s.explanation+'</div>';
-  if(s.formula)h+='<p><span class="formula">'+TeX(s.formula)+'</span></p>';
+  h+='<p style="color:var(--muted);font-size:.92rem"><i>'+s.question+'</i></p>';
+  if(s.explanation)h+='<div class="callout">'+s.explanation+'</div>';
+  if(s.formula)h+='<p><span class="formula">'+M(s.formula)+'</span></p>';
 
-  if(s.id==="data"){
-    h+='<div class="box box-warn"><b>Step-by-step:</b> (1) Load '+rd.n_rows+' observations from the DGP. (2) Check positivity: PS in [0.01,0.99] → '+badge(String(rd.positivity_ok),rd.positivity_ok)+'. (3) Compute the rung-1 naive contrast vs. the known rung-2 truth.</div>';
-    h+='<table>'+row("Sample size",rd.n_rows)+row("Positivity check",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
-    h+='<table><tr><th>Contrast</th><th>Value</th><th>Rung</th></tr>';
-    h+='<tr><td>Naive: P(Y|T=1) - P(Y|T=0)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1 — seeing</td></tr>';
-    h+='<tr><td>Causal: E[Y|do(T=1)] - E[Y|do(T=0)]</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2 — doing</td></tr>';
-    h+='<tr><td><b>Confounding gap</b></td><td><b style="color:var(--red)">'+fmt(rd.gap||0)+'</b></td><td>—</td></tr></table>';
+  // Step-by-step box per station
+  if(s.id==="frame"){
+    h+='<div class="step-box"><b>How:</b> We specify the hypothetical randomized trial we are emulating: eligibility (all active user-days), treatment (push notification), outcome (order), and the causal contrast (ATE at rung 2).</div>';
   }
   if(s.id==="assume"){
-    h+='<div class="box"><b>Step-by-step:</b> (1) Enumerate all known variables (13 observed + 1 latent). (2) Draw each arrow based on domain knowledge. (3) Declare absent edges as falsifiable claims. (4) Version the graph (hash='+rd.graph_version+').</div>';
+    h+='<div class="step-box"><b>How:</b> (1) List all variables: 13 observed + 1 latent (U). (2) Draw arrows based on domain knowledge. (3) Explicitly declare the 8 absent edges as falsifiable claims. (4) Version the graph — every change is tracked.</div>';
     h+='<table>'+row("Graph version","<code>"+rd.graph_version+"</code>")+row("Observed / Edges","13 / 20")+row("Absent edges","8 (falsifiable)")+'</table>';
   }
   if(s.id==="identify"){
-    h+='<div class="box"><b>Step-by-step:</b> (1) Delete all edges OUT of T (back-door graph). (2) Search observed, non-descendant variable subsets. (3) Test d-separation via networkx. (4) Return smallest valid set.</div>';
-    h+='<table>'+row("Criterion",rd.criterion)+row("Identified",badge("true",true))+'<tr><td><b>Adjustment set</b></td><td><code>'+(rd.adjustment_set||[]).join(", ")+'</code></td></tr></table>';
+    h+='<div class="step-box"><b>How:</b> (1) Delete all edges out of T (back-door graph). (2) Search subsets of observed variables for one that d-separates T from Y. (3) Return the smallest valid set.</div>';
+    h+='<table>'+row("Criterion","back-door")+row("Identified",badge("true",true))+'<tr><td><b>Adjustment set</b></td><td><code>'+(rd.adjustment_set||[]).join(", ")+'</code></td></tr></table>';
+  }
+  if(s.id==="data"){
+    h+='<div class="step-box"><b>How:</b> (1) Sample '+rd.n_rows+' observations. (2) Check positivity: propensity scores must be in [0.01, 0.99]. (3) Compute the naive rung-1 contrast and compare to the known rung-2 truth.</div>';
+    h+='<table>'+row("Positivity",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
+    h+='<table><tr><th>Contrast</th><th>Value</th><th>Rung</th></tr>';
+    h+='<tr><td>Naive: P(Y|T=1) - P(Y|T=0)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1</td></tr>';
+    h+='<tr><td>Causal: E[Y|do(T=1)] - E[Y|do(T=0)]</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2</td></tr>';
+    h+='<tr><td style="color:var(--red)"><b>Confounding gap</b></td><td style="color:var(--red)"><b>'+fmt(rd.gap||0)+'</b></td><td>—</td></tr></table>';
   }
   if(s.id==="feature"){
-    h+='<div class="box"><b>Step-by-step:</b> (1) Start with the adjustment set. (2) Identify colliders (descendants of both T and Y) → exclude S. (3) Identify mediators (on T→Y path) → exclude M. (4) Identify instruments (affect T, no Y path) → Z.</div>';
-    h+='<table>'+row("In adjustment","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded (never adjust)","M (mediator), S (collider)")+row("Instruments","Z (send-time jitter)")+row("Negative controls","NC (battery drain)")+'</table>';
+    h+='<div class="step-box"><b>How:</b> From the adjustment set, identify and exclude colliders (common effects of T and Y → S) and mediators (on the causal path → M). Never adjust for either.</div>';
+    h+='<table>'+row("Adjustment set","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded","M (mediator), S (collider)")+row("Instruments","Z")+row("Neg. controls","NC")+'</table>';
   }
   if(s.id==="model"){
-    h+='<div class="box"><b>Step-by-step:</b> (1) Split data into 2 folds. (2) Fit propensity model P(T|X) on fold 1, evaluate on fold 2. (3) Fit outcome model E[Y|T,X] on fold 1, evaluate on fold 2. (4) Compute '+TeX("\\psi_i = \\hat\\mu_1 - \\hat\\mu_0 + \\frac{T_i(Y_i-\\hat\\mu_1)}{\\hat e_i} - \\frac{(1-T_i)(Y_i-\\hat\\mu_0)}{1-\\hat e_i}")+'. (5) ATE = mean(psi), SE = sd(psi)/sqrt(n).</div>';
-    h+='<p style="font-size:.84rem;color:var(--muted)">Estimator: '+rd.estimator+'</p>';
-    h+='<div class="metrics"><div class="metric"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE</div></div>';
+    h+='<div class="step-box"><b>How:</b> (1) Split into 2 folds. (2) Fit P(T|X) and E[Y|T,X] on fold 1. (3) Compute the AIPW score on fold 2. (4) Average the scores. The Neyman-orthogonal score makes the estimate insensitive to nuisance model errors.</div>';
+    h+='<p style="font-size:.82rem;color:var(--muted)">Estimator: '+rd.estimator+'</p>';
+    h+='<div class="metrics"><div class="metric highlight"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE</div></div>';
     h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+', '+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
     h+='<div class="metric"><div class="val">'+fmt(rd.truth)+'</div><div class="lbl">Truth</div></div>';
     h+='<div class="metric"><div class="val">'+(cov(rd)?"PASS":"FAIL")+'</div><div class="lbl">CI Covers</div></div></div>';
   }
   if(s.id==="evaluate"){
+    h+='<div class="step-box"><b>How:</b> (1) Compute E-value from the risk ratio. (2) Check covariate balance after IPW: if |SMD| < 0.1, the weighting worked.</div>';
     h+='<div class="metrics"><div class="metric"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div>';
     h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
-    h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">Max |SMD|</div></div></div>';
-    h+='<p>E-value '+rd.e_value.toFixed(1)+': confounder needs RR ≥'+rd.e_value.toFixed(1)+' with both T and Y to explain away the effect.</p>';
+    h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">|SMD|</div></div></div>';
+    h+='<p>E-value '+rd.e_value.toFixed(1)+': confounder needs RR &ge;'+rd.e_value.toFixed(1)+' to explain away the effect.</p>';
   }
   if(s.id==="test"){
-    h+='<div class="box"><b>Step-by-step:</b> (1) Placebo: randomly permute T → re-estimate → should be ~0. (2) RCC: add a random covariate → estimate should be stable. (3) Subset: estimate on 80% of data → should agree. (4) NC: estimate T→NC effect → should be ~null.</div>';
+    h+='<div class="step-box"><b>How:</b> (1) Permute T → re-estimate (should be ~0). (2) Add random covariate → estimate stable. (3) 80% subsample → agrees. (4) T→NC effect → should be null.</div>';
     h+='<table><tr><th>Refuter</th><th>Result</th><th>What it checks</th></tr>';
-    var names=["Placebo treatment","Random common cause","Subset refuter","Negative control (NC)"];
-    var checks=["Pipeline returns ~0 when T is random","Estimate is stable under added noise","80% sample agrees with full data","T→NC effect is ~null (residual confounding alarm)"];
-    for(var j=0;j<4;j++)h+='<tr><td>'+names[j]+'</td><td class="'+(rd.all_green?"pass":"fail")+'">'+(rd.all_green?"PASS":"FAIL")+'</td><td style="font-size:.82rem;color:var(--muted)">'+checks[j]+'</td></tr>';
+    var ns=["Placebo treatment","Random common cause","Subset refuter","Negative control (NC)"];
+    var cs=["Pipeline returns ~0 when T is random","Estimate stable under added noise","80% sample agrees with full data","T→NC is ~null (residual confounding alarm)"];
+    for(var j=0;j<4;j++)h+='<tr><td>'+ns[j]+'</td><td class="'+(rd.all_green?"pass":"fail")+'">'+(rd.all_green?"PASS":"FAIL")+'</td><td style="font-size:.82rem;color:var(--muted)">'+cs[j]+'</td></tr>';
     h+='</table><p>'+badge("ALL GREEN: "+rd.all_green,rd.all_green)+'</p>';
   }
   h+="</div>";
@@ -223,11 +242,11 @@ function stationCard(s,rd){
 
 function buildSidebar(){
   var h='<h2>Causal Science</h2><div class="sub">A Guided Walkthrough</div>';
-  h+='<div class="regime-badge">REGIME: '+activeRegime.toUpperCase()+'</div>';
+  h+='<div class="regime-badge '+activeRegime+'">WORLD: '+activeRegime.toUpperCase()+'</div>';
+  h+='<p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal operations.<br>Holiday = users habituated to notifications (T→M drops 1.6→0.4).<br><b>Toggle to see how the pipeline performs in each world.</b></p>';
   h+='<select onchange="switchRegime(this.value)"><option value="static"'+(activeRegime==="static"?" selected":"")+'>Static (baseline)</option><option value="holiday"'+(activeRegime==="holiday"?" selected":"")+'>Holiday (drifted)</option></select>';
-  h+='<p style="font-size:.72rem;color:#95a5a6;margin-top:4px">Holiday: T→M coeff drops 1.6→0.4.<br>Y mechanism invariant.</p>';
-  if(D&&D.content&&D.content.glossary){h+='<h3>Glossary</h3>';
-    for(var i=0;i<D.content.glossary.length;i++){var g=D.content.glossary[i];h+='<div class="gt"><b>'+g.term+'</b> — '+g.def+'</div>';}}
+  if(D&&D.content&&D.content.glossary){h+='<h3>Glossary (hover underlined terms above for definitions)</h3>';
+    for(var i=0;i<D.content.glossary.length;i++){var g=D.content.glossary[i];h+='<div class="gt"><b>'+g.term+'</b>: '+g.def+'</div>';}}
   document.getElementById("sidebar").innerHTML=h;
 }
 function switchRegime(v){activeRegime=v;build()}
