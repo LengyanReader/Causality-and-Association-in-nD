@@ -112,7 +112,77 @@ data["content"] = {
         "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: *\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"*",
         "problem": "This is a causal question. The platform's targeting algorithm sends more notifications to users it predicts are hungry — and hungry users order more regardless. The naive association overstates the true effect due to confounding.",
         "premise": "We work with the NomNom DGP (Data-Generating Process) — a synthetic world with known ground truth, like a flight simulator for causal inference. Every estimate is checked against the true ATE computed by Monte Carlo under do(T=1) vs do(T=0).",
-        "rungs": "Pearl's ladder of causation: (1) Association — P(Y|T), (2) Intervention — P(Y|do(T)), (3) Counterfactuals — P(Y(0)=0 | T=1, Y=1). This walkthrough climbs all three.",
+        "rungs": "Pearl's ladder of causation: (1) Association: P(Y|T), (2) Intervention: P(Y|do(T)), (3) Counterfactuals: P(Y(0)=0 | T=1, Y=1). This walkthrough climbs all three.",
+    },
+    "problem_formulation": {
+        "question": "Do push notifications cause users to place orders?",
+        "why_causal": "The platform's targeting algorithm sends more notifications to users it predicts are hungry (based on app-use history W). But hunger (U) also drives orders directly. So the observed association P(Y|T=1) - P(Y|T=0) mixes the causal effect of notifications with the confounding effect of hunger. Only a causal analysis can separate them.",
+        "target_trial": "The idealized experiment we would run if we could: randomly assign notifications to some users and withhold them from others, then measure the difference in order rates. Since we cannot run this experiment (the platform needs to target), we emulate it from observational data using the back-door criterion.",
+        "estimand": "ATE = E[Y(1) - Y(0)] — the expected difference in order probability if every user were notified vs. if no user were notified.",
+        "assumptions": [
+            "Ignorability: {Y(0), Y(1)} independent of T | {W, rain, weekend, payday} — no unmeasured confounding beyond what W captures",
+            "Positivity: 0 < P(T=1 | X=x) < 1 for all covariate patterns x",
+            "SUTVA: one user's notification does not affect another user's order",
+            "Consistency: the observed outcome under T=t equals the potential outcome Y(t)"
+        ],
+        "ladder_climbed": "Rung 1 (P(Y|T): naive association) → Rung 2 (P(Y|do(T)): ATE identified via back-door) → Rung 3 (P(Y(0)=0 | T=1, Y=1): probability of necessity via abduction-action-prediction)"
+    },
+    "dag": {
+        "description": "The causal DAG (Directed Acyclic Graph) encodes everything we believe — and everything we DON'T believe — about how notifications and orders relate. Each arrow is an assumption; each absent arrow is a falsifiable claim.",
+        "nodes": [
+            {"id":"Z","label":"Z (jitter)","x":180,"y":30,"color":"#3498db","role":"Instrument"},
+            {"id":"rain","label":"rain","x":180,"y":80,"color":"#95a5a6","role":"Confounder"},
+            {"id":"weekend","label":"weekend","x":180,"y":130,"color":"#95a5a6","role":"Confounder"},
+            {"id":"payday","label":"payday","x":180,"y":180,"color":"#95a5a6","role":"Confounder"},
+            {"id":"U","label":"U (hunger)","x":50,"y":105,"color":"#e8e8e8","role":"Latent confounder"},
+            {"id":"W","label":"W (app-use)","x":250,"y":105,"color":"#f39c12","role":"Measured proxy"},
+            {"id":"T","label":"T (notify)","x":380,"y":105,"color":"#2ecc40","role":"Treatment"},
+            {"id":"M","label":"M (open)","x":510,"y":105,"color":"#8e44ad","role":"Mediator"},
+            {"id":"Y","label":"Y (order)","x":640,"y":105,"color":"#2ecc40","role":"Outcome"},
+            {"id":"S","label":"S (engage)","x":510,"y":195,"color":"#e67e22","role":"Collider"},
+            {"id":"NC","label":"NC (battery)","x":50,"y":195,"color":"#e74c3c","role":"Neg. control"}
+        ],
+        "edges": [
+            {"from":"U","to":"W","style":"dashed","color":"#e74c3c","label":"confounding"},
+            {"from":"W","to":"T","style":"dashed","color":"#e74c3c","label":"confounding"},
+            {"from":"U","to":"Y","style":"dashed","color":"#e74c3c","label":"confounding"},
+            {"from":"U","to":"M","style":"dashed","color":"#e74c3c","label":"confounding"},
+            {"from":"U","to":"NC","style":"dashed","color":"#e74c3c","label":"confounding"},
+            {"from":"Z","to":"T","style":"dotted","color":"#3498db","label":"instrument"},
+            {"from":"rain","to":"T","style":"solid","color":"#95a5a6","label":""},
+            {"from":"rain","to":"Y","style":"solid","color":"#95a5a6","label":""},
+            {"from":"weekend","to":"T","style":"solid","color":"#95a5a6","label":""},
+            {"from":"weekend","to":"Y","style":"solid","color":"#95a5a6","label":""},
+            {"from":"payday","to":"T","style":"solid","color":"#95a5a6","label":""},
+            {"from":"payday","to":"Y","style":"solid","color":"#95a5a6","label":""},
+            {"from":"T","to":"Y","style":"solid","color":"#2ecc40","label":"causal target"},
+            {"from":"T","to":"M","style":"dashed","color":"#8e44ad","label":"mediator"},
+            {"from":"M","to":"Y","style":"dashed","color":"#8e44ad","label":"mediator"},
+            {"from":"T","to":"S","style":"dotted","color":"#e67e22","label":"collider"},
+            {"from":"Y","to":"S","style":"dotted","color":"#e67e22","label":"collider"}
+        ],
+        "legend": [
+            {"color":"#2ecc40","style":"solid","label":"Causal target (T->Y)"},
+            {"color":"#e74c3c","style":"dashed","label":"Confounding (U paths)"},
+            {"color":"#3498db","style":"dotted","label":"Instrument (Z)"},
+            {"color":"#8e44ad","style":"dashed","label":"Mediator (M)"},
+            {"color":"#e67e22","style":"dotted","label":"Collider (S) — NEVER adjust"},
+            {"color":"#95a5a6","style":"solid","label":"Other confounders"}
+        ]
+    },
+    "evalue_deep_dive": {
+        "definition": "The E-value (VanderWeele & Ding, 2017, Annals of Internal Medicine) quantifies the minimum strength of association that an unmeasured confounder would need to have with BOTH the treatment and the outcome to fully explain away the observed effect, conditional on the measured covariates.",
+        "formula": "E-value = RR_obs + sqrt(RR_obs * (RR_obs - 1)), where RR_obs is the observed risk ratio (or its inverse if < 1)",
+        "intuition": "Think of it as a 'worst-case' sensitivity analysis: how strong would a hidden confounder need to be to make our result go away? The larger the E-value, the more robust the finding.",
+        "thresholds": [
+            "E-value = 1.0: Trivial — any weak confounder could explain the effect away",
+            "E-value = 1.0-1.5: Fragile — modest unmeasured confounding could explain the effect",
+            "E-value = 1.5-2.0: Moderate — somewhat robust to unmeasured confounding",
+            "E-value = 2.0-5.0: Robust — strong unmeasured confounding needed to explain away",
+            "E-value > 5.0: Highly robust — very strong unmeasured confounding needed"
+        ],
+        "ci_bound_note": "For a more conservative assessment, compute the E-value using the confidence interval bound closest to the null (rather than the point estimate). If the CI-bound E-value is still above 2, the conclusion is robust even under parameter uncertainty.",
+        "example": "With an E-value of ~2.7 (our static regime estimate), an unmeasured confounder would need to be associated with BOTH notification receipt and order placement by a risk ratio of at least 2.7 — above and beyond the 4 measured covariates (W, rain, weekend, payday) — to reduce the true causal effect to zero. This is a moderately robust finding."
     },
     "stations": [
         {

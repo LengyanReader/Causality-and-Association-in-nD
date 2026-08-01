@@ -49,6 +49,7 @@ fetch("data.json").then(function(r){return r.json()}).then(function(j){
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
 function cov(re){return re.ci_low<=re.truth&&re.truth<=re.ci_high}
+function getNodePos(nodes,id){for(var i=0;i<nodes.length;i++){if(nodes[i].id===id)return nodes[i]}return null}
 function row(k,v,c){c=c||"";return"<tr><td>"+k+"</td><td"+((c)?" class=\""+c+"\"":"")+"><b>"+v+"</b></td></tr>"}
 function badge(v,ok){return'<span class="badge '+(ok?"bg":"br")+'">'+v+'</span>'}
 
@@ -119,6 +120,54 @@ function sec0_overview(){
   h+='<div class="metric"><div class="val">'+fmt(D.static.cate_loyal)+'</div><div class="lbl">CATE (loyal)</div></div>';
   h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">CATE (new)</div></div></div>';
   h+='<p>Holiday changes exactly one mechanism: T→M coefficient from 1.6 to 0.4. Station 8 detects this.</p></div>';
+
+  // Problem formulation card
+  if(c.problem_formulation){
+    var pf=c.problem_formulation;
+    h+='<div class="card"><h3>Problem Formulation</h3>';
+    h+='<p><b>Question:</b> '+pf.question+'</p>';
+    h+='<div class="info warn"><b>Why this is causal (not just associational):</b> '+pf.why_causal+'</div>';
+    h+='<p><b>Target trial:</b> '+pf.target_trial+'</p>';
+    h+='<p><b>Estimand:</b> <span class="formula">'+pf.estimand+'</span></p>';
+    h+='<p><b>Key Assumptions:</b></p><ol>';
+    for(var j=0;j<pf.assumptions.length;j++)h+='<li>'+pf.assumptions[j]+'</li>';
+    h+='</ol><p><b>Ladder climbed:</b> '+pf.ladder_climbed+'</p></div>';
+  }
+
+  // DAG visualization
+  if(c.dag){
+    h+='<div class="card"><h3>Causal DAG</h3><p>'+c.dag.description+'</p>';
+    h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:6px">';
+    // Edges
+    for(var j=0;j<c.dag.edges.length;j++){
+      var e=c.dag.edges[j],fn=getNodePos(c.dag.nodes,e.from),tn=getNodePos(c.dag.nodes,e.to);
+      if(fn&&tn){
+        var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
+        h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.7"/>';
+        // Arrowhead for causal target
+        if(e.label==="causal target"){
+          var ax=tn.x-8,ay=tn.y,mx=ax,my=ay;
+          h+='<polygon points="'+tn.x+','+tn.y+' '+(ax-6)+','+(ay-4)+' '+(ax-6)+','+(ay+4)+'" fill="'+e.color+'"/>';
+        }
+      }
+    }
+    // Nodes
+    for(var j=0;j<c.dag.nodes.length;j++){
+      var n=c.dag.nodes[j];
+      h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#2c3e50" stroke-width="1.5"/>';
+      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#666":"white")+'">'+n.id+'</text>';
+      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#2c3e50">'+n.label+'</text>';
+    }
+    // Legend
+    h+='<g transform="translate(10,210)">';
+    for(var j=0;j<c.dag.legend.length;j++){
+      var l=c.dag.legend[j];
+      h+='<line x1="'+(j*155)+'" y1="8" x2="'+(j*155+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
+      h+='<text x="'+(j*155+34)+'" y="12" font-size="7" fill="#2c3e50">'+l.label+'</text>';
+    }
+    h+='</g></svg></div>';
+  }
+
   h+='<div class="card"><h3>The 9 UCL Stations</h3><table><tr><th>#</th><th>Station</th><th>Question</th><th>Output</th></tr>';
   for(var i=0;i<c.stations.length;i++){var s=c.stations[i];h+='<tr><td>'+s.number+'</td><td><b>'+s.emoji+' '+s.name+'</b></td><td>'+s.question+'</td><td><code>'+s.output+'</code></td></tr>'}
   h+="</table></div></div>";
@@ -163,6 +212,16 @@ function sec_station(s){
     h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
     h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">Max |SMD|</div></div></div>';
     h+='<p>E-value ~'+rd.e_value.toFixed(1)+': unmeasured confounder needs RR >='+rd.e_value.toFixed(1)+' with both T and Y to explain away effect. '+(s.metrics?("Thresholds: "+s.metrics["SMD threshold"]):"")+'</p>';
+    if(c.evalue_deep_dive){
+      var ev=c.evalue_deep_dive;
+      h+='<div class="info good"><b>E-value Deep Dive</b><br>'+ev.definition+'</div>';
+      h+='<div class="formula">'+ev.formula+'</div>';
+      h+='<p>'+ev.intuition+'</p>';
+      h+='<table><tr><th>E-value Range</th><th>Interpretation</th></tr>';
+      for(var j=0;j<ev.thresholds.length;j++){var t=ev.thresholds[j].split(":");h+='<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td></tr>'}
+      h+='</table><p style="font-size:.84rem;color:var(--muted)">'+ev.ci_bound_note+'</p>';
+      h+='<div class="info">'+ev.example+'</div>';
+    }
   }
   if(s.id==="test"){
     h+='<table><tr><th>Refuter</th><th>Result</th><th>Detail</th></tr>';
