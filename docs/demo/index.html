@@ -259,7 +259,7 @@ function buildStation(s,rd){
     h+='<table>'+row("Criterion","back-door")+row("Identified",badge("true",true))+'<tr><td><b>Adjustment set</b></td><td><code>'+(rd.adjustment_set||[]).join(", ")+'</code></td></tr></table>';
   }
   if(s.id==="data"){
-    h+='<div class="step-box"><b>How:</b> (1) Sample '+rd.n_rows+' observations. (2) Check positivity: propensity scores must be in [0.01, 0.99]. (3) Compute the naive rung-1 contrast and compare to the known rung-2 truth.</div>';
+    h+='<div class="step-box"><b>How:</b> (1) Sample '+rd.n_rows+' observations from the DGP. (2) Check positivity: PS in [0.01, 0.99]. (3) <b>[Observation]</b> Compute the rung-1 contrast from data. <b>[Ground truth]</b> The rung-2 truth is known from the DGP — we compare.</div>';
     h+='<table>'+row("Positivity",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
     h+='<table><tr><th>Contrast</th><th>Value</th><th>Rung</th></tr>';
     h+='<tr><td>Naive: P(Y|T=1) - P(Y|T=0)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1</td></tr>';
@@ -271,7 +271,7 @@ function buildStation(s,rd){
     h+='<table>'+row("Adjustment set","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded","M (mediator), S (collider)")+row("Instruments","Z")+row("Neg. controls","NC")+'</table>';
   }
   if(s.id==="model"){
-    h+='<div class="step-box"><b>How:</b> (1) Split into 2 folds. (2) Fit P(T|X) and E[Y|T,X] on fold 1. (3) Compute the AIPW score on fold 2. (4) Average the scores. The Neyman-orthogonal score makes the estimate insensitive to nuisance model errors.</div>';
+    h+='<div class="step-box"><b>How:</b> (1) Split into 2 folds. (2) Fit P(T|X) and E[Y|T,X] on fold 1. (3) <b>[Computed estimate]</b> Compute the AIPW score on fold 2, average. (4) <b>[Verification]</b> Compare to known ground truth. Neyman orthogonality protects the estimand from nuisance errors.</div>';
     h+='<p style="font-size:.82rem;color:var(--muted)">Estimator: '+rd.estimator+'</p>';
     h+='<div class="metrics"><div class="metric highlight"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE</div></div>';
     h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+', '+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
@@ -279,14 +279,14 @@ function buildStation(s,rd){
     h+='<div class="metric"><div class="val">'+(cov(rd)?"PASS":"FAIL")+'</div><div class="lbl">CI Covers</div></div></div>';
   }
   if(s.id==="evaluate"){
-    h+='<div class="step-box"><b>How:</b> (1) Compute E-value from the risk ratio. (2) Check covariate balance after IPW: if |SMD| < 0.1, the weighting worked.</div>';
+    h+='<div class="step-box"><b>How:</b> (1) <b>[Computed from estimate]</b> E-value from the risk ratio. (2) <b>[Diagnostic]</b> Check balance after IPW: |SMD| &lt; 0.1 means adequate weighting.</div>';
     h+='<div class="metrics"><div class="metric"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div>';
     h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
     h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">|SMD|</div></div></div>';
     h+='<p>E-value '+rd.e_value.toFixed(1)+': confounder needs RR &ge;'+rd.e_value.toFixed(1)+' to explain away the effect.</p>';
   }
   if(s.id==="test"){
-    h+='<div class="step-box"><b>How:</b> (1) Permute T → re-estimate (should be ~0). (2) Add random covariate → estimate stable. (3) 80% subsample → agrees. (4) T→NC effect → should be null.</div>';
+    h+='<div class="step-box"><b>How:</b> (1) <b>[Refutation test]</b> Permute T → re-estimate → expect ~0. (2) Add random covariate → expect stable. (3) 80% subsample → expect agreement. (4) T→NC → expect null (smoke alarm). All four are pass/fail checks on the pipeline.</div>';
     h+='<table><tr><th>Refuter</th><th>Result</th><th>What it checks</th></tr>';
     var ns=["Placebo treatment","Random common cause","Subset refuter","Negative control (NC)"];
     var cs=["Pipeline returns ~0 when T is random","Estimate stable under added noise","80% sample agrees with full data","T→NC is ~null (residual confounding alarm)"];

@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0017447132861496979, 'tolerance': 0.01334973356372258}"
+        "detail": "{'estimate': 0.0019128884368200167, 'tolerance': 0.013344095319694249}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 2.5419354312966602e-05, 'tolerance': 0.008025267842536135}"
+        "detail": "{'delta': 2.6468696240317113e-05, 'tolerance': 0.008025654609711969}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.00518284973290431, 'tolerance': 0.01854503311012651}"
+        "detail": "{'delta': 0.005161654362854623, 'tolerance': 0.01854482197651846}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008108130686191663, 'tolerance': 0.014538109480350857}"
+        "detail": "{'estimate': -0.0008666778050414559, 'tolerance': 0.014535378476353975}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
+    "ci_low": 0.1769,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004339542525002486, 'tolerance': 0.01336179532290889}"
+        "detail": "{'estimate': 0.004343812100554327, 'tolerance': 0.013361883039605846}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.001188667109774444, 'tolerance': 0.007932382498100507}"
+        "detail": "{'delta': 0.0012115262048730258, 'tolerance': 0.007932844469479297}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005088026544378399, 'tolerance': 0.01833496651574256}"
+        "detail": "{'delta': 0.005075068296143653, 'tolerance': 0.018335175590176486}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004323988630796639, 'tolerance': 0.01417509978486937}"
+        "detail": "{'estimate': -0.004385592098402146, 'tolerance': 0.014168609620654726}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0082,
+      "M": 0.0083,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.0081
+      "Y": 0.008
     },
     "worst": "M",
     "alarm": 0.02
@@ -374,14 +374,14 @@
     },
     "problem_formulation": {
       "question": "Do push notifications cause users to place orders?",
-      "why_causal": "Here is what happens when we look at the raw data. The naive difference P(Y|T=1) - P(Y|T=0) is approximately <b>+0.343</b> — suggesting notifications increase order probability by ~34 percentage points. But this number is not the causal effect. It mixes together two fundamentally different things. Here is the breakdown:",
+      "why_causal": "Here is what we observe in the raw data. The naive difference P(Y|T=1) - P(Y|T=0) is approximately <b>+0.343</b>. If we (incorrectly) interpret this as causal, we would conclude notifications boost orders by 34 percentage points. But this number is <b>not</b> the causal effect — it mixes together two fundamentally different things. We will now decompose it, and later verify the decomposition against the ground truth ATE.",
       "confounding_breakdown": [
-        "<b>The observed naive difference.</b> P(Y|T=1) − P(Y|T=0) ≈ +0.343. If we naively interpret this as causal, we would conclude notifications boost orders by 34 percentage points.",
-        "<b>Component A — the true causal effect.</b> The actual effect of the notification on orders, which we will estimate as ≈ +0.241. This is the quantity we want.",
-        "<b>Component B — confounding bias.</b> The spurious difference caused by the platform's targeting: ≈ +0.102. This is the gap between the naive and causal estimates.",
-        "<b>Why confounding exists — Mechanism 1 (targeting).</b> True hunger U drives app-use W (U → W), and the platform targets notifications based on W (W → T). So treated users are systematically hungrier than untreated users.",
-        "<b>Why confounding exists — Mechanism 2 (outcome).</b> Hunger U also drives orders directly (U → Y). So even without any causal effect of notifications, hungrier (treated) users would order more.",
-        "<b>Net result.</b> The treated group has a higher baseline order rate <i>even without any causal effect of notifications</i>. This is the confounding gap — and only causal methods (conditioning on W to block the back-door path U→W→T ... U→Y) can close it."
+        "<b>[Observation] The raw naive difference.</b> Looking at the data: P(Y|T=1) − P(Y|T=0) ≈ +0.343. If we naively interpret this as causal, we would conclude notifications boost orders by 34 percentage points. This is what the raw data shows — but it is rung 1, not rung 2.",
+        "<b>[Prediction — to be verified] Component A — the true causal effect.</b> Based on the structure of the DGP (which we can inspect because this is a synthetic world), we expect the actual causal effect of notifications on orders to be ≈ +0.241. This prediction will be tested by the estimation pipeline.",
+        "<b>[Prediction — to be verified] Component B — confounding bias.</b> The spurious difference introduced by the platform's targeting: the gap should be ≈ +0.102. This is what the back-door adjustment must remove.",
+        "<b>[Assumption — from domain knowledge] Mechanism 1 — why confounding exists (targeting).</b> True hunger U drives app-use W (U → W), and the platform targets notifications based on W (W → T). As a result, treated users are systematically hungrier than untreated users.",
+        "<b>[Assumption — from domain knowledge] Mechanism 2 — why confounding exists (outcome).</b> Hunger U also drives orders directly (U → Y). Even without any causal effect of notifications, hungrier (treated) users would order more.",
+        "<b>[Implication] Net result.</b> The treated group has a higher baseline order rate <i>even with no causal effect of notifications</i>. This is the confounding gap. Only by conditioning on W (blocking the back-door path U→W→T ... U→Y) can we separate the causal signal from this confounding noise. We will verify this by comparing the adjusted estimate to the known ground truth."
       ],
       "target_trial": "The idealized experiment we would run if we could: randomly assign notifications to some users and withhold them from others, then measure the difference in order rates. Since we cannot run this experiment (the platform needs to target), we emulate it from observational data using the back-door criterion.",
       "estimand": "ATE = E[Y(1) - Y(0)] — the expected difference in order probability if every user were notified vs. if no user were notified.",
