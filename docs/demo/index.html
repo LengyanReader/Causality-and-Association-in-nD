@@ -5,6 +5,25 @@
 <title>Causal Science — A Guided Walkthrough</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script>
+var dagZoom=1;
+function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
+function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
+function dagReset(){dagZoom=1;updateDagZoom()}
+function updateDagZoom(){var s=document.getElementById('dagsvg');if(s)s.style.transform='scale('+dagZoom+')'}
+function dagShowPopup(ev,nodeId){
+  var popup=document.getElementById('dagpopup');
+  if(!popup)return;
+  var nd=null;
+  if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
+  if(!nd||!nd.detail)return;
+  popup.innerHTML='<div style='text-align:right;margin-bottom:4px'><button onclick="document.getElementById('dagpopup').classList.remove('on')" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem">x</button></div>'+nd.detail;
+  popup.classList.add('on');
+  popup.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+'px';
+  popup.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+'px';
+}
+document.addEventListener('click',function(e){var p=document.getElementById('dagpopup');if(p&&!e.target.closest('.dag-node')&&!e.target.closest('.dag-popup'))p.classList.remove('on')});
+</script>
 <style>
 :root{--bg:#fafbfc;--card:#fff;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--teal:#0d9488;--dark:#0f172a;--border:#e2e8f0;--radius:10px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -48,6 +67,17 @@ svg text{font-family:system-ui,sans-serif}
 a{color:var(--blue);text-decoration:none}
 pre{background:var(--dark);color:#e2e8f0;padding:14px 18px;border-radius:var(--radius);overflow-x:auto;font-size:.82rem;margin:12px 0}
 code{font-size:.88em;background:#f1f5f9;padding:1px 5px;border-radius:3px}
+
+.dag-container{position:relative;overflow:hidden;border-radius:8px;border:1px solid var(--border);background:#fff}
+.dag-container svg{display:block;transform-origin:0 0;transition:transform .2s}
+.dag-toolbar{display:flex;gap:4px;padding:8px;background:#f8fafc;border-bottom:1px solid var(--border)}
+.dag-toolbar button{width:30px;height:30px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:1.1rem;line-height:1;color:var(--text)}
+.dag-toolbar button:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.dag-popup{display:none;position:fixed;background:var(--dark);color:#e2e8f0;padding:16px 20px;border-radius:var(--radius);max-width:400px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.84rem;line-height:1.55}
+.dag-popup.on{display:block}
+.dag-node{cursor:pointer}
+.dag-node:hover{filter:brightness(1.15)}
+.dag-popup b{color:#34d399}
 </style></head>
 <body><div class="app">
 <aside class="sidebar" id="sidebar"></aside>
@@ -101,20 +131,20 @@ function build(){
   h+='<h2><span class="chapter-num">2</span> The '+T('Causal Graph','A Directed Acyclic Graph (DAG). Nodes are variables; arrows are direct causal relationships. Every arrow is an assumption; every absent arrow is a falsifiable claim.')+' <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive →</a></h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';
-    h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:8px">';
+    h+='<div class="dag-container"><div class="dag-toolbar"><button onclick="dagZoomIn()" title="Zoom in">+</button><button onclick="dagZoomOut()" title="Zoom out">-</button><button onclick="dagReset()" title="Reset">1:1</button><span style="font-size:.75rem;color:var(--muted);padding:4px 8px">Click nodes for details</span></div><div id="dagpopup" class="dag-popup"></div><svg id="dagsvg" viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:8px">';
     for(var j=0;j<c.dag.edges.length;j++){var e=c.dag.edges[j],fn=nodePos(c.dag.nodes,e.from),tn=nodePos(c.dag.nodes,e.to);
       if(fn&&tn){var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
       h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+tn.x+'" y2="'+tn.y+'" stroke="'+e.color+'" stroke-width="'+(e.label==="causal target"?3:1.5)+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
       if(e.label==="causal target")h+='<polygon points="'+tn.x+','+tn.y+' '+(tn.x-8)+','+(tn.y-4)+' '+(tn.x-8)+','+(tn.y+4)+'" fill="'+e.color+'"/>';}}
     for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
-      h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+      h+='<g class="dag-node" onclick="dagShowPopup(event,'"+'+n.id+'+"')">'; h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
       h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
-      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text>';}
+      h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text>'; h+='</g>';}
     h+='<g transform="translate(10,210)">';
     for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
       h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
       h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#1a1a2e">'+l.label+'</text>';}
-    h+='</g></svg></div>';}
+    h+='</g></svg></div></div>';}
   h+='<div class="callout"><b>The key to identification:</b> W (app-use history) is a proxy for the unobserved hunger U. Because the platform targets notifications <i>using only W</i>, conditioning on W '+T('blocks the back-door path','A back-door path is a non-causal association path between T and Y that starts with an arrow INTO T. Blocking it requires conditioning on a set of variables that d-separates T from Y in the back-door graph.')+' from U to T to Y. Without W, the ATE is not identifiable.</div>';
 
   // Data preview + flow
@@ -324,6 +354,24 @@ function buildSidebar(){
   document.getElementById("sidebar").innerHTML=h;
 }
 function switchRegime(v){activeRegime=v;build()}
+
+var dagZoom=1;
+function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
+function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
+function dagReset(){dagZoom=1;updateDagZoom()}
+function updateDagZoom(){var s=document.getElementById('dagsvg');if(s)s.style.transform='scale('+dagZoom+')'}
+function dagShowPopup(ev,nodeId){
+  var popup=document.getElementById('dagpopup');
+  if(!popup)return;
+  var nd=null;
+  if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];
+  if(!nd||!nd.detail)return;
+  popup.innerHTML='<div style='text-align:right;margin-bottom:4px'><button onclick="document.getElementById('dagpopup').classList.remove('on')" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem">x</button></div>'+nd.detail;
+  popup.classList.add('on');
+  popup.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+'px';
+  popup.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+'px';
+}
+document.addEventListener('click',function(e){var p=document.getElementById('dagpopup');if(p&&!e.target.closest('.dag-node')&&!e.target.closest('.dag-popup'))p.classList.remove('on')});
 </script>
 </body>
 </html>
