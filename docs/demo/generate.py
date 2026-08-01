@@ -9,7 +9,7 @@ The demo HTML loads this file and renders everything dynamically.
 import json, sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
@@ -212,7 +212,7 @@ data["content"] = {
 }
 
 # ── Write ──
-out_path = REPO_ROOT / "docs" / "demo" / "data.json"
+out_path = Path(__file__).resolve().parent / "data.json"
 out_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 print(f"Written: {out_path} ({out_path.stat().st_size:,} bytes)")
 print(f"  static ATE={data['static']['ate']}, holiday ATE={data['holiday']['ate']}")

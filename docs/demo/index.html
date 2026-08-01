@@ -43,7 +43,7 @@ var T=[];
 fetch("data.json").then(function(r){return r.json()}).then(function(j){
   D=j;buildAll();
 }).catch(function(e){
-  document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python scripts/generate_demo_data.py</code> to generate <code>docs/demo/data.json</code>.</p><p style="color:var(--muted);font-size:.85rem">'+e.message+'</p></div>';
+  document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python docs/demo/generate.py</code> to generate the data file.</p><p style="color:var(--muted);font-size:.85rem">'+e.message+'</p></div>';
 });
 
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
