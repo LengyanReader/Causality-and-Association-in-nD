@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019033963013291152, 'tolerance': 0.013352832494940797}"
+        "detail": "{'estimate': 0.0017447132861496979, 'tolerance': 0.01334973356372258}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 2.0923762618030306e-05, 'tolerance': 0.008025350479336375}"
+        "detail": "{'delta': 2.5419354312966602e-05, 'tolerance': 0.008025267842536135}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.00522381095630417, 'tolerance': 0.018555849477414364}"
+        "detail": "{'delta': 0.00518284973290431, 'tolerance': 0.01854503311012651}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008686225663662924, 'tolerance': 0.014535280826075305}"
+        "detail": "{'estimate': -0.0008108130686191663, 'tolerance': 0.014538109480350857}"
       }
     ],
     "naive": 0.3467,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004347412750824536, 'tolerance': 0.013361790395303606}"
+        "detail": "{'estimate': 0.004339542525002486, 'tolerance': 0.01336179532290889}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012896208077489146, 'tolerance': 0.0079329838572327}"
+        "detail": "{'delta': 0.001188667109774444, 'tolerance': 0.007932382498100507}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005069541022289792, 'tolerance': 0.018334984053411028}"
+        "detail": "{'delta': 0.005088026544378399, 'tolerance': 0.01833496651574256}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004342616210434094, 'tolerance': 0.014167478804643887}"
+        "detail": "{'estimate': -0.004323988630796639, 'tolerance': 0.01417509978486937}"
       }
     ],
     "naive": 0.297,
@@ -745,7 +745,7 @@
         "emoji": "🔄",
         "question": "Is the world still the one we modeled?",
         "output": "EvolutionLog",
-        "explanation": "The mechanism-stability monitor applies the invariance principle (Peters, Bühlmann & Meinshausen 2016): a correctly specified causal mechanism has a stable conditional distribution across environments. For each endogenous node, we fit P(node | parents) on the reference (static) batch and evaluate log-loss on the new (holiday) batch. The node whose conditional degrades most is the locus of drift. The holiday regime changes exactly one mechanism — T→M (coefficient 1.6→0.4) — and the monitor localizes it correctly."
+        "explanation": "<b>Principle:</b> the invariance principle (Peters, Bühlmann & Meinshausen 2016): a correctly specified causal mechanism has a stable conditional distribution across environments. For each endogenous node, we fit P(node | parents) on the reference (static) batch and evaluate log-loss on the new (holiday) batch. <b>(3) Compare:</b> the node with the largest degradation is the locus of drift -- T->M degrades most (coefficient 1.6->0.4). <b>(4) Confirm:</b> the Y (order) mechanism is confirmed invariant, and the monitor correctly localizes the change to exactly the one mechanism we altered in the DGP."
       }
     ],
     "rung3_section": {

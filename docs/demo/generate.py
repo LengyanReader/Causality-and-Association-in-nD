@@ -322,7 +322,7 @@ data["content"] = {
             "id": "evolve", "number": 8, "name": "EVOLVE", "emoji": "🔄",
             "question": "Is the world still the one we modeled?",
             "output": "EvolutionLog",
-            "explanation": "The mechanism-stability monitor applies the invariance principle (Peters, Bühlmann & Meinshausen 2016): a correctly specified causal mechanism has a stable conditional distribution across environments. For each endogenous node, we fit P(node | parents) on the reference (static) batch and evaluate log-loss on the new (holiday) batch. The node whose conditional degrades most is the locus of drift. The holiday regime changes exactly one mechanism — T→M (coefficient 1.6→0.4) — and the monitor localizes it correctly.",
+            "explanation": "<b>Principle:</b> the invariance principle (Peters, Bühlmann & Meinshausen 2016): a correctly specified causal mechanism has a stable conditional distribution across environments. For each endogenous node, we fit P(node | parents) on the reference (static) batch and evaluate log-loss on the new (holiday) batch. <b>(3) Compare:</b> the node with the largest degradation is the locus of drift -- T->M degrades most (coefficient 1.6->0.4). <b>(4) Confirm:</b> the Y (order) mechanism is confirmed invariant, and the monitor correctly localizes the change to exactly the one mechanism we altered in the DGP.",
         },
     ],
     "rung3_section": {
