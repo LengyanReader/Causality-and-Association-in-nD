@@ -93,7 +93,7 @@ function build(){
     h+='</ol></div>';}
 
   // ── CHAPTER 2: THE GRAPH ──
-  h+='<h2><span class="chapter-num">2</span> The '+T('Causal Graph','A Directed Acyclic Graph (DAG). Nodes are variables; arrows are direct causal relationships. Every arrow is an assumption; every absent arrow is a falsifiable claim.')+'</h2>';
+  h+='<h2><span class="chapter-num">2</span> The '+T('Causal Graph','A Directed Acyclic Graph (DAG). Nodes are variables; arrows are direct causal relationships. Every arrow is an assumption; every absent arrow is a falsifiable claim.')+' <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive →</a></h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';
     h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white;border-radius:8px">';
@@ -170,7 +170,7 @@ function build(){
   for(var i=0;i<cs.length;i++)h+=buildStation(cs[i],rd);
 
   // ── CHAPTER 4: SENSITIVITY ──
-  h+='<h2><span class="chapter-num">4</span> How Wrong Could We Be?</h2>';
+  h+='<h2><span class="chapter-num">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive →</a></h2>';
   h+='<div class="card"><p>We estimated an effect. But what if we missed a confounder? The '+T('E-value','VanderWeele & Ding (2017): the minimum strength of association an unmeasured confounder would need to have with BOTH the treatment and the outcome to fully explain away the observed effect, conditional on the measured covariates.')+' answers this quantitatively.</p>';
   h+='<div class="callout callout-red">'+c.evalue_deep_dive.definition+'</div>';
   h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p>';

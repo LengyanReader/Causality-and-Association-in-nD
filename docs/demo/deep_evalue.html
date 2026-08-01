@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dive: E-value</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--border:#e2e8f0;--radius:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0}
+.callout{background:#fef2f2;border-left:4px solid var(--red);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.callout-blue{background:#eff6ff;border-left-color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:#0f172a;color:#fff;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:6px 0}
+a{color:var(--blue)}code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.9em}
+.back{display:inline-block;margin-bottom:20px;color:var(--muted);text-decoration:none;font-size:.88rem}
+.back:hover{color:var(--blue)}
+</style></head><body>
+<a href="index.html" class="back">← Back to Walkthrough</a>
+<h1>Deep Dive: The E-value</h1>
+<p style="color:var(--muted)">VanderWeele & Ding (2017). Sensitivity Analysis in Observational Research: Introducing the E-value. <i>Annals of Internal Medicine</i>.</p>
+
+<h2>1. The Problem It Solves</h2>
+<div class="card">
+<p>Every observational causal estimate rests on the assumption of <b>no unmeasured confounding</b> — that we have measured and adjusted for all common causes of treatment and outcome. But this assumption is untestable from the data alone. We need a way to answer: <b>"How strong would an unmeasured confounder need to be to explain away our result?"</b></p>
+<p>The E-value provides a quantitative, standardized answer — without requiring the analyst to specify the exact nature of the hypothetical confounder.</p>
+</div>
+
+<h2>2. First Principles</h2>
+<div class="card">
+<h3>2.1 The Risk Ratio</h3>
+<p>Start with the observed association between treatment (T) and outcome (Y), expressed as a <b>risk ratio</b>:</p>
+<p class="formula"><span id="eq1"></span></p>
+<p>If RR > 1, the treatment is associated with higher outcome probability (positive association). If RR < 1, it's associated with lower probability (protective). For the E-value computation, we use the observed RR (or its inverse if RR < 1, to ensure RR ≥ 1).</p>
+
+<h3>2.2 The Key Question</h3>
+<p>Suppose an <b>unmeasured confounder U</b> exists. For U to fully explain away the observed RR, it would need to be associated with <b>both</b>:</p>
+<ol>
+  <li>The <b>treatment T</b>, with risk ratio RR<sub>TU</sub></li>
+  <li>The <b>outcome Y</b>, with risk ratio RR<sub>UY</sub></li>
+</ol>
+<p>Both associations are conditional on the measured covariates X.</p>
+
+<h3>2.3 The Bound</h3>
+<p>Ding & VanderWeele (2016) proved that the maximum bias an unmeasured confounder can induce is bounded by:</p>
+<p class="formula"><span id="eq2"></span></p>
+<p>Setting RR<sub>true</sub> = 1 (no true causal effect — the confounder explains everything) and assuming the worst case where RR<sub>TU</sub> = RR<sub>UY</sub> = E-value gives:</p>
+<p class="formula"><span id="eq3"></span></p>
+<p>Solving for the E-value:</p>
+<p class="formula"><span id="eq4"></span></p>
+</div>
+
+<h2>3. How to Interpret It</h2>
+<div class="card">
+<table>
+<tr><th>E-value</th><th>Interpretation</th><th>Example</th></tr>
+<tr><td>1.0</td><td>Trivial — any weak confounder could explain the effect</td><td>RR=1.0 → E-value=1.0</td></tr>
+<tr><td>1.0–1.5</td><td>Fragile — modest confounding could explain it away</td><td>RR=1.1 → E-value≈1.5</td></tr>
+<tr><td>1.5–2.0</td><td>Moderate — somewhat robust</td><td>RR=1.3 → E-value≈1.9</td></tr>
+<tr><td>2.0–5.0</td><td>Robust — strong confounding needed</td><td>RR=1.8 → E-value≈3.0</td></tr>
+<tr><td>&gt;5.0</td><td>Highly robust — very strong confounding needed</td><td>RR=3.0 → E-value≈5.4</td></tr>
+</table>
+</div>
+
+<h2>4. Worked Example (Our Data)</h2>
+<div class="card">
+<p>In our static regime, the estimated ATE corresponds to a <b>risk ratio of approximately 1.67</b> (treated users have 1.67× the order probability of untreated users, after adjustment).</p>
+<p>The <b>E-value = 2.72</b> means:</p>
+<div class="callout callout-blue">
+An unmeasured confounder would need to be associated with <b>both</b> the notification decision <b>and</b> the order outcome by a risk ratio of <b>at least 2.72</b> — above and beyond the four measured covariates (W, rain, weekend, payday) — to reduce the true causal effect to zero.
+</div>
+<p>Is a confounder with RR ≥ 2.72 plausible? Consider: even strong confounders like smoking (for lung cancer) have risk ratios in the 5–20 range. A confounder with RR=2.72 would be moderately strong — roughly equivalent to the association between moderate exercise and cardiovascular health. This makes our finding <b>moderately robust</b> but not ironclad.</p>
+</div>
+
+<h2>5. The CI-Bound E-value</h2>
+<div class="card">
+<p>For a <b>more conservative</b> assessment, compute the E-value using the <b>confidence interval bound closest to the null</b> instead of the point estimate. This accounts for statistical uncertainty: even if the true effect is near the lower CI bound, the E-value tells us how robust that smaller effect would be.</p>
+</div>
+
+<h2>6. Key Reference</h2>
+<div class="card">
+<p>VanderWeele, T. J. & Ding, P. (2017). Sensitivity analysis in observational research: Introducing the E-value. <i>Annals of Internal Medicine</i>, 167(4), 268–274. <a href="https://doi.org/10.7326/M16-2607" target="_blank">DOI</a></p>
+</div>
+
+<script>
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+document.getElementById("eq1").innerHTML=M("RR_{\\text{obs}} = \\frac{P(Y=1 \\mid T=1)}{P(Y=1 \\mid T=0)}");
+document.getElementById("eq2").innerHTML=M("RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}");
+document.getElementById("eq3").innerHTML=M("RR_{\\text{obs}} \\leq \\frac{E\\text{-value}^2}{2 \\times E\\text{-value} - 1}");
+document.getElementById("eq4").innerHTML=M("E\\text{-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}");
+</script>
+</body>
+</html>
