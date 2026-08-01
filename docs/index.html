@@ -69,7 +69,7 @@
 
 <div class="container">
   <div class="strip">
-    <a class="demo" href="https://causality-association-nd.streamlit.app" target="_blank">🚀 Live Demo (Streamlit)</a>
+    <a class="demo" href="https://github.com/LengyanReader/Causality-and-Association-in-nD/blob/main/panel_app/app.py" target="_blank">🚀 Panel Demo</a>
     <a class="nb" href="https://github.com/LengyanReader/Causality-and-Association-in-nD/blob/main/notebooks/nomnom_endtoend/full_causal_workflow.ipynb" target="_blank">📓 Jupyter Notebook</a>
     <a class="gh" href="https://github.com/LengyanReader/Causality-and-Association-in-nD" target="_blank">💻 GitHub Repo</a>
   </div>
@@ -118,8 +118,8 @@
 conda env create -f environment.yml
 conda activate causality-nd
 
-# 2. Run the interactive demo
-streamlit run streamlit_app/app.py
+# 2. Run the interactive Panel demo
+panel serve panel_app/app.py --auto
 
 # 3. Or open the Jupyter notebook
 jupyter notebook notebooks/nomnom_endtoend/full_causal_workflow.ipynb
@@ -139,7 +139,7 @@ python -m pytest causal_ci -q</pre>
         <tr><td>🔄 Workflow</td><td><code>ucl/</code></td><td>UCL engine: 9 stations, typed artifact contracts, graph compiler</td></tr>
         <tr><td>🧪 Tests</td><td><code>causal_ci/</code></td><td>37-test pyramid: unit / integration / property / regression</td></tr>
         <tr><td>📓 Walkthrough</td><td><code>notebooks/</code></td><td>Jupyter notebook (34 cells, executed), math bridge, Tier-1 gallery</td></tr>
-        <tr><td>🚀 App</td><td><code>streamlit_app/</code></td><td>Interactive Streamlit demo with persistent glossary sidebar</td></tr>
+        <tr><td>🚀 App</td><td><code>panel_app/</code></td><td>Reactive Panel demo with persistent glossary sidebar — only re-computes what changed</td></tr>
         <tr><td>⚙️ CI/CD</td><td><code>.github/</code></td><td>GitHub Actions: test pyramid, math bridge, gallery on push</td></tr>
         <tr><td>📋 Docs</td><td><code>docs/</code></td><td>This landing page (GitHub Pages)</td></tr>
       </table>
@@ -165,10 +165,10 @@ python -m pytest causal_ci -q</pre>
     <div class="cards">
       <div class="card">
         <div class="icon">🚀</div>
-        <h4>Streamlit App</h4>
-        <p>Interactive walkthrough with persistent glossary sidebar, tab navigation, expandable sections, and live metric updates. Deployed on Streamlit Community Cloud.</p>
-        <a href="https://causality-association-nd.streamlit.app" target="_blank" style="color:var(--green);font-weight:600;">Open Demo →</a>
-        <br><small style="color:var(--muted);">Or run locally: <code>streamlit run streamlit_app/app.py</code></small>
+        <h4>Panel App</h4>
+        <p>Reactive walkthrough — only re-computes what changed. Persistent glossary sidebar, tab navigation, full LaTeX via MathJax.</p>
+        <a href="https://github.com/LengyanReader/Causality-and-Association-in-nD/tree/main/panel_app" target="_blank" style="color:var(--green);font-weight:600;">View Code →</a>
+        <br><small style="color:var(--muted);">Or run locally: <code>panel serve panel_app/app.py --auto</code></small>
       </div>
       <div class="card">
         <div class="icon">📓</div>
@@ -214,7 +214,7 @@ python -m pytest causal_ci -q</pre>
 <footer>
   <div class="container">
     Causality &amp; Association in nD · <a href="https://github.com/LengyanReader/Causality-and-Association-in-nD" style="color:var(--muted);">GitHub</a><br>
-    Built with Python · Streamlit · Jupyter · NumPy · scikit-learn · networkx
+    Built with Python · Panel · Jupyter · NumPy · scikit-learn · networkx
   </div>
 </footer>
 

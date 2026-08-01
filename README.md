@@ -10,8 +10,8 @@ and real-data reproductions, all unit-tested against known truth.*
 
 | Demo | Description | Link |
 |---|---|---|
-| **Streamlit App** | Interactive walkthrough with persistent glossary sidebar, tabs, expandable sections, live metrics | [→ Open App](https://causality-association-nd.streamlit.app) · `streamlit run streamlit_app/app.py` |
-| **Jupyter Notebook** | 37-cell executed notebook: rich markdown, LaTeX, DAG viz, interactive Plotly overview, glossary accordions | [→ View Notebook](notebooks/nomnom_endtoend/full_causal_workflow.ipynb) |
+| **Panel App** | Reactive walkthrough — only re-computes what changed. Sidebar glossary, tabs, LaTeX | `panel serve panel_app/app.py --auto` |
+| **Jupyter Notebook** | 37-cell executed notebook: rich markdown, LaTeX, DAG viz, Plotly overview, glossary accordions | [→ View Notebook](notebooks/nomnom_endtoend/full_causal_workflow.ipynb) |
 | **NHEFS Real Data** | Same workflow on 1,566 real Americans: does quitting smoking cause weight gain? | [→ View Notebook](notebooks/tier1_gallery/nhefs_real_world_walkthrough.ipynb) |
 | **Landing Page** | Project overview website | [→ Open Page](https://lengyanreader.github.io/Causality-and-Association-in-nD) |
 
@@ -117,7 +117,7 @@ conda env create -f environment.yml
 conda activate causality-nd
 
 # Interactive demo (browser)
-streamlit run streamlit_app/app.py
+panel serve panel_app/app.py --auto
 
 # Jupyter walkthrough
 jupyter notebook notebooks/nomnom_endtoend/full_causal_workflow.ipynb
@@ -159,7 +159,7 @@ Causality-and-Association-in-nD/
 │   ├── math_bridge/             6-level self-verifying curriculum (Levels 0–5)
 │   ├── tier1_gallery/           6 classic reproductions + NHEFS real-world walkthrough
 │   └── nomnom_endtoend/         Full-walkthrough Jupyter notebook + end-to-end runners
-├── streamlit_app/               Interactive demo with persistent glossary sidebar
+├── panel_app/                   Reactive Panel demo — only re-computes what changed
 ├── loops/                       Event-driven UCL runner
 ├── scripts/                     Notebook builder, .ipynb converter
 ├── docs/                        GitHub Pages landing page
