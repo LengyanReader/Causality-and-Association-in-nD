@@ -129,6 +129,18 @@ function build(){
   h+='<div class="callout"><b>Key insight:</b> W is the most important node. The platform targets on W (proxy for U). Conditioning on W blocks the back-door path, making the ATE identifiable. <b>Without W, the ATE is not identified.</b></div>';
   h+='<h2 id="s3"><span class="cn">3</span> The Estimation</h2>';
   h+='<p>The 9-station UCL. The DAG is our single source of truth - everything is compiled from it.</p>';
+  h+='<div class="card"><h3>How the Data Is Generated</h3>';
+  h+='<p>The NomNom DGP is a <b>structural causal model (SCM)</b> — a set of equations, one per node, each describing how that variable is caused by its parents in the graph. For example:</p>';
+  h+='<p><b>T (notification):</b> <code>T = f(W, Z, rain, weekend, payday, noise)</code> — the platform targets based on app-use W and context, plus randomized jitter Z.</p>';
+  h+='<p><b>Y (order):</b> <code>Y = f(T, M, U, rain, weekend, payday, coupon, noise)</code> — orders depend on the notification (causal target), app-open (mediator), hunger (confounder), context, and coupons.</p>';
+  h+='<p><b>M (app open):</b> <code>M = f(T, U, noise)</code> — the mediator is affected by both the notification and hunger.</p>';
+  h+='<p>Because this is a <b>synthetic world</b>, we know the exact values of every coefficient. This lets us compute the <b>ground truth ATE</b> by Monte Carlo simulation: draw 200,000 random users, run the SCM twice — once with <code>do(T=1)</code>, once with <code>do(T=0)</code>, using the same noise — and average the difference. The result is the exact causal effect, against which every estimator below is checked.</p>';
+  h+='<p>The four metrics in the Ground Truth panel serve different purposes:</p>';
+  h+='<table><tr><th>Metric</th><th>What it tells us</th></tr>';
+  h+='<tr><td><b>Static ATE</b></td><td>The true causal effect in normal conditions — our estimation target. The pipeline should recover this within its confidence interval.</td></tr>';
+  h+='<tr><td><b>Holiday ATE</b></td><td>The true effect when the T→M mechanism is weakened (1.6→0.4). Different from Static because the mediation path is weaker. The EVOLVE station must detect this shift.</td></tr>';
+  h+='<tr><td><b>CATE (loyal users)</b></td><td>The causal effect for loyal users — larger than for new users (heterogeneity). Demonstrates that the ATE is an average over subgroups with different effects.</td></tr>';
+  h+='<tr><td><b>CATE (new users)</b></td><td>The causal effect for new users — smaller. Together with the loyal CATE, these bracket the ATE (the ATE is a weighted average of the two).</td></tr></table></div>';
   if(c.data_preview){var dp=c.data_preview;
     h+='<div class="card"><h3>A Look at the Raw Data</h3>';
     h+='<p>The NomNom DGP produces '+dp.shape.n_rows+' rows and '+dp.shape.n_cols+' columns. Each row is one user-day. Here is a sample of 5 rows:</p>';

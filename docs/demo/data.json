@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0021130204286157373, 'tolerance': 0.013347077463278754}"
+        "detail": "{'estimate': 0.0017349124949306322, 'tolerance': 0.013350117030491318}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 8.109059575656108e-06, 'tolerance': 0.00802580988029223}"
+        "detail": "{'delta': 7.281857022101157e-05, 'tolerance': 0.008025805752167402}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.0051505662361812365, 'tolerance': 0.018539954622876064}"
+        "detail": "{'delta': 0.005230292156852084, 'tolerance': 0.018556073999142966}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008712760865807684, 'tolerance': 0.0145344542365983}"
+        "detail": "{'estimate': -0.0008263247171963135, 'tolerance': 0.014538628012323576}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.1769,
+    "ci_low": 0.177,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004338864780065264, 'tolerance': 0.013361667807169516}"
+        "detail": "{'estimate': 0.004343822900419904, 'tolerance': 0.013361647102621029}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012892876578803891, 'tolerance': 0.007932857434996292}"
+        "detail": "{'delta': 0.0012680952273886326, 'tolerance': 0.007932818662983796}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005078025909504291, 'tolerance': 0.018335042005380633}"
+        "detail": "{'delta': 0.005068694417397934, 'tolerance': 0.018334447013393568}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004444909976822119, 'tolerance': 0.01416718509086499}"
+        "detail": "{'estimate': -0.004449862879391024, 'tolerance': 0.01416824873089573}"
       }
     ],
     "naive": 0.297,
@@ -692,7 +692,7 @@
         "question": "Can the effect be computed from observables?",
         "output": "IdentificationProof",
         "explanation": "Identification is the central methodological question — a separate, prior step to estimation. <b>(1) Form the back-door graph:</b> delete all edges OUT of T (T→M, T→Y, T→S). <b>(2) Search:</b> test subsets of observed non-descendant variables for d-separation of T and Y. <b>(3) Compile:</b> return the smallest valid set. W is in (blocks U→W→T ... U→Y), M and S are correctly excluded (mediator and collider — never adjust).",
-        "formula": "E[Y|do(T)] = Σ_z E[Y | T, z] · P(z)  for z in adjustment set"
+        "formula": "E[Y \\mid do(T)] = \\sum_z E[Y \\mid T, z] \\cdot P(z)"
       },
       {
         "id": "data",

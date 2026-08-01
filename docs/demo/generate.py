@@ -287,7 +287,7 @@ data["content"] = {
             "question": "Can the effect be computed from observables?",
             "output": "IdentificationProof",
             "explanation": "Identification is the central methodological question — a separate, prior step to estimation. <b>(1) Form the back-door graph:</b> delete all edges OUT of T (T→M, T→Y, T→S). <b>(2) Search:</b> test subsets of observed non-descendant variables for d-separation of T and Y. <b>(3) Compile:</b> return the smallest valid set. W is in (blocks U→W→T ... U→Y), M and S are correctly excluded (mediator and collider — never adjust).",
-            "formula": "E[Y|do(T)] = Σ_z E[Y | T, z] · P(z)  for z in adjustment set",
+            "formula": "E[Y \mid do(T)] = \sum_z E[Y \mid T, z] \cdot P(z)",
         },
         {
             "id": "data", "number": 3, "name": "DATA", "emoji": "📊",
