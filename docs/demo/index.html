@@ -293,7 +293,25 @@ function buildStation(s,rd){
 }
 
 function buildSidebar(){
-  var h='<h2>Causal Science</h2><div class="sub">A Guided Walkthrough</div>';
+  var h='<h2><a href="index.html" style="color:#fff;text-decoration:none">Causal Science</a></h2><div class="sub">A Guided Walkthrough</div>';
+
+  // Navigation menu
+  h+='<div style="margin:14px 0;padding:10px;background:rgba(255,255,255,.08);border-radius:6px">';
+  h+='<div style="font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:6px">NAVIGATION</div>';
+  h+='<div style="font-size:.76rem"><a href="index.html" style="color:#34d399;display:block;padding:2px 0;text-decoration:none">🏠 Main Walkthrough</a></div>';
+  h+='<div style="font-size:.76rem;margin-top:4px"><b style="color:#94a3b8">In-page sections:</b></div>';
+  h+='<a href="#s1" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">1. The Question</a>';
+  h+='<a href="#s2" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">2. The Causal Graph</a>';
+  h+='<a href="#s3" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">3. The Estimation</a>';
+  h+='<a href="#s4" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">4. How Wrong Could We Be?</a>';
+  h+='<a href="#s5" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">5. When the World Changes</a>';
+  h+='<a href="#s6" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">6. Was THIS Order Caused?</a>';
+  h+='<a href="#s7" style="color:#e2e8f0;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">7. What We Learned</a>';
+  h+='<div style="font-size:.76rem;margin-top:6px"><b style="color:#94a3b8">Deep Dives:</b></div>';
+  h+='<a href="deep_evalue.html" style="color:#fbbf24;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">📖 E-value (first principles)</a>';
+  h+='<a href="deep_backdoor.html" style="color:#fbbf24;display:block;padding:1px 0;font-size:.74rem;text-decoration:none">📖 Back-Door Criterion</a>';
+  h+='</div>';
+  h+='<p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal operations.<br>Holiday = users habituated to notifications (T→M drops 1.6→0.4).<br><b>Toggle to see how the pipeline performs in each world.</b></p>';
   h+='<div class="regime-badge '+activeRegime+'">WORLD: '+activeRegime.toUpperCase()+'</div>';
   h+='<p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal operations.<br>Holiday = users habituated to notifications (T→M drops 1.6→0.4).<br><b>Toggle to see how the pipeline performs in each world.</b></p>';
   h+='<select onchange="switchRegime(this.value)"><option value="static"'+(activeRegime==="static"?" selected":"")+'>Static (baseline)</option><option value="holiday"'+(activeRegime==="holiday"?" selected":"")+'>Holiday (drifted)</option></select>';
