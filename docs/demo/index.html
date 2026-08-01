@@ -12,56 +12,85 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .sidebar h2{font-size:1.1rem;margin-bottom:2px}
 .sidebar .sub{font-size:.78rem;color:#95a5a6;margin-bottom:12px}
 .sidebar h3{font-size:.85rem;margin:14px 0 6px;color:var(--green)}
-.gt{font-size:.78rem;margin-bottom:4px;padding:2px 0}
-.gt b{color:var(--green)}
+.gt{font-size:.78rem;margin-bottom:4px;padding:2px 0}.gt b{color:var(--green)}
 .main{margin-left:280px;padding:28px 36px;max-width:1060px;flex:1}
-h1{font-size:1.7rem;font-weight:800;margin-bottom:6px}
-h2{font-size:1.2rem;margin:24px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}
-h3{font-size:1rem;margin:16px 0 8px}
+h1{font-size:1.7rem;font-weight:800;margin-bottom:6px}h2{font-size:1.2rem;margin:24px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:16px 0 8px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
 .metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;text-align:center;min-width:110px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
-.metric .val{font-size:1.4rem;font-weight:800;color:var(--blue)}
-.metric .lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
+.metric .val{font-size:1.4rem;font-weight:800;color:var(--blue)}.metric .lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
 table{width:100%;border-collapse:collapse;font-size:.86rem;margin:10px 0}
-th{background:var(--dark);color:white;padding:7px 10px;text-align:left}
-td{padding:7px 10px;border-bottom:1px solid var(--border)}
-tr:hover td{background:#f1f5f9}
+th{background:var(--dark);color:white;padding:7px 10px;text-align:left}td{padding:7px 10px;border-bottom:1px solid var(--border)}tr:hover td{background:#f1f5f9}
 .info{background:#eaf2f8;border-left:4px solid var(--blue);padding:10px 14px;margin:10px 0;border-radius:0 var(--radius) var(--radius) 0;font-style:italic;font-size:.88rem}
-.warn{background:#fef9e7;border-left:4px solid var(--orange)}
-.good{background:#eafaf1;border-left:4px solid var(--green)}
+.warn{background:#fef9e7;border-left:4px solid var(--orange)}.good{background:#eafaf1;border-left:4px solid var(--green)}
 .formula{background:#f4f4f4;padding:8px 14px;border-radius:var(--radius);font-family:monospace;font-size:.92rem;margin:6px 0;display:inline-block}
 .nav-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:16px 0}
 .nav-tabs button{padding:7px 13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--text);transition:all .15s}
 .nav-tabs button:hover,.nav-tabs button.on{background:var(--blue);color:white;border-color:var(--blue)}
-.section{display:none}
-.section.on{display:block}
+.section{display:none}.section.on{display:block}
 .pass{color:var(--green)}.fail{color:var(--red)}
-.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700}
-.bg{background:#d5f5e3;color:#1e8449}.br{background:#fadbd8;color:#c0392b}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700}.bg{background:#d5f5e3;color:#1e8449}.br{background:#fadbd8;color:#c0392b}
 select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.84rem;width:100%;margin-bottom:12px}
-a{color:var(--blue);text-decoration:none}
-a:hover{text-decoration:underline}
-</style>
-</head>
-<body>
-<div class="app">
+</style></head>
+<body><div class="app">
 <aside class="sidebar" id="sidebar"></aside>
 <main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading demo data...</p></main>
 </div>
 <script>
 var D=null,activeRegime="static";
+var T=[];
 
-// Load JSON data, then render
-fetch("data.json").then(function(r){return r.json()}).then(function(json){
-  D=json;build();buildSidebar();
+fetch("data.json").then(function(r){return r.json()}).then(function(j){
+  D=j;buildAll();
 }).catch(function(e){
-  document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python scripts/generate_demo_data.py</code> to generate <code>docs/demo/data.json</code>, then reload.</p><p style="color:var(--muted);font-size:.85rem">Error: '+e.message+'</p></div>';
+  document.getElementById("content").innerHTML='<div class="card"><h3>Data not found</h3><p>Run <code>python scripts/generate_demo_data.py</code> to generate <code>docs/demo/data.json</code>.</p><p style="color:var(--muted);font-size:.85rem">'+e.message+'</p></div>';
 });
 
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
-function cov(re){return re.lo<=re.truth&&re.truth<=re.hi}
+function cov(re){return re.ci_low<=re.truth&&re.truth<=re.ci_high}
+function row(k,v,c){c=c||"";return"<tr><td>"+k+"</td><td"+((c)?" class=\""+c+"\"":"")+"><b>"+v+"</b></td></tr>"}
+function badge(v,ok){return'<span class="badge '+(ok?"bg":"br")+'">'+v+'</span>'}
+
+function sdata(id){
+  var rd=r(),cs=D.content.stations;
+  for(var i=0;i<cs.length;i++){if(cs[i].id===id)return{rd:rd,s:cs[i],idx:i+1}}
+  return{rd:rd,s:null,idx:-1}
+}
+
+function buildAll(){
+  buildSidebar();
+  var rd=r(),c=D.content,h="";
+  var labels=[];
+  labels.push("Overview");
+  for(var i=0;i<c.stations.length;i++)labels.push(c.stations[i].number+". "+c.stations[i].name);
+  labels.push("Rung 3");labels.push("Summary");
+
+  // Tabs
+  h+='<h1>'+c.title+'</h1><p><b>'+c.subtitle+'</b></p>';
+  h+='<div class="info">Regime: <b>'+activeRegime+'</b> | n: <b>'+rd.n_rows+'</b> | Graph v<b>'+rd.graph_version+'</b> | Truth ATE: <b>'+fmt(rd.truth)+'</b></div>';
+  h+='<div class="nav-tabs">';
+  for(var i=0;i<labels.length;i++)h+='<button id="btn'+i+'" class="'+(i===0?"on":"")+'" onclick="switchTab('+i+')">'+labels[i]+'</button>';
+  h+="</div>";
+
+  // Build all section content
+  h+=sec0_overview();
+  for(var i=0;i<c.stations.length;i++)h+=sec_station(c.stations[i]);
+  h+=sec_rung3();
+  h+=sec_summary();
+
+  document.getElementById("content").innerHTML=h;
+  switchTab(0); // show overview
+}
+
+function switchTab(i){
+  var btns=document.querySelectorAll(".nav-tabs button");
+  for(var j=0;j<btns.length;j++)btns[j].classList.remove("on");
+  var b=document.getElementById("btn"+i);if(b)b.classList.add("on");
+  var secs=document.querySelectorAll(".section");
+  for(var j=0;j<secs.length;j++)secs[j].classList.remove("on");
+  var s=document.getElementById("sec"+i);if(s)s.classList.add("on");
+}
 
 function buildSidebar(){
   var h='<h2>Causal Science</h2><div class="sub">UCL Walkthrough</div>';
@@ -76,120 +105,104 @@ function buildSidebar(){
   document.getElementById("sidebar").innerHTML=h;
 }
 
-function switchRegime(v){activeRegime=v;build()}
+function switchRegime(v){activeRegime=v;buildAll()}
 
-function build(){
-  if(!D){return}
-  var rd=r(),c=D.content,h='';
-  h+="<h1>"+c.title+"</h1><p><b>"+c.subtitle+"</b></p>";
-  h+='<div class="info">Regime: <b>'+activeRegime+'</b> | n: <b>'+rd.n_rows+'</b> | Graph v<b>'+rd.graph_version+"</b> | Truth ATE: <b>"+fmt(rd.truth)+"</b></div>";
+// ── SECTION BUILDERS ──
 
-  // Tabs
-  var tabs=["Overview"];
-  for(var i=0;i<c.stations.length;i++)tabs.push(c.stations[i].number+". "+c.stations[i].name);
-  tabs.push("Rung 3");tabs.push("Summary");
-  h+='<div class="nav-tabs">';
-  for(var i=0;i<tabs.length;i++)h+='<button class="'+(i===0?"on":"")+'" onclick="showSec(event,'+i+')">'+tabs[i]+'</button>';
-  h+="</div>";
-
-  // SEC 0 — Overview
-  h+='<div class="section on" id="sec0">';
-  h+='<div class="card"><p style="font-size:1.05rem"><i>'+c.background.use_case+'</i></p>';
-  h+='<p>'+c.background.problem+'</p></div>';
-  h+='<div class="card"><h3>Ground Truth</h3><p>'+c.background.premise+'</p>';
+function sec0_overview(){
+  var rd=r(),c=D.content,b=c.background,h="";
+  h+='<div class="section" id="sec0"><div class="card"><p style="font-size:1.05rem"><i>'+b.use_case+'</i></p><p>'+b.problem+'</p></div>';
+  h+='<div class="card"><h3>Ground Truth</h3><p>'+b.premise+'</p>';
   h+='<div class="metrics">';
   h+='<div class="metric"><div class="val">'+fmt(D.static.truth)+'</div><div class="lbl">Static ATE</div></div>';
   h+='<div class="metric"><div class="val">'+fmt(D.holiday.truth)+'</div><div class="lbl">Holiday ATE</div></div>';
   h+='<div class="metric"><div class="val">'+fmt(D.static.cate_loyal)+'</div><div class="lbl">CATE (loyal)</div></div>';
-  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">CATE (new)</div></div>';
-  h+='<p>Holiday changes exactly one mechanism: T→M coefficient from 1.6 to 0.4. Y-mechanism invariant. Station 8 detects this.</p></div>';
+  h+='<div class="metric"><div class="val">'+fmt(D.static.cate_new)+'</div><div class="lbl">CATE (new)</div></div></div>';
+  h+='<p>Holiday changes exactly one mechanism: T→M coefficient from 1.6 to 0.4. Station 8 detects this.</p></div>';
   h+='<div class="card"><h3>The 9 UCL Stations</h3><table><tr><th>#</th><th>Station</th><th>Question</th><th>Output</th></tr>';
-  for(var i=0;i<c.stations.length;i++){
-    var s=c.stations[i];
-    h+='<tr><td>'+s.number+'</td><td><b>'+s.emoji+' '+s.name+'</b></td><td>'+s.question+'</td><td><code>'+s.output+'</code></td></tr>';
-  }
+  for(var i=0;i<c.stations.length;i++){var s=c.stations[i];h+='<tr><td>'+s.number+'</td><td><b>'+s.emoji+' '+s.name+'</b></td><td>'+s.question+'</td><td><code>'+s.output+'</code></td></tr>'}
   h+="</table></div></div>";
+  return h;
+}
 
-  // Station sections
-  for(var i=0;i<c.stations.length;i++){
-    var s=c.stations[i],si=i+1;
-    h+='<div class="section" id="sec'+si+'"><div class="card">';
-    h+='<h3>Station '+s.number+' — '+s.name+': '+s.question+'</h3>';
-    h+='<div class="info">'+s.explanation+'</div>';
-    if(s.formula)h+='<div class="formula">'+s.formula+'</div>';
-    if(s.metrics){
-      h+='<p style="font-size:.82rem;color:var(--muted)">';
-      for(var mk in s.metrics)h+=mk+": "+s.metrics[mk]+" | ";
-      h+='</p>';
-    }
-    if(s.id==="data"){
-      h+='<table><tr><td><b>Rows</b></td><td>'+rd.n_rows+'</td></tr><tr><td><b>Positivity</b></td><td><span class="badge bg">'+rd.positivity_ok+'</span></td></tr></table>';
-      h+='<table><tr><th>Quantity</th><th>Value</th><th>Rung</th></tr>';
-      h+='<tr><td>P(Y|T=1)-P(Y|T=0) (naive)</td><td><b>'+fmt(rd.naive)+'</b></td><td>1 — association</td></tr>';
-      h+='<tr><td>E[Y|do(T=1)]-E[Y|do(T=0)] (truth)</td><td><b>'+fmt(rd.truth)+'</b></td><td>2 — intervention</td></tr>';
-      h+='<tr><td><b>Confounding gap</b></td><td><b style="color:var(--red)">'+fmt(rd.gap)+'</b></td><td>—</td></tr></table>';
-    }
-    if(s.id==="assume"){
-      h+='<table><tr><td><b>Graph version</b></td><td><code>'+rd.graph_version+'</code></td></tr><tr><td><b>Edges</b></td><td>20</td></tr><tr><td><b>Absent edges (falsifiable)</b></td><td>8</td></tr></table>';
-    }
-    if(s.id==="identify"){
-      h+='<table><tr><td><b>Criterion</b></td><td>'+rd.criterion+'</td></tr><tr><td><b>Identified</b></td><td><span class="badge bg">true</span></td></tr><tr><td><b>Adjustment set</b></td><td><code>'+rd.adjustment_set.join(", ")+'</code></td></tr></table>';
-    }
-    if(s.id==="feature"){
-      h+='<table><tr><td><b>In adjustment</b></td><td><code>'+rd.adjustment_set.join(", ")+'</code></td></tr><tr><td><b>Excluded</b></td><td>M (mediator), S (collider)</td></tr><tr><td><b>Instruments</b></td><td>Z</td></tr><tr><td><b>Neg. controls</b></td><td>NC</td></tr></table>';
-    }
-    if(s.id==="model"){
-      h+='<p>Estimator: <b>'+rd.estimator+'</b></p>';
-      h+='<div class="metrics"><div class="metric"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE (AIPW/DML)</div></div>';
-      h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
-      h+='<div class="metric"><div class="val">'+fmt(rd.truth)+'</div><div class="lbl">Ground Truth</div></div>';
-      var cv=cov({lo:rd.ci_low,hi:rd.ci_high,truth:rd.truth});
-      h+='<div class="metric"><div class="val">'+(cv?"PASS":"FAIL")+'</div><div class="lbl">CI Covers</div></div></div>';
-    }
-    if(s.id==="evaluate"){
-      h+='<div class="metrics"><div class="metric"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div>';
-      h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
-      h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">Max |SMD|</div></div></div>';
-      h+='<p>E-value ~'+rd.e_value.toFixed(1)+' means an unmeasured confounder would need RR >= '+rd.e_value.toFixed(1)+' with both T and Y to explain away the effect.</p>';
-    }
-    if(s.id==="test"){
-      h+='<table><tr><th>Refuter</th><th>Result</th><th>Detail</th></tr>';
-      if(rd.refuters)for(var j=0;j<rd.refuters.length;j++){var rf=rd.refuters[j];h+='<tr><td>'+rf.name+'</td><td class="'+(rf.passed?"pass":"fail")+'">'+(rf.passed?"PASS":"FAIL")+'</td><td>'+rf.detail+'</td></tr>'}
-      h+='</table><p><span class="badge '+(rd.all_green?"bg":"br")+'">ALL GREEN: '+rd.all_green+'</span></p>';
-    }
-    if(s.id==="evolve"){
-      if(D.evolve){
-        h+='<table><tr><th>Node</th><th>Holiday Degradation</th><th>Status</th></tr>';
-        var dr=D.evolve.drift;var keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
-        for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn],alarm=D.evolve.alarm;h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>alarm?'<span class="badge br">DRIFT</span>':'<span class="badge bg">OK</span>')+'</td></tr>'}
-        h+='</table><p><b>Drift localized to: <code>'+D.evolve.worst+'</code></b> — the T→M mechanism (exactly what changed in the DGP).</p>';
-      }
-      if(D.actuator){
-        h+='<div class="card good"><h3>'+c.actuator_section.title+'</h3><p>'+c.actuator_section.explanation+'</p>';
-        h+='<table><tr><td>Holiday ATE</td><td><b>'+fmt(D.actuator.ate)+'</b></td></tr><tr><td>Holiday Truth</td><td><b>'+fmt(D.actuator.truth)+'</b></td></tr><tr><td>CI Covers</td><td><span class="badge bg">'+D.actuator.covers+'</span></td></tr><tr><td>All Green</td><td><span class="badge bg">'+D.actuator.all_green+'</span></td></tr></table></div>';
-      }
-    }
-    h+="</div></div>";
+function sec_station(s){
+  var sd=sdata(s.id),rd=sd.rd,si=sd.idx,h="";
+  h+='<div class="section" id="sec'+si+'"><div class="card">';
+  h+='<h3>Station '+s.number+' — '+s.name+': '+s.question+'</h3>';
+  h+='<div class="info">'+s.explanation+'</div>';
+  if(s.formula)h+='<div class="formula">'+s.formula+'</div>';
+
+  if(s.id==="frame"){
+    h+='<table>'+row("Estimand",rd.estimand||"ATE (rung 2)")+row("Treatment",rd.treatment||"T (push notification)")+row("Outcome",rd.outcome||"Y (order placed)")+row("Population",rd.population||"all active user-days")+'</table>';
   }
+  if(s.id==="assume"){
+    h+='<table>'+row("Graph version","<code>"+rd.graph_version+"</code>")+row("Edges","20 (observed: 13, latent: 1)")+row("Absent edges","8 (the falsifiable part)")+'</table>';
+  }
+  if(s.id==="identify"){
+    h+='<table>'+row("Criterion",rd.criterion)+row("Identified",badge("true",true))+'<tr><td><b>Adjustment set</b></td><td><code>'+(rd.adjustment_set||[]).join(", ")+'</code></td></tr></table>';
+  }
+  if(s.id==="data"){
+    h+='<table>'+row("Rows",rd.n_rows)+row("Positivity",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table>';
+    h+='<table><tr><th>Quantity</th><th>Value</th><th>Rung</th></tr>';
+    h+='<tr><td>P(Y|T=1)-P(Y|T=0) (naive)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1 — association</td></tr>';
+    h+='<tr><td>E[Y|do(T=1)]-E[Y|do(T=0)] (truth)</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2 — intervention</td></tr>';
+    h+='<tr><td><b>Confounding gap</b></td><td><b style="color:var(--red)">'+fmt(rd.gap||0)+'</b></td><td>—</td></tr></table>';
+  }
+  if(s.id==="feature"){
+    h+='<table>'+row("In adjustment","<code>"+(rd.adjustment_set||[]).join(", ")+"</code>")+row("Excluded","M (mediator), S (collider)")+row("Instruments","Z (send-time jitter)")+row("Neg. controls","NC (battery drain)")+'</table>';
+  }
+  if(s.id==="model"){
+    h+='<p style="font-size:.84rem;color:var(--muted)">Estimator: '+rd.estimator+'</p>';
+    h+='<div class="metrics"><div class="metric"><div class="val">'+fmt(rd.ate)+'</div><div class="lbl">ATE (AIPW/DML)</div></div>';
+    h+='<div class="metric"><div class="val">['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+']</div><div class="lbl">95% CI</div></div>';
+    h+='<div class="metric"><div class="val">'+fmt(rd.truth)+'</div><div class="lbl">Ground Truth</div></div>';
+    h+='<div class="metric"><div class="val">'+(cov(rd)?"PASS":"FAIL")+'</div><div class="lbl">CI Covers</div></div></div>';
+  }
+  if(s.id==="evaluate"){
+    h+='<div class="metrics"><div class="metric"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div>';
+    h+='<div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div>';
+    h+='<div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">Max |SMD|</div></div></div>';
+    h+='<p>E-value ~'+rd.e_value.toFixed(1)+': unmeasured confounder needs RR >='+rd.e_value.toFixed(1)+' with both T and Y to explain away effect. '+(s.metrics?("Thresholds: "+s.metrics["SMD threshold"]):"")+'</p>';
+  }
+  if(s.id==="test"){
+    h+='<table><tr><th>Refuter</th><th>Result</th><th>Detail</th></tr>';
+    if(rd.refuters)for(var j=0;j<rd.refuters.length;j++){var rf=rd.refuters[j];h+='<tr><td>'+rf.name+'</td><td class="'+(rf.passed?"pass":"fail")+'">'+(rf.passed?"PASS":"FAIL")+'</td><td>'+rf.detail+'</td></tr>'}
+    h+='</table><p>'+badge("ALL GREEN: "+rd.all_green,rd.all_green)+'</p>';
+  }
+  if(s.id==="evolve"){
+    if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
+      h+='<table><tr><th>Node</th><th>Holiday Degradation</th><th>Status</th></tr>';
+      for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
+      h+='</table><p><b>Drift localized to: <code>'+D.evolve.worst+'</code></b> — the T→M mechanism (exactly what changed in the DGP, coefficient 1.6→0.4).</p>';
+    }
+    if(D.actuator){
+      h+='<div class="card good"><h3>'+D.content.actuator_section.title+'</h3><p>'+D.content.actuator_section.explanation+'</p>';
+      h+='<table>'+row("Holiday ATE",fmt(D.actuator.ate))+row("Holiday Truth",fmt(D.actuator.truth))+row("CI Covers",badge(String(D.actuator.covers),D.actuator.covers))+row("All Green",badge(String(D.actuator.all_green),D.actuator.all_green))+'</table></div>';
+    }
+  }
+  h+="</div></div>";
+  return h;
+}
 
-  // Rung 3
-  var r3i=c.stations.length+1;
-  h+='<div class="section" id="sec'+r3i+'"><div class="card"><h3>'+c.rung3_section.title+'</h3>';
-  h+='<div class="info">'+c.rung3_section.explanation+'</div>';
+function sec_rung3(){
+  var si=D.content.stations.length+1,h="";
+  h+='<div class="section" id="sec'+si+'"><div class="card"><h3>'+D.content.rung3_section.title+'</h3>';
+  h+='<div class="info">'+D.content.rung3_section.explanation+'</div>';
   if(D.rung3){
-    h+='<table><tr><td>P(Y(0)=0 | T=1, Y=1)</td><td><b>'+fmt(D.rung3.p_necessity)+'</b></td><td>Rung 3: probability of necessity</td></tr><tr><td>ATE (same draws)</td><td><b>'+fmt(D.rung3.ate_sim)+'</b></td><td>Rung 2</td></tr><tr><td>Ground truth ATE</td><td><b>'+fmt(D.static.truth)+'</b></td><td>—</td></tr></table>';
-    h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered outcomes were CAUSED by the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+'%) averages over everyone.</p>';
+    h+='<table>'+row("P(Y(0)=0 | T=1, Y=1)",fmt(D.rung3.p_necessity)+" (Rung 3)")+row("ATE (same draws)",fmt(D.rung3.ate_sim)+" (Rung 2)")+row("Ground truth ATE",fmt(D.static.truth))+'</table>';
+    h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered outcomes were CAUSED by the notification. The ATE (~'+(D.rung3.ate_sim*100).toFixed(0)+'%) averages over everyone — fundamentally different quantities.</p>';
   }
   h+='<table><tr><th>Step</th><th>Action</th></tr><tr><td>1. Abduction</td><td>Infer exogenous noise from factual evidence</td></tr><tr><td>2. Action</td><td>Intervene: do(T = 1 - T_factual)</td></tr><tr><td>3. Prediction</td><td>Re-run mechanisms with SAME noise, different T</td></tr></table></div></div>';
+  return h;
+}
 
-  // Summary
-  var si=c.stations.length+2;
-  h+='<div class="section" id="sec'+si+'"><div class="card"><h3>Summary — The Complete Workflow</h3>';
-  h+='<table><tr><th>Station</th><th>Result</th></tr>';
+function sec_summary(){
+  var rd=r(),si=D.content.stations.length+2,h="";
+  h+='<div class="section" id="sec'+si+'"><div class="card"><h3>Summary — The Complete Workflow</h3><table><tr><th>Station</th><th>Result</th></tr>';
   h+='<tr><td>0 — FRAME</td><td>ATE at rung 2 (intervention)</td></tr>';
-  h+='<tr><td>1 — ASSUME</td><td>Graph v'+rd.graph_version+', '+rd.adjustment_set.length+'-variable adj.</td></tr>';
-  h+='<tr><td>2 — IDENTIFY</td><td>'+rd.criterion+': '+rd.adjustment_set.join(", ")+'</td></tr>';
-  h+='<tr><td>3 — DATA</td><td>Positivity OK, gap '+fmt(rd.gap)+'</td></tr>';
+  h+='<tr><td>1 — ASSUME</td><td>Graph v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-variable adj.</td></tr>';
+  h+='<tr><td>2 — IDENTIFY</td><td>'+rd.criterion+': '+(rd.adjustment_set||[]).join(", ")+'</td></tr>';
+  h+='<tr><td>3 — DATA</td><td>Positivity OK, gap '+fmt(rd.gap||0)+'</td></tr>';
   h+='<tr><td>4 — FEATURE</td><td>Collider & mediator excluded</td></tr>';
   h+='<tr><td>5 — MODEL</td><td>'+fmt(rd.ate)+' ['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+'] vs '+fmt(rd.truth)+'</td></tr>';
   h+='<tr><td>6 — EVALUATE</td><td>E-value: '+rd.e_value.toFixed(2)+', |SMD|='+rd.max_smd.toFixed(4)+'</td></tr>';
@@ -197,15 +210,7 @@ function build(){
   h+='<tr><td>8 — EVOLVE</td><td>Drift: '+(D.evolve?D.evolve.worst:"M")+', actuator recovered truth</td></tr>';
   h+='<tr><td>Rung 3</td><td>Necessity: ~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'%</td></tr></table>';
   h+='<p><b>Every claim verified against ground truth. The loop is closed.</b></p></div></div>';
-
-  document.getElementById("content").innerHTML=h;
-}
-
-function showSec(e,i){
-  var btns=e.target.parentElement.querySelectorAll("button");for(var j=0;j<btns.length;j++)btns[j].classList.remove("on");
-  e.target.classList.add("on");
-  var secs=document.querySelectorAll(".section");for(var j=0;j<secs.length;j++)secs[j].classList.remove("on");
-  var el=document.getElementById("sec"+i);if(el)el.classList.add("on");
+  return h;
 }
 </script>
 </body>
