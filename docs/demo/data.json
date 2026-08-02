@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.228,
+    "ci_low": 0.2279,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0017675136518384342, 'tolerance': 0.013349534429175783}"
+        "detail": "{'estimate': 0.0017310906422321412, 'tolerance': 0.013350315693234825}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 2.4923940503046582e-05, 'tolerance': 0.008025411146021566}"
+        "detail": "{'delta': 0.00011093800128214593, 'tolerance': 0.008026208483910835}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.0052043008253435386, 'tolerance': 0.01855435133951935}"
+        "detail": "{'delta': 0.005220371348548497, 'tolerance': 0.018554352733237918}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008128608813117081, 'tolerance': 0.014537783233232862}"
+        "detail": "{'estimate': -0.0008137748626842931, 'tolerance': 0.014537247234680225}"
       }
     ],
     "naive": 0.3467,
@@ -51,8 +51,8 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.1769,
-    "ci_high": 0.208,
+    "ci_low": 0.177,
+    "ci_high": 0.2081,
     "se": 0.0079,
     "truth": 0.191,
     "mu1": 0.5755,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004338162745109888, 'tolerance': 0.01336168188550247}"
+        "detail": "{'estimate': 0.004343564497231216, 'tolerance': 0.013361688051714393}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012449608694091174, 'tolerance': 0.007932514566890972}"
+        "detail": "{'delta': 0.0011558857379018739, 'tolerance': 0.007932812296569844}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005061341101685796, 'tolerance': 0.01833516052262455}"
+        "detail": "{'delta': 0.005066200674891913, 'tolerance': 0.01833504754389736}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.00444144909539834, 'tolerance': 0.014168354634667781}"
+        "detail": "{'estimate': -0.004425064456716442, 'tolerance': 0.014174240425162197}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0083,
+      "M": 0.0082,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -1617,6 +1617,137 @@
       "Z": "instrument",
       "coupon": "rdd_assignment",
       "loyalty": "rdd_running"
+    }
+  },
+  "visuals": {
+    "ladder": {
+      "title": "Pearl's Ladder of Causation",
+      "rungs": [
+        {
+          "y": 140,
+          "label": "Rung 1: Association",
+          "symbol": "P(Y | T)",
+          "desc": "Seeing — passive observation",
+          "op": "condition",
+          "color": "#3498db"
+        },
+        {
+          "y": 280,
+          "label": "Rung 2: Intervention",
+          "symbol": "P(Y | do(T))",
+          "desc": "Doing — graph surgery, external manipulation",
+          "op": "do()",
+          "color": "#2ecc71"
+        },
+        {
+          "y": 420,
+          "label": "Rung 3: Counterfactual",
+          "symbol": "P(Y(0)=0 | T=1,Y=1)",
+          "desc": "Imagining — same unit, different treatment",
+          "op": "abduction",
+          "color": "#e74c3c"
+        }
+      ],
+      "climb": [
+        {
+          "from_rung": 1,
+          "to_rung": 2,
+          "requires": "DAG + Back-door Criterion"
+        },
+        {
+          "from_rung": 2,
+          "to_rung": 3,
+          "requires": "Full SCM + Noise Structure"
+        }
+      ]
+    },
+    "confounding_gap": {
+      "title": "Decomposing the Naive Association",
+      "bars": [
+        {
+          "label": "Naive P(Y|T=1) - P(Y|T=0)",
+          "value": 0.343,
+          "color": "#e74c3c",
+          "rung": 1
+        },
+        {
+          "label": "True ATE E[Y(1)-Y(0)]",
+          "value": 0.241,
+          "color": "#2ecc71",
+          "rung": 2
+        },
+        {
+          "label": "Confounding Bias",
+          "value": 0.102,
+          "color": "#f39c12",
+          "rung": "bias"
+        }
+      ]
+    },
+    "evalue_gauge": {
+      "title": "E-value Sensitivity Threshold",
+      "our_value": 2.73,
+      "zones": [
+        {
+          "min": 1.0,
+          "max": 1.5,
+          "label": "Trivial",
+          "color": "#e74c3c"
+        },
+        {
+          "min": 1.5,
+          "max": 2.0,
+          "label": "Fragile",
+          "color": "#f39c12"
+        },
+        {
+          "min": 2.0,
+          "max": 5.0,
+          "label": "Robust",
+          "color": "#2ecc71"
+        },
+        {
+          "min": 5.0,
+          "max": 10.0,
+          "label": "Highly Robust",
+          "color": "#2563eb"
+        }
+      ]
+    },
+    "identification_flow": {
+      "title": "Identification via Back-Door Criterion",
+      "steps": [
+        {
+          "x": 0,
+          "label": "DAG G",
+          "detail": "17 edges",
+          "color": "#3498db"
+        },
+        {
+          "x": 1,
+          "label": "Graph Surgery",
+          "detail": "Delete T→M, T→Y, T→S",
+          "color": "#9b59b6"
+        },
+        {
+          "x": 2,
+          "label": "Back-Door Graph G_BD",
+          "detail": "Only back-door paths remain",
+          "color": "#f39c12"
+        },
+        {
+          "x": 3,
+          "label": "Candidate Search",
+          "detail": "Test subsets for d-sep",
+          "color": "#e67e22"
+        },
+        {
+          "x": 4,
+          "label": "Z = {W,rain,wknd,payday}",
+          "detail": "Minimal valid set",
+          "color": "#2ecc71"
+        }
+      ]
     }
   }
 }

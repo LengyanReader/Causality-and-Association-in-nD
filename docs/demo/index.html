@@ -52,7 +52,7 @@ svg text{font-family:system-ui,sans-serif}
 details.think{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius);margin:16px 0 0 0;overflow:hidden}
 details.think summary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:12px 18px;cursor:pointer;font-weight:700;font-size:.9rem;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
 details.think summary::-webkit-details-marker{display:none}
-details.think summary::after{content:'\\25BC';margin-left:auto;font-size:.7rem;transition:transform .2s}
+details.think summary::after{content:'▼';margin-left:auto;font-size:.7rem;transition:transform .2s}
 details.think[open] summary::after{transform:rotate(180deg)}
 details.think .think-body{padding:16px 18px}
 details.think .think-body h4{font-size:.86rem;color:var(--purple);margin:14px 0 6px;font-weight:700}
@@ -92,6 +92,97 @@ function T(tx,tip){return'<span class="term" data-tip="'+tip+'">'+tx+'</span>'}
 function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return"<code>"+s+"</code>"}}
 function DM(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:true})}catch(e){return"<code>"+s+"</code>"}}
 
+function buildLadderSVG(ladder){
+  if(!ladder)return"";
+  var W=520,H=480,h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<rect width="'+W+'" height="'+H+'" fill="#fafbfc" rx="8"/>';
+  h+='<text x="260" y="25" text-anchor="middle" font-size="14" font-weight="800" fill="#1a1a2e">'+ladder.title+'</text>';
+  // Draw rungs
+  for(var i=0;i<ladder.rungs.length;i++){
+    var r=ladder.rungs[i],rx=60,ry=r.y-22,rw=400,rh=44;
+    h+='<rect x="'+rx+'" y="'+ry+'" width="'+rw+'" height="'+rh+'" rx="8" fill="'+r.color+'" opacity="0.15" stroke="'+r.color+'" stroke-width="2"/>';
+    h+='<circle cx="'+(rx+22)+'" cy="'+r.y+'" r="12" fill="'+r.color+'"/><text x="'+(rx+22)+'" y="'+(r.y+4)+'" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">'+(i+1)+'</text>';
+    h+='<text x="'+(rx+44)+'" y="'+(r.y-6)+'" font-size="11" font-weight="700" fill="'+r.color+'">'+r.label+'</text>';
+    h+='<text x="'+(rx+44)+'" y="'+(r.y+12)+'" font-size="9" fill="#475569">'+r.desc+'</text>';
+    h+='<text x="'+(rx+300)+'" y="'+(r.y+4)+'" text-anchor="middle" font-size="11" font-family="monospace" fill="'+r.color+'">'+r.symbol+'</text>';
+  }
+  // Climb arrows
+  for(var i=0;i<ladder.climb.length;i++){
+    var c=ladder.climb[i],fromR=ladder.rungs[c.from_rung-1],toR=ladder.rungs[c.to_rung-1];
+    var ax=60,ay=fromR.y+22,by=toR.y-22;
+    h+='<line x1="'+ax+'" y1="'+ay+'" x2="'+ax+'" y2="'+by+'" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>';
+    h+='<polygon points="'+(ax-5)+','+(by-3)+' '+ax+','+by+' '+(ax+5)+','+(by-3)+'" fill="#64748b"/>';
+    h+='<text x="'+(ax+16)+'" y="'+(ay+by)/2+'" font-size="8" fill="#64748b">'+c.requires+'</text>';
+  }
+  // Labels on the right
+  h+='<text x="475" y="142" font-size="9" fill="#64748b" font-style="italic">condition()</text>';
+  h+='<text x="475" y="282" font-size="9" fill="#64748b" font-style="italic">do()</text>';
+  h+='<text x="475" y="422" font-size="9" fill="#64748b" font-style="italic">abduction-action-prediction</text>';
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
+function buildConfoundingBars(v){
+  if(!v)return"";
+  var W=500,H=140,barW=360,barX=90,barH=28,gap=12;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<text x="250" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  var maxVal=Math.max.apply(null,v.bars.map(function(b){return b.value}))*1.3;
+  for(var i=0;i<v.bars.length;i++){
+    var b=v.bars[i],y=40+i*(barH+gap),w=(b.value/maxVal)*barW;
+    h+='<text x="85" y="'+(y+18)+'" text-anchor="end" font-size="10" fill="#475569">'+b.label+'</text>';
+    h+='<rect x="'+barX+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'" opacity="0.8"/>';
+    h+='<text x="'+(barX+w+6)+'" y="'+(y+18)+'" font-size="11" font-weight="700" fill="'+b.color+'">'+(b.value>=0?'+':'')+b.value.toFixed(3)+'</text>';
+    h+='<text x="'+(barX+w+56)+'" y="'+(y+18)+'" font-size="9" fill="#94a3b8">rung '+b.rung+'</text>';
+  }
+  // Annotations
+  h+='<text x="250" y="130" text-anchor="middle" font-size="9" fill="#64748b" font-style="italic">Red bar = rung-1 association. Green = rung-2 causal truth. Orange gap = confounding bias removed by adjustment.</text>';
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
+function buildEvalueGauge(v){
+  if(!v)return"";
+  var W=520,H=120;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<text x="260" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  var gx=40,gw=440,gy=50,gh=30;
+  var total=v.zones[v.zones.length-1].max-v.zones[0].min;
+  for(var i=0;i<v.zones.length;i++){
+    var z=v.zones[i],zx=gx+(z.min-v.zones[0].min)/total*gw,zw=(z.max-z.min)/total*gw;
+    h+='<rect x="'+zx+'" y="'+gy+'" width="'+zw+'" height="'+gh+'" rx="3" fill="'+z.color+'" opacity="0.3" stroke="'+z.color+'" stroke-width="1"/>';
+    h+='<text x="'+(zx+zw/2)+'" y="'+(gy+gh+16)+'" text-anchor="middle" font-size="8" fill="'+z.color+'">'+z.label+'</text>';
+  }
+  // Marker
+  var mx=gx+(v.our_value-v.zones[0].min)/total*gw;
+  h+='<polygon points="'+(mx-6)+','+(gy-4)+' '+mx+','+(gy+8)+' '+(mx+6)+','+(gy-4)+'" fill="#1a1a2e"/>';
+  h+='<line x1="'+mx+'" y1="'+(gy+8)+'" x2="'+mx+'" y2="'+(gy+gh+4)+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+  h+='<text x="'+mx+'" y="'+(gy-8)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">'+v.our_value.toFixed(2)+'</text>';
+  h+='<text x="260" y="110" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Higher E-value = more robust to unmeasured confounding</text>';
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
+function buildIDFlow(v){
+  if(!v)return"";
+  var W=650,H=120,stY=40,stW=105,stH=50;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<defs><marker id="ah2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#64748b"/></marker></defs>';
+  h+='<text x="325" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  for(var i=0;i<v.steps.length;i++){
+    var s=v.steps[i],sx=20+i*(stW+12);
+    h+='<rect x="'+sx+'" y="'+stY+'" width="'+stW+'" height="'+stH+'" rx="6" fill="'+s.color+'" opacity="0.15" stroke="'+s.color+'" stroke-width="1.5"/>';
+    h+='<text x="'+(sx+stW/2)+'" y="'+(stY+20)+'" text-anchor="middle" font-size="9" font-weight="700" fill="'+s.color+'">'+s.label+'</text>';
+    h+='<text x="'+(sx+stW/2)+'" y="'+(stY+38)+'" text-anchor="middle" font-size="7" fill="#475569">'+s.detail+'</text>';
+    if(i<v.steps.length-1){
+      var ax=sx+stW,ay=stY+stH/2;
+      h+='<line x1="'+ax+'" y1="'+ay+'" x2="'+(ax+12)+'" y2="'+ay+'" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah2)"/>';
+    }
+  }
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
 function buildThinking(th){
   if(!th)return"";
   var h='<details class="think"><summary>Thought Process</summary><div class="think-body">';
@@ -117,7 +208,7 @@ function buildThinking(th){
     h+='<h4>III. Logic Verification</h4>';
     for(var i=0;i<th.logic.length;i++){
       var lc=th.logic[i],cls=lc.holds?"logic-row":"logic-row lr-false";
-      h+='<div class="'+cls+'"><span class="lr-symbol">'+(lc.holds?'\\2713':'\\2717')+'</span><div><span class="lr-if">IF</span> '+lc["if"]+' <span class="lr-then">THEN</span> '+lc.then;
+      h+='<div class="'+cls+'"><span class="lr-symbol">'+(lc.holds?'\✓':'\✗')+'</span><div><span class="lr-if">IF</span> '+lc["if"]+' <span class="lr-then">THEN</span> '+lc.then;
       if(lc.note)h+=' <span style="font-size:.76rem;color:var(--muted)">('+lc.note+')</span>';
       h+='</div></div>';
     }
@@ -127,7 +218,7 @@ function buildThinking(th){
     h+='<h4>IV. Common Pitfalls</h4>';
     for(var i=0;i<th.pitfalls.length;i++){
       var pf=th.pitfalls[i];
-      h+='<div class="pitfall"><div class="pf-mistake">'+(i+1)+'. '+pf.mistake+'</div><div class="pf-consequence">\\2192 '+pf.consequence+'</div><div class="pf-why">'+pf.why+'</div></div>';
+      h+='<div class="pitfall"><div class="pf-mistake">'+(i+1)+'. '+pf.mistake+'</div><div class="pf-consequence">\→ '+pf.consequence+'</div><div class="pf-why">'+pf.why+'</div></div>';
     }
   }
   // References
@@ -202,6 +293,7 @@ function build(){
     h+='<li><b>NC (battery):</b> Correlated with U (more app use → more battery drain) but NOT caused by T. If our adjustment is correct, the T→NC effect should be zero — a non-zero result is a smoke alarm for residual confounding.</li></ul></div>';
 
   h+='<div class="callout"><b>Key insight:</b> W is the most important node. The platform targets on W (proxy for U). Conditioning on W blocks the back-door path, making the ATE identifiable. <b>Without W, the ATE is not identified.</b></div>';
+  if(D.visuals&&D.visuals.identification_flow)h+=buildIDFlow(D.visuals.identification_flow);
   h+='<h2 id="s3"><span class="cn">3</span> The Estimation</h2>';
   h+='<p>The 9-station UCL. The DAG is our single source of truth - everything is compiled from it.</p>';
   h+='<div class="card"><h3>How the Data Is Generated</h3>';
@@ -248,11 +340,13 @@ function build(){
       var trans=null;
       for(var j=0;j<tf.length;j++){if(tf[j].from_station===cs[i].id&&tf[j].to_station===cs[i+1].id){trans=tf[j];break;}}
       if(trans){
-        h+='<div class="think-chain"><span class="chain-arrow">\\2193</span><span class="chain-math">'+M(trans.symbolic_link||"")+'</span><span>'+trans.narrative+'</span></div>';
+        h+='<div class="think-chain"><span class="chain-arrow">\↓</span><span class="chain-math">'+M(trans.symbolic_link||"")+'</span><span>'+trans.narrative+'</span></div>';
       }
     }
   }
+  if(D.visuals&&D.visuals.confounding_gap)h+=buildConfoundingBars(D.visuals.confounding_gap);
   h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
+  if(D.visuals&&D.visuals.evalue_gauge)h+=buildEvalueGauge(D.visuals.evalue_gauge);
   if(c.evalue_deep_dive){var ev=c.evalue_deep_dive;
     h+='<div class="card"><p>The E-value: how strong must an unmeasured confounder be to explain away our result?</p><div class="callout cr">'+ev.definition+'</div>';
     h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p><p>Our estimate: <b>E-value = '+rd.e_value.toFixed(2)+'</b> (RR = '+rd.risk_ratio.toFixed(2)+')</p>';
@@ -270,6 +364,7 @@ function build(){
     if(D.rung3){h+='<table>'+row("P(Y(0)=0 | T=1,Y=1)",fmt(D.rung3.p_necessity))+'</table>';
     h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered users would NOT have ordered without the notification.</p>';}
     h+='<table><tr><th>Step</th><th>Action</th></tr><tr><td>1. Abduction</td><td>Infer noise from observed data</td></tr><tr><td>2. Action</td><td>do(T=1-T_factual)</td></tr><tr><td>3. Prediction</td><td>Re-run with same noise, different T</td></tr></table></div>';}
+  if(D.visuals&&D.visuals.ladder)h+=buildLadderSVG(D.visuals.ladder);
   if(c.ladder_chain){var lc=c.ladder_chain;
     h+='<h2 id="ladder"><span class="cn">&#127903;</span> The Ladder of Causation</h2>';
     h+='<div class="card"><p>'+lc.title+'</p>';

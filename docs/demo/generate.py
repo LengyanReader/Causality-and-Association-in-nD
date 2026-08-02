@@ -609,6 +609,50 @@ data["dag_stats"] = {
     "node_roles": dict(sorted(_g.node_roles.items())),
 }
 
+# ── Visual diagrams ──
+data["visuals"] = {
+    "ladder": {
+        "title": "Pearl's Ladder of Causation",
+        "rungs": [
+            {"y": 140, "label": "Rung 1: Association", "symbol": "P(Y | T)", "desc": "Seeing — passive observation", "op": "condition", "color": "#3498db"},
+            {"y": 280, "label": "Rung 2: Intervention", "symbol": "P(Y | do(T))", "desc": "Doing — graph surgery, external manipulation", "op": "do()", "color": "#2ecc71"},
+            {"y": 420, "label": "Rung 3: Counterfactual", "symbol": "P(Y(0)=0 | T=1,Y=1)", "desc": "Imagining — same unit, different treatment", "op": "abduction", "color": "#e74c3c"}
+        ],
+        "climb": [
+            {"from_rung": 1, "to_rung": 2, "requires": "DAG + Back-door Criterion"},
+            {"from_rung": 2, "to_rung": 3, "requires": "Full SCM + Noise Structure"}
+        ]
+    },
+    "confounding_gap": {
+        "title": "Decomposing the Naive Association",
+        "bars": [
+            {"label": "Naive P(Y|T=1) - P(Y|T=0)", "value": 0.343, "color": "#e74c3c", "rung": 1},
+            {"label": "True ATE E[Y(1)-Y(0)]", "value": 0.241, "color": "#2ecc71", "rung": 2},
+            {"label": "Confounding Bias", "value": 0.102, "color": "#f39c12", "rung": "bias"}
+        ]
+    },
+    "evalue_gauge": {
+        "title": "E-value Sensitivity Threshold",
+        "our_value": 2.73,
+        "zones": [
+            {"min": 1.0, "max": 1.5, "label": "Trivial", "color": "#e74c3c"},
+            {"min": 1.5, "max": 2.0, "label": "Fragile", "color": "#f39c12"},
+            {"min": 2.0, "max": 5.0, "label": "Robust", "color": "#2ecc71"},
+            {"min": 5.0, "max": 10.0, "label": "Highly Robust", "color": "#2563eb"}
+        ]
+    },
+    "identification_flow": {
+        "title": "Identification via Back-Door Criterion",
+        "steps": [
+            {"x": 0, "label": "DAG G", "detail": "17 edges", "color": "#3498db"},
+            {"x": 1, "label": "Graph Surgery", "detail": "Delete T→M, T→Y, T→S", "color": "#9b59b6"},
+            {"x": 2, "label": "Back-Door Graph G_BD", "detail": "Only back-door paths remain", "color": "#f39c12"},
+            {"x": 3, "label": "Candidate Search", "detail": "Test subsets for d-sep", "color": "#e67e22"},
+            {"x": 4, "label": "Z = {W,rain,wknd,payday}", "detail": "Minimal valid set", "color": "#2ecc71"}
+        ]
+    }
+}
+
 # ── Write ──
 out_path = Path(__file__).resolve().parent / "data.json"
 out_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
