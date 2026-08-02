@@ -1,1 +1,29 @@
+# Jupyter checkpoint noise
 .ipynb_checkpoints/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest cache
+.pytest_cache/
+
+# Generated run artifacts
+runs/*.json
+
+# Streamlit (not used in this project)
+.streamlit/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/

@@ -57,6 +57,40 @@ a{color:var(--blue)}code{background:#f1f5f9;padding:1px 5px;border-radius:3px;fo
 <p class="formula"><span id="eq4"></span></p>
 </div>
 
+<h2>2b. Step-by-Step Quadratic Derivation</h2>
+<div class="card">
+<p>Starting from the Ding-VanderWeele maximum bias bound:</p>
+<p class="formula"><span id="eq2b"></span></p>
+
+<p><b>Step 1 — Set the true effect to zero (worst case):</b> To find the minimum confounder strength that would explain away the entire observed effect, set RR<sub>true</sub> = 1 (no true causal effect remains after confounding):</p>
+<p class="formula"><span id="eq5"></span></p>
+
+<p><b>Step 2 — Worst-case confounder:</b> The maximum bias occurs when the confounder has equal association with both T and Y. Set RR<sub>TU</sub> = RR<sub>UY</sub> = e:</p>
+<p class="formula"><span id="eq6"></span></p>
+
+<p><b>Step 3 — Cross-multiply:</b></p>
+<p class="formula"><span id="eq7"></span></p>
+
+<p><b>Step 4 — Expand and collect terms:</b></p>
+<p class="formula"><span id="eq8"></span></p>
+
+<p><b>Step 5 — Solve the quadratic in e (discard the smaller root):</b></p>
+<p class="formula"><span id="eq9"></span></p>
+
+<p>This is the <b>E-value formula</b>. It gives the minimum risk ratio an unmeasured confounder must have with BOTH T and Y (conditional on measured covariates) to reduce the true causal effect to zero.</p>
+</div>
+
+<h2>2c. Worked Example with Our Data</h2>
+<div class="card">
+<p>Our adjusted RR<sub>obs</sub> = 1.67 (treated users are 1.67&times; as likely to order). Plug in:</p>
+<p class="formula"><span id="eq10"></span></p>
+<p>Check: 1.67 + 1.058 = 2.728 &asymp; <b>2.73</b>.</p>
+<p>This means <b>an unmeasured confounder would need RR &ge; 2.73 with BOTH treatment and outcome</b> (above the 4 measured covariates) to fully explain away the effect.</p>
+<div class="callout callout-blue">
+<b>Calibration:</b> Smoking &rarr; lung cancer has RR &asymp; 10-20. Moderate exercise &rarr; cardiovascular health has RR &asymp; 2-3. Obesity &rarr; diabetes has RR &asymp; 3-5. An RR of 2.73 is <b>moderately strong</b> — comparable to the exercise-CVD association. This finding is <b>moderately robust but not ironclad.</b>
+</div>
+</div>
+
 <h2>3. How to Interpret It</h2>
 <div class="card">
 <table>
@@ -95,6 +129,13 @@ document.getElementById("eq1").innerHTML=M("RR_{\\text{obs}} = \\frac{P(Y=1 \\mi
 document.getElementById("eq2").innerHTML=M("RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}");
 document.getElementById("eq3").innerHTML=M("RR_{\\text{obs}} \\leq \\frac{E\\text{-value}^2}{2 \\times E\\text{-value} - 1}");
 document.getElementById("eq4").innerHTML=M("E\\text{-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}");
+document.getElementById("eq2b").innerHTML=M("RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}");
+document.getElementById("eq5").innerHTML=M("RR_{\\text{obs}} \\leq 1 \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1} = \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}");
+document.getElementById("eq6").innerHTML=M("RR_{\\text{obs}} \\leq \\frac{e \\times e}{e + e - 1} = \\frac{e^2}{2e - 1}");
+document.getElementById("eq7").innerHTML=M("RR_{\\text{obs}} \\cdot (2e - 1) \\leq e^2");
+document.getElementById("eq8").innerHTML=M("e^2 - 2 \\cdot RR_{\\text{obs}} \\cdot e + RR_{\\text{obs}} \\geq 0");
+document.getElementById("eq9").innerHTML=M("e = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}} \\cdot (RR_{\\text{obs}} - 1)}");
+document.getElementById("eq10").innerHTML=M("E\\text{-value} = 1.67 + \\sqrt{1.67 \\cdot 0.67} = 1.67 + \\sqrt{1.1189} = 1.67 + 1.058 = 2.728 \\approx 2.73");
 </script>
 </body>
 </html>

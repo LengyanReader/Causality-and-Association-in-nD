@@ -77,15 +77,54 @@ a{color:var(--blue)}code{background:#f1f5f9;padding:1px 5px;border-radius:3px;fo
 <div class="callout-red"><b>Key insight:</b> Conditioning on a chain/fork node <i>blocks</i> the flow of association. Conditioning on a collider node <i>opens</i> the flow of association. This is why "adjust for everything" fails — you can't tell from the data alone which nodes are chains/forks vs. colliders. You need the DAG.</div>
 </div>
 
-<h2>6. Key Reference</h2>
+<h2>5b. Formal d-Separation Definition</h2>
+<div class="card">
+<p>A path p between X and Y is <b>blocked</b> by a set of nodes Z if and only if:</p>
+<ol style="margin-left:20px">
+<li>p contains a <b>chain</b> i <span id="ds1"></span> m <span id="ds2"></span> j, and m &isin; Z, <b>OR</b></li>
+<li>p contains a <b>fork</b> i <span id="ds3"></span> m <span id="ds4"></span> j, and m &isin; Z, <b>OR</b></li>
+<li>p contains a <b>collider</b> i <span id="ds5"></span> m <span id="ds6"></span> j, and <b>neither</b> m <b>nor any descendant of m</b> is in Z.</li>
+</ol>
+<p>X and Y are <b>d-separated</b> by Z, written:</p>
+<p class="formula"><span id="ds7"></span></p>
+<p>if and only if Z blocks <b>every</b> path between X and Y in G.</p>
+<p><b>Intuition:</b> Chains and forks transmit association (dependence flows through them). Conditioning on the middle node "screens off" the association — the two ends become conditionally independent. Colliders do NOT transmit association — the two causes are (unconditionally) independent. But conditioning on a collider (or its descendant) <b>opens</b> the path, creating spurious association.</p>
+</div>
+
+<h2>5c. The Graph-Surgery Algorithm (Pearl 1995)</h2>
+<div class="card">
+<p>The back-door identification procedure is <b>fully algorithmic</b>. Given any DAG G with treatment T and outcome Y:</p>
+<div class="callout">
+<b>Algorithm: Find-Adjustment-Set(G, T, Y)</b><br>
+1. Form the <b>back-door graph</b> G<sub>BD</sub> by deleting all edges <b>out of</b> T from G.<br>
+2. Let C = all observed variables that are <b>not descendants</b> of T.<br>
+3. For each subset Z &sube; C (from smallest to largest):<br>
+&nbsp;&nbsp;&nbsp;If Z d-separates T from Y in G<sub>BD</sub>, return Z.<br>
+4. If no subset works, the effect is <b>not back-door identifiable</b> — try front-door or IV.
+</div>
+<p><b>Nominal complexity:</b> O(2<sup>|C|</sup>) enumerations. In practice, observed adjustment sets are small (3-8 variables) and the search is fast. For large graphs, the ID algorithm (Shpitser & Pearl 2006) provides a complete polynomial-time identification procedure.</p>
+</div>
+
+<h2>6. Key References</h2>
 <div class="card">
 <p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a></p>
+<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a></p>
+<p>Greenland, S., Pearl, J., & Robins, J. M. (1999). Causal diagrams for epidemiologic research. <i>Epidemiology</i>, 10(1), 37-48.</p>
+<p>Cinelli, C., Forney, A., & Pearl, J. (2022). A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>. <a href="https://doi.org/10.1177/00491241221099552" target="_blank">DOI</a></p>
+</div>
 <p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a></p>
 </div>
 
 <script>
 function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
 document.getElementById("eq1").innerHTML=M("P(y \\mid do(T=t)) = \\sum_z P(y \\mid T=t, Z=z) \\cdot P(Z=z)");
+document.getElementById("ds1").innerHTML=M("\\rightarrow");
+document.getElementById("ds2").innerHTML=M("\\rightarrow");
+document.getElementById("ds3").innerHTML=M("\\leftarrow");
+document.getElementById("ds4").innerHTML=M("\\rightarrow");
+document.getElementById("ds5").innerHTML=M("\\rightarrow");
+document.getElementById("ds6").innerHTML=M("\\leftarrow");
+document.getElementById("ds7").innerHTML=M("X \\perp\\!\\!\\!\\perp_G Y \\mid Z");
 </script>
 </body>
 </html>
