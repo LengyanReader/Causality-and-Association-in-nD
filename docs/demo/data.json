@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.228,
+    "ci_low": 0.2279,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.001726556607532705, 'tolerance': 0.013350667066014576}"
+        "detail": "{'estimate': 0.0017656996357632803, 'tolerance': 0.013349607741580284}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 2.7148714950853137e-06, 'tolerance': 0.008025204705468686}"
+        "detail": "{'delta': 4.704754326850802e-05, 'tolerance': 0.00802532922595101}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.0052081809336248786, 'tolerance': 0.018555828765773448}"
+        "detail": "{'delta': 0.005222065967451034, 'tolerance': 0.018557519696334502}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.000819672901542815, 'tolerance': 0.014537951764922862}"
+        "detail": "{'estimate': -0.0007960033522527297, 'tolerance': 0.014537291711758394}"
       }
     ],
     "naive": 0.3467,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004342719493552211, 'tolerance': 0.013361834502308321}"
+        "detail": "{'estimate': 0.004328091408957536, 'tolerance': 0.013361775597932354}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012507724220491012, 'tolerance': 0.007932515042666266}"
+        "detail": "{'delta': 0.001249204059801473, 'tolerance': 0.007932539577893718}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005068091112068851, 'tolerance': 0.01833522635031863}"
+        "detail": "{'delta': 0.005069747533562541, 'tolerance': 0.018335177582423683}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004329947560569584, 'tolerance': 0.014175157873655062}"
+        "detail": "{'estimate': -0.004346268520892096, 'tolerance': 0.014175737004350396}"
       }
     ],
     "naive": 0.297,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.0081
+      "Y": 0.008
     },
     "worst": "M",
     "alarm": 0.02
@@ -1369,7 +1369,7 @@
         "explanation": "<b>Principle:</b> the invariance principle (Peters, Bühlmann & Meinshausen 2016): a correctly specified causal mechanism has a stable conditional distribution across environments. For each endogenous node, we fit P(node | parents) on the reference (static) batch and evaluate log-loss on the new (holiday) batch. <b>(3) Compare:</b> the node with the largest degradation is the locus of drift -- T->M degrades most (coefficient 1.6->0.4). <b>(4) Confirm:</b> the Y (order) mechanism is confirmed invariant, and the monitor correctly localizes the change to exactly the one mechanism we altered in the DGP.",
         "thinking": {
           "takeaway": "Causal systems drift — the invariance principle detects mechanism changes and triggers autonomous re-estimation",
-          "symbolic": "\\text{Invariance principle (Peters, B\\\"uhlmann & Meinshausen 2016, JRSS-B):} \\\\\nP(Y \\mid pa_G(Y)) \\text{ is INVARIANT across environments } \\mathcal{E} \\; \\Leftrightarrow \\; pa_G(Y) \\text{ are true causal parents} \\\\\n\\text{Mechanism-stability monitor:} \\\\\n\\text{For each node } V \\text{ with parents } pa(V): \\\\\n\\quad \\text{degradation}(V) = |\\log\\text{-loss}_{\\text{ref}}(V \\mid pa(V)) - \\log\\text{-loss}_{\\text{new}}(V \\mid pa(V))| \\\\\n\\quad \\text{alarm if degradation}(V) > \\theta \\quad (\\theta = 0.02 \\text{ nats}) \\\\\n\\text{Locus of drift} = \\arg\\max_V \\text{degradation}(V)",
+          "symbolic": "\\text{Invariance principle (Peters, Bühlmann & Meinshausen 2016, JRSS-B):} \\\\\nP(Y \\mid pa_G(Y)) \\text{ is INVARIANT across environments } \\mathcal{E} \\; \\Leftrightarrow \\; pa_G(Y) \\text{ are true causal parents} \\\\\n\\text{Mechanism-stability monitor:} \\\\\n\\text{For each node } V \\text{ with parents } pa(V): \\\\\n\\quad \\text{degradation}(V) = |\\log\\text{-loss}_{\\text{ref}}(V \\mid pa(V)) - \\log\\text{-loss}_{\\text{new}}(V \\mid pa(V))| \\\\\n\\quad \\text{alarm if degradation}(V) > \\theta \\quad (\\theta = 0.02 \\text{ nats}) \\\\\n\\text{Locus of drift} = \\arg\\max_V \\text{degradation}(V)",
           "steps": [
             {
               "label": "Mental operation 1: State the monitoring problem",
