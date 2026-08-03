@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019290528913976075, 'tolerance': 0.013344060921288071}"
+        "detail": "{'estimate': 0.0017400002134361624, 'tolerance': 0.013349449123756327}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 1.7834564757679416e-05, 'tolerance': 0.008025029732272865}"
+        "detail": "{'delta': 5.9218732793797635e-05, 'tolerance': 0.008025469050271445}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005183373215976145, 'tolerance': 0.018544256795594717}"
+        "detail": "{'delta': 0.0052635280222596, 'tolerance': 0.018570631593060258}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008079575263253238, 'tolerance': 0.014537269727511385}"
+        "detail": "{'estimate': -0.0008002827320996826, 'tolerance': 0.014537953017401205}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
+    "ci_low": 0.1769,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004327423701971554, 'tolerance': 0.013362448417993403}"
+        "detail": "{'estimate': 0.00433351152426043, 'tolerance': 0.01336148648615599}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012642197070280303, 'tolerance': 0.007932242431121051}"
+        "detail": "{'delta': 0.0012583955866171392, 'tolerance': 0.007932777009161153}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005053739986927375, 'tolerance': 0.018335177478553646}"
+        "detail": "{'delta': 0.005078956426895098, 'tolerance': 0.018334461374533706}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004321588765629596, 'tolerance': 0.014175048693357216}"
+        "detail": "{'estimate': -0.004345126292813914, 'tolerance': 0.014167513474605152}"
       }
     ],
     "naive": 0.297,
@@ -784,15 +784,15 @@
             }
           ],
           "derivation": {
-            "title": "Why association \\≠ causation",
-            "body": "In the presence of confounding by U (hunger):<br><span class=\\\"formula\\\">P(Y \\mid T=1) - P(Y \\mid T=0) = \\underbrace{E[Y(1)-Y(0)]}_{\\text{causal effect}} + \\underbrace{\\text{confounding bias}}_{\\text{spurious}}</span><br>The confounding bias arises because the treated and untreated groups differ systematically in their distribution of U. Treated users are hungrier (U\\↑), and hungrier users order more (U\\→Y). The naive difference confounds these two mechanisms."
+            "title": "Why association ≠ causation",
+            "body": "In the presence of confounding by U (hunger):<br><span class=\\\"formula\\\">P(Y \\mid T=1) - P(Y \\mid T=0) = \\underbrace{E[Y(1)-Y(0)]}_{\\text{causal effect}} + \\underbrace{\\text{confounding bias}}_{\\text{spurious}}</span><br>The confounding bias arises because the treated and untreated groups differ systematically in their distribution of U. Treated users are hungrier (U\\↑), and hungrier users order more (U→Y). The naive difference confounds these two mechanisms."
           },
           "logic": [
             {
               "if": "Ignorability holds given X: {Y(0),Y(1)} \\perp T \\mid X",
               "then": "ATE is identified via the back-door formula",
               "holds": true,
-              "note": "W (app-use proxy) blocks U\\→W\\→T"
+              "note": "W (app-use proxy) blocks U→W→T"
             },
             {
               "if": "Positivity holds: 0 < P(T=1 \\mid X=x) < 1 for all x",
@@ -804,22 +804,22 @@
               "if": "SUTVA holds: no interference between units",
               "then": "Y_i(1), Y_i(0) are well-defined for each unit i",
               "holds": true,
-              "note": "One user\\’s notification does not affect another\\’s order"
+              "note": "One user’s notification does not affect another’s order"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“Just compare P(Y|T=1) and P(Y|T=0)\\”",
-              "consequence": "The naive associational difference is confounded. In our data it\\’s +0.343 vs. the true ATE +0.241 \\— a 42% overestimate.",
-              "why": "Without adjusting for confounders, the back-door path T\\←W\\←U\\→Y remains open, mixing causal and spurious association."
+              "mistake": "“Just compare P(Y|T=1) and P(Y|T=0)”",
+              "consequence": "The naive associational difference is confounded. In our data it’s +0.343 vs. the true ATE +0.241 — a 42% overestimate.",
+              "why": "Without adjusting for confounders, the back-door path T←W←U→Y remains open, mixing causal and spurious association."
             },
             {
-              "mistake": "\\“Control for everything you can measure\\”",
-              "consequence": "Induces mediator bias (blocking the causal path T\\→M\\→Y) and collider bias (opening T\\→S\\←Y, Berkson 1946).",
+              "mistake": "“Control for everything you can measure”",
+              "consequence": "Induces mediator bias (blocking the causal path T→M→Y) and collider bias (opening T→S←Y, Berkson 1946).",
               "why": "The correct adjustment set is determined by the DAG, not by data availability. Including mediators or colliders guarantees bias."
             }
           ],
-          "refs": "Hern\\án & Robins (2016) \\“Using Big Data to Emulate a Target Trial\\” <i>Am J Epi</i>; Hern\\án & Robins (2020) <i>Causal Inference: What If</i> Ch.1-3; Pearl (2009) <i>Causality</i> Ch.1; Imbens & Rubin (2015) <i>Causal Inference</i> Ch.1-2"
+          "refs": "Hern\\án & Robins (2016) “Using Big Data to Emulate a Target Trial” <i>Am J Epi</i>; Hern\\án & Robins (2020) <i>Causal Inference: What If</i> Ch.1-3; Pearl (2009) <i>Causality</i> Ch.1; Imbens & Rubin (2015) <i>Causal Inference</i> Ch.1-2"
         }
       },
       {
@@ -840,15 +840,15 @@
             },
             {
               "label": "Mental operation 2: Encode causal beliefs as arrows",
-              "detail": "<b>U\\→W:</b> hungrier users use the app more. <b>W\\→T:</b> the platform targets notifications on observed W. <b>U\\→Y:</b> hungrier users order more regardless. <b>T\\→M\\→Y:</b> notification causes app-open, which causes order. <b>U\\→M:</b> hunger also affects app-opening. <b>T\\→S\\←Y:</b> engagement score is computed from both. <b>Z\\→T:</b> jitter affects delivery. <b>U\\→NC:</b> more app use drains battery."
+              "detail": "<b>U→W:</b> hungrier users use the app more. <b>W→T:</b> the platform targets notifications on observed W. <b>U→Y:</b> hungrier users order more regardless. <b>T→M→Y:</b> notification causes app-open, which causes order. <b>U→M:</b> hunger also affects app-opening. <b>T→S←Y:</b> engagement score is computed from both. <b>Z→T:</b> jitter affects delivery. <b>U→NC:</b> more app use drains battery."
             },
             {
               "label": "Mental operation 3: Encode what we BELIEVE does NOT cause what",
-              "detail": "<b>Z\\↛Y:</b> jitter only affects T, not Y directly (exclusion restriction). <b>T\\↛NC:</b> notifications don\\’t drain battery (negative control). <b>S\\↛Y, S\\↛T:</b> engagement is a pure effect, never a cause. These <i>absent</i> edges are the <b>falsifiable</b> part of our model."
+              "detail": "<b>Z\\↛Y:</b> jitter only affects T, not Y directly (exclusion restriction). <b>T\\↛NC:</b> notifications don’t drain battery (negative control). <b>S\\↛Y, S\\↛T:</b> engagement is a pure effect, never a cause. These <i>absent</i> edges are the <b>falsifiable</b> part of our model."
             },
             {
               "label": "Mental operation 4: Trace the confounding paths",
-              "detail": "Forward from U: U\\→W\\→T (affects who gets treated) AND U\\→Y (affects who orders). So T and Y share a common cause U via the path T\\←W\\←U\\→Y. This is the <b>back-door path</b> — association flows through it without any causal effect of T on Y."
+              "detail": "Forward from U: U→W→T (affects who gets treated) AND U→Y (affects who orders). So T and Y share a common cause U via the path T←W←U→Y. This is the <b>back-door path</b> — association flows through it without any causal effect of T on Y."
             },
             {
               "label": "Conclusion",
@@ -857,12 +857,12 @@
           ],
           "derivation": {
             "title": "d-separation rules (Pearl 1995) — the engine of causal graphs",
-            "body": "A path between X and Y is <b>blocked</b> by conditioning set Z if:<br>(i) <b>Chain</b> X\\→M\\→Y or <b>fork</b> X\\←M\\→Y: M is in Z \\→ path BLOCKED<br>(ii) <b>Collider</b> X\\→M\\←Y: neither M nor any descendant of M is in Z \\→ path BLOCKED<br><br>If you condition on a collider, you OPEN the path (Berkson\\’s bias).<br>If you condition on a mediator, you BLOCK the causal path (over-adjustment).<br><br>This is why \\“just control for everything\\” fails: you cannot tell from data alone whether a variable is a fork, chain, or collider. You need the DAG."
+            "body": "A path between X and Y is <b>blocked</b> by conditioning set Z if:<br>(i) <b>Chain</b> X→M→Y or <b>fork</b> X←M→Y: M is in Z → path BLOCKED<br>(ii) <b>Collider</b> X→M←Y: neither M nor any descendant of M is in Z → path BLOCKED<br><br>If you condition on a collider, you OPEN the path (Berkson’s bias).<br>If you condition on a mediator, you BLOCK the causal path (over-adjustment).<br><br>This is why “just control for everything” fails: you cannot tell from data alone whether a variable is a fork, chain, or collider. You need the DAG."
           },
           "logic": [
             {
-              "if": "U is the only latent confounder AND W fully mediates U\\→T",
-              "then": "Conditioning on W blocks the back-door path T\\←W\\←U\\→Y",
+              "if": "U is the only latent confounder AND W fully mediates U→T",
+              "then": "Conditioning on W blocks the back-door path T←W←U→Y",
               "holds": true,
               "note": "W is the measured proxy for hunger"
             },
@@ -870,34 +870,34 @@
               "if": "rain, weekend, payday are additional confounders (affect both T and Y)",
               "then": "We must also condition on them to block their back-door paths",
               "holds": true,
-              "note": "T\\←rain\\→Y, T\\←weekend\\→Y, T\\←payday\\→Y"
+              "note": "T←rain→Y, T←weekend→Y, T←payday→Y"
             },
             {
-              "if": "M is a mediator (T\\→M\\→Y)",
+              "if": "M is a mediator (T→M→Y)",
               "then": "We must NOT condition on M when estimating total effect",
               "holds": true,
               "note": "Adjusting for M blocks the mediated path"
             },
             {
-              "if": "S is a collider (T\\→S\\←Y)",
+              "if": "S is a collider (T→S←Y)",
               "then": "We must NEVER condition on S — it opens a spurious path",
               "holds": true,
-              "note": "Berkson\\’s bias"
+              "note": "Berkson’s bias"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“The Kitchen Sink DAG\\” — drawing every possible edge to avoid committing",
+              "mistake": "“The Kitchen Sink DAG” — drawing every possible edge to avoid committing",
               "consequence": "No absent edges = nothing is testable = the DAG is unfalsifiable. An absent edge IS the assumption.",
               "why": "Pearl (1995): each absent edge implies a conditional independence that d-separation can test. Without absent edges, the model makes no testable predictions."
             },
             {
-              "mistake": "\\“Omit W from the adjustment set\\”",
-              "consequence": "The back-door path T\\←W\\←U\\→Y remains open. The estimate will be confounded — the naive gap (~+0.10) persists.",
-              "why": "W is the ONLY channel through which latent U affects T. Without W, U\\’s confounding cannot be blocked."
+              "mistake": "“Omit W from the adjustment set”",
+              "consequence": "The back-door path T←W←U→Y remains open. The estimate will be confounded — the naive gap (~+0.10) persists.",
+              "why": "W is the ONLY channel through which latent U affects T. Without W, U’s confounding cannot be blocked."
             }
           ],
-          "refs": "Pearl (1995) \\“Causal diagrams for empirical research\\” <i>Biometrika</i> 82(4); Pearl (2009) <i>Causality</i> Ch.2-3; Greenland, Pearl & Robins (1999) <i>Epidemiology</i>; Cinelli, Forney & Pearl (2022) \\“A Crash Course in Good and Bad Controls\\”; Textor et al. (2016) dagitty"
+          "refs": "Pearl (1995) “Causal diagrams for empirical research” <i>Biometrika</i> 82(4); Pearl (2009) <i>Causality</i> Ch.2-3; Greenland, Pearl & Robins (1999) <i>Epidemiology</i>; Cinelli, Forney & Pearl (2022) “A Crash Course in Good and Bad Controls”; Textor et al. (2016) dagitty"
         }
       },
       {
@@ -915,15 +915,15 @@
           "steps": [
             {
               "label": "Mental operation 1: Perform graph surgery",
-              "detail": "Take our DAG and <b>delete all edges OUT of T</b>: remove T\\→M, T\\→Y, T\\→S. What remains connected between T and Y are <b>only back-door paths</b> \\— paths where association flows without causation. We must block ALL of them."
+              "detail": "Take our DAG and <b>delete all edges OUT of T</b>: remove T→M, T→Y, T→S. What remains connected between T and Y are <b>only back-door paths</b> — paths where association flows without causation. We must block ALL of them."
             },
             {
               "label": "Mental operation 2: Identify back-door paths in the surgically altered graph",
-              "detail": "<b>Path 1:</b> T \\← W \\← U \\→ Y (confounding through hunger proxy). <b>Path 2:</b> T \\← W \\← U \\→ M \\→ Y (hunger via mediator). <b>Path 3:</b> T \\← rain \\→ Y. <b>Path 4:</b> T \\← weekend \\→ Y. <b>Path 5:</b> T \\← payday \\→ Y. These 5 paths are our target."
+              "detail": "<b>Path 1:</b> T ← W ← U → Y (confounding through hunger proxy). <b>Path 2:</b> T ← W ← U → M → Y (hunger via mediator). <b>Path 3:</b> T ← rain → Y. <b>Path 4:</b> T ← weekend → Y. <b>Path 5:</b> T ← payday → Y. These 5 paths are our target."
             },
             {
               "label": "Mental operation 3: Search for a blocking set by d-separation",
-              "detail": "Candidate variables: {W, rain, weekend, payday, Z, M, S, NC}. <b>Eliminate M and S:</b> both are descendants of T (violates condition i). <b>Test Z = {W, rain, weekend, payday}:</b> Path 1: T\\←W\\←U\\→Y \\→ W in Z \\→ BLOCKED at fork U. Path 2: T\\←W\\←U\\→M\\→Y \\→ W in Z \\→ BLOCKED at fork U. Paths 3-5: each confounder in Z \\→ BLOCKED. <b>All 5 paths blocked.</b>"
+              "detail": "Candidate variables: {W, rain, weekend, payday, Z, M, S, NC}. <b>Eliminate M and S:</b> both are descendants of T (violates condition i). <b>Test Z = {W, rain, weekend, payday}:</b> Path 1: T←W←U→Y → W in Z → BLOCKED at fork U. Path 2: T←W←U→M→Y → W in Z → BLOCKED at fork U. Paths 3-5: each confounder in Z → BLOCKED. <b>All 5 paths blocked.</b>"
             },
             {
               "label": "Mental operation 4: Verify minimality",
@@ -931,12 +931,12 @@
             },
             {
               "label": "Conclusion",
-              "detail": "Back-door criterion satisfied. The causal effect is <b>identified</b>. The adjustment formula transforms a causal query (do) into a purely observational computation (condition + sum). No amount of statistical sophistication can rescue a non-identified estimand \\— identification is a separate, prior step (Pearl 2009, Ch.3)."
+              "detail": "Back-door criterion satisfied. The causal effect is <b>identified</b>. The adjustment formula transforms a causal query (do) into a purely observational computation (condition + sum). No amount of statistical sophistication can rescue a non-identified estimand — identification is a separate, prior step (Pearl 2009, Ch.3)."
             }
           ],
           "derivation": {
             "title": "From truncated factorization to the adjustment formula",
-            "body": "<b>Step 1: Markov factorization of the DAG</b><br>P(V) = \\∏_j P(V_j \\mid pa(V_j))<br><br><b>Step 2: Apply do(T=t) \\— delete the equation for T, fix T=t</b><br>P(V \\mid do(T=t)) = \\∏_{V_j \\neq T} P(V_j \\mid pa(V_j)) \\big|_{T=t}<br><br><b>Step 3: Marginalize over Z (the adjustment set)</b><br>P(Y \\mid do(T=t)) = \\sum_z P(Y \\mid T=t, Z=z) \\cdot P(Z=z)<br><br>This is the <b>back-door adjustment formula</b>. It expresses a causal quantity solely in terms of observational (conditional) probabilities. The price: we must have correctly specified Z \\— and that requires the DAG."
+            "body": "<b>Step 1: Markov factorization of the DAG</b><br>P(V) = ∏_j P(V_j \\mid pa(V_j))<br><br><b>Step 2: Apply do(T=t) — delete the equation for T, fix T=t</b><br>P(V \\mid do(T=t)) = ∏_{V_j \\neq T} P(V_j \\mid pa(V_j)) \\big|_{T=t}<br><br><b>Step 3: Marginalize over Z (the adjustment set)</b><br>P(Y \\mid do(T=t)) = \\sum_z P(Y \\mid T=t, Z=z) \\cdot P(Z=z)<br><br>This is the <b>back-door adjustment formula</b>. It expresses a causal quantity solely in terms of observational (conditional) probabilities. The price: we must have correctly specified Z — and that requires the DAG."
           },
           "logic": [
             {
@@ -947,30 +947,30 @@
             },
             {
               "if": "We had omitted W from Z",
-              "then": "The path T\\←W\\←U\\→Y would remain open \\— the ATE would NOT be identified",
+              "then": "The path T←W←U→Y would remain open — the ATE would NOT be identified",
               "holds": true,
               "note": "W is the only channel through which latent U affects T"
             },
             {
               "if": "We had included M (mediator) in Z",
-              "then": "Condition (i) would fail \\— M is a descendant of T",
+              "then": "Condition (i) would fail — M is a descendant of T",
               "holds": true,
-              "note": "Adjusting for M blocks the mediated causal path T\\→M\\→Y"
+              "note": "Adjusting for M blocks the mediated causal path T→M→Y"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“Just run a regression with all variables\\”",
-              "consequence": "Guarantees adjusting for M (mediator \\→ blocks causal path \\→ downward bias) AND S (collider \\→ opens spurious path \\→ Berkson\\’s bias).",
+              "mistake": "“Just run a regression with all variables”",
+              "consequence": "Guarantees adjusting for M (mediator → blocks causal path → downward bias) AND S (collider → opens spurious path → Berkson’s bias).",
               "why": "Mediators and colliders look identical to confounders in the covariance matrix. Only the DAG tells them apart."
             },
             {
-              "mistake": "\\“{W} alone should be enough since U is the main confounder\\”",
+              "mistake": "“{W} alone should be enough since U is the main confounder”",
               "consequence": "Paths via rain, weekend, and payday would remain open, leaving residual confounding.",
               "why": "The back-door criterion requires blocking ALL back-door paths, not just the strongest one. Each observed confounder creates its own path."
             }
           ],
-          "refs": "Pearl (1995) <i>Biometrika</i>; Pearl (2009) <i>Causality</i> Ch.3-4; Shpitser & Pearl (2006) \\“Complete identification methods for the causal hierarchy\\”; Richardson & Robins (2013) SWIGs; Bareinboim & Pearl (2016) data-fusion"
+          "refs": "Pearl (1995) <i>Biometrika</i>; Pearl (2009) <i>Causality</i> Ch.3-4; Shpitser & Pearl (2006) “Complete identification methods for the causal hierarchy”; Richardson & Robins (2013) SWIGs; Bareinboim & Pearl (2016) data-fusion"
         }
       },
       {
@@ -995,24 +995,24 @@
             },
             {
               "label": "Mental operation 2: Decompose the naive difference",
-              "detail": "The naive difference = causal effect + confounding bias. From the DGP\\’s Monte Carlo truth: causal effect = +0.241. So confounding bias = 0.345 \\− 0.241 = +0.104. <b>42% of the naive association is spurious</b> \\— it comes from the back-door path T\\←W\\←U\\→Y, not from any causal effect of T on Y."
+              "detail": "The naive difference = causal effect + confounding bias. From the DGP’s Monte Carlo truth: causal effect = +0.241. So confounding bias = 0.345 \\− 0.241 = +0.104. <b>42% of the naive association is spurious</b> — it comes from the back-door path T←W←U→Y, not from any causal effect of T on Y."
             },
             {
               "label": "Mental operation 3: Check positivity (do the data support the identification?)",
-              "detail": "For each covariate pattern in the 4-dimensional adjustment space, estimate P(T=1 \\mid W, rain, weekend, payday). The propensity scores fall in [0.01, 0.99] \\— no unit has deterministic treatment assignment. <b>Positivity holds:</b> every user has some non-zero probability of receiving or not receiving a notification."
+              "detail": "For each covariate pattern in the 4-dimensional adjustment space, estimate P(T=1 \\mid W, rain, weekend, payday). The propensity scores fall in [0.01, 0.99] — no unit has deterministic treatment assignment. <b>Positivity holds:</b> every user has some non-zero probability of receiving or not receiving a notification."
             },
             {
               "label": "Mental operation 4: Verify the data contract",
-              "detail": "20,000 rows \\✓. All 13 columns present \\✓. No missing values in treatment, outcome, or adjustment variables \\✓. Positivity check passed \\✓. <b>The data support the identification.</b> We can proceed to estimation."
+              "detail": "20,000 rows ✓. All 13 columns present ✓. No missing values in treatment, outcome, or adjustment variables ✓. Positivity check passed ✓. <b>The data support the identification.</b> We can proceed to estimation."
             },
             {
               "label": "Conclusion",
-              "detail": "The rung-1 answer (+0.345) is <b>wrong</b> by ~10 percentage points. No amount of data or statistical sophistication closes this gap. Gap-closing requires <b>assumptions</b> (the DAG) and <b>identification</b> (the back-door criterion). That\\’s what stations 1 and 2 provided. Now we verify the data meet the conditions."
+              "detail": "The rung-1 answer (+0.345) is <b>wrong</b> by ~10 percentage points. No amount of data or statistical sophistication closes this gap. Gap-closing requires <b>assumptions</b> (the DAG) and <b>identification</b> (the back-door criterion). That’s what stations 1 and 2 provided. Now we verify the data meet the conditions."
             }
           ],
           "derivation": {
             "title": "Decomposing the naive association gap",
-            "body": "Without adjustment:<br>P(Y=1 \\mid T=1) \\− P(Y=1 \\mid T=0) = 0.613 \\− 0.268 = <b>+0.345</b><br><br>With adjustment (back-door):<br>E[Y \\mid do(T=1)] \\− E[Y \\mid do(T=0)] = <b>+0.241</b> (ground truth)<br><br>The gap: 0.345 \\− 0.241 = <b>+0.104</b><br><br>This +0.104 is the confounding bias \\— the spurious difference created by the back-door path T\\←W\\←U\\→Y. Treated users are systematically hungrier (U\\↑), and hungrier users order more (U\\→Y). The naive comparison attributes this hunger-driven difference to T, but it has nothing to do with notifications."
+            "body": "Without adjustment:<br>P(Y=1 \\mid T=1) \\− P(Y=1 \\mid T=0) = 0.613 \\− 0.268 = <b>+0.345</b><br><br>With adjustment (back-door):<br>E[Y \\mid do(T=1)] \\− E[Y \\mid do(T=0)] = <b>+0.241</b> (ground truth)<br><br>The gap: 0.345 \\− 0.241 = <b>+0.104</b><br><br>This +0.104 is the confounding bias — the spurious difference created by the back-door path T←W←U→Y. Treated users are systematically hungrier (U\\↑), and hungrier users order more (U→Y). The naive comparison attributes this hunger-driven difference to T, but it has nothing to do with notifications."
           },
           "logic": [
             {
@@ -1028,25 +1028,25 @@
               "note": "Would require trimming or reweighting"
             },
             {
-              "if": "The naive gap \\≠ 0",
-              "then": "Confounding exists \\— adjustment is necessary",
+              "if": "The naive gap ≠ 0",
+              "then": "Confounding exists — adjustment is necessary",
               "holds": true,
               "note": "Gap = +0.104, 42% of naive estimate"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“The naive difference is +0.345, so notifications increase orders by 34.5 pp\\”",
+              "mistake": "“The naive difference is +0.345, so notifications increase orders by 34.5 pp”",
               "consequence": "This is NOT the causal effect. It mixes the true ATE (+0.241) with confounding bias (+0.104). The analyst has confused rung 1 (seeing) with rung 2 (doing).",
               "why": "Without adjusting for confounders, the back-door path remains open. Treated and untreated users are not comparable."
             },
             {
-              "mistake": "\\“Positivity is a theoretical nicety, don\\’t bother checking it\\”",
+              "mistake": "“Positivity is a theoretical nicety, don’t bother checking it”",
               "consequence": "If positivity fails, the ATE is literally not defined for some subpopulations. Any estimate is then an extrapolation, not an observation.",
               "why": "Petersen et al. (2012): positivity violations are common in practice and can be diagnosed empirically."
             }
           ],
-          "refs": "Hern\\án & Robins (2020) <i>Causal Inference: What If</i> Ch.4; Petersen et al. (2012) \\“Diagnosing and responding to violations in the positivity assumption\\” <i>Epidemiology</i>; Rubin (2008) \\“For objective causal inference, design trumps analysis\\”; Imbens & Rubin (2015) Ch.13-14"
+          "refs": "Hern\\án & Robins (2020) <i>Causal Inference: What If</i> Ch.4; Petersen et al. (2012) “Diagnosing and responding to violations in the positivity assumption” <i>Epidemiology</i>; Rubin (2008) “For objective causal inference, design trumps analysis”; Imbens & Rubin (2015) Ch.13-14"
         }
       },
       {
@@ -1067,11 +1067,11 @@
             },
             {
               "label": "Mental operation 2: Compile the NEVER-IN list from the DAG",
-              "detail": "<b>M (app opened):</b> T\\→M\\→Y. M is a <b>mediator</b> — it lies on the causal path. If we adjust for M, we block the indirect effect T\\→M\\→Y and measure only the direct effect T\\→Y. We want the TOTAL effect \\→ do NOT adjust.<br><b>S (engagement):</b> T\\→S\\←Y. S is a <b>collider</b> — a common effect of T and Y. Conditioning on S opens a spurious association path. This is Berkson\\’s bias (1946). NEVER adjust.<br><b>Z (jitter):</b> Z\\→T only. Adjusting for a pure instrument amplifies residual confounding bias (Pearl 2011).<br><b>NC (battery):</b> NC shares U with Y but has no T effect. We do NOT adjust — we use it for testing (Station 7)."
+              "detail": "<b>M (app opened):</b> T→M→Y. M is a <b>mediator</b> — it lies on the causal path. If we adjust for M, we block the indirect effect T→M→Y and measure only the direct effect T→Y. We want the TOTAL effect → do NOT adjust.<br><b>S (engagement):</b> T→S←Y. S is a <b>collider</b> — a common effect of T and Y. Conditioning on S opens a spurious association path. This is Berkson’s bias (1946). NEVER adjust.<br><b>Z (jitter):</b> Z→T only. Adjusting for a pure instrument amplifies residual confounding bias (Pearl 2011).<br><b>NC (battery):</b> NC shares U with Y but has no T effect. We do NOT adjust — we use it for testing (Station 7)."
             },
             {
               "label": "Mental operation 3: Verify the compiled spec is correct",
-              "detail": "Run AIPW with the correct set: ATE \\≈ +0.244 (close to truth +0.241). Now deliberately add S (the collider): the estimate shifts and bias increases. <b>The DAG\\’s exclusion rules are not optional — violating them causes measurable harm.</b>"
+              "detail": "Run AIPW with the correct set: ATE ≈ +0.244 (close to truth +0.241). Now deliberately add S (the collider): the estimate shifts and bias increases. <b>The DAG’s exclusion rules are not optional — violating them causes measurable harm.</b>"
             },
             {
               "label": "Conclusion",
@@ -1080,47 +1080,47 @@
           ],
           "derivation": {
             "title": "Why adjusting for a mediator gives the WRONG answer",
-            "body": "The total causal effect decomposes as:<br><b>Total Effect = Direct Effect + Indirect Effect</b><br>= T\\→Y + T\\→M\\→Y<br><br>If we adjust for M:<br>- The indirect path T\\→M\\→Y is BLOCKED<br>- We measure only T\\→Y (direct effect)<br>- The estimate is biased DOWNWARD (over-adjustment)<br><br>Conversely, if we adjust for a collider S (T\\→S\\←Y):<br>- Treated units with Y=1 have S=1 (via T\\→S)<br>- Control units with Y=1 have S=1 (via Y\\→S)<br>- Conditioning on S=1 creates a spurious negative association between T and Y<br>- Berkson (1946): \\“If two diseases are independent in the population, they will appear negatively correlated among hospitalized patients\\”"
+            "body": "The total causal effect decomposes as:<br><b>Total Effect = Direct Effect + Indirect Effect</b><br>= T→Y + T→M→Y<br><br>If we adjust for M:<br>- The indirect path T→M→Y is BLOCKED<br>- We measure only T→Y (direct effect)<br>- The estimate is biased DOWNWARD (over-adjustment)<br><br>Conversely, if we adjust for a collider S (T→S←Y):<br>- Treated units with Y=1 have S=1 (via T→S)<br>- Control units with Y=1 have S=1 (via Y→S)<br>- Conditioning on S=1 creates a spurious negative association between T and Y<br>- Berkson (1946): “If two diseases are independent in the population, they will appear negatively correlated among hospitalized patients”"
           },
           "logic": [
             {
-              "if": "Variable is a descendant of T and lies on the causal path T\\→\\u2026\\→Y",
-              "then": "Do NOT adjust \\— it is a mediator",
+              "if": "Variable is a descendant of T and lies on the causal path T→\\u2026→Y",
+              "then": "Do NOT adjust — it is a mediator",
               "holds": true,
               "note": "M excluded"
             },
             {
               "if": "Variable is a descendant of T and a common effect of T and Y",
-              "then": "NEVER adjust \\— it is a collider (Berkson\\’s bias)",
+              "then": "NEVER adjust — it is a collider (Berkson’s bias)",
               "holds": true,
               "note": "S excluded"
             },
             {
               "if": "Variable is a cause of T only, not of Y",
-              "then": "Do NOT adjust \\— instrument, may amplify bias",
+              "then": "Do NOT adjust — instrument, may amplify bias",
               "holds": true,
               "note": "Z excluded"
             },
             {
               "if": "Variable shares confounders with Y but has no causal link to/from T",
-              "then": "Do NOT adjust \\— use it as a falsification check instead",
+              "then": "Do NOT adjust — use it as a falsification check instead",
               "holds": true,
               "note": "NC = negative control outcome"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“Kitchen sink: include ALL observed variables and let regularization sort it out\\”",
+              "mistake": "“Kitchen sink: include ALL observed variables and let regularization sort it out”",
               "consequence": "Regularization shrinks coefficients but does NOT fix structural bias from conditioning on colliders/mediators. The bias is causal, not statistical.",
               "why": "Lasso/Ridge minimize prediction error, not causal error. A variable that improves Y-prediction may be a collider that destroys causal identification."
             },
             {
-              "mistake": "\\“Let the data decide which variables matter via stepwise selection\\”",
-              "consequence": "Stepwise selection uses p-values, which cannot distinguish confounders from mediators from colliders. All three can be \\“significant\\” predictors of Y.",
+              "mistake": "“Let the data decide which variables matter via stepwise selection”",
+              "consequence": "Stepwise selection uses p-values, which cannot distinguish confounders from mediators from colliders. All three can be “significant” predictors of Y.",
               "why": "Statistical significance measures association (rung 1), not causal relevance (rung 2). Variable selection for causal inference requires the DAG."
             }
           ],
-          "refs": "Pearl (2009) \\§3.3 M-bias; Hern\\án, Hern\\ández-D\\íaz & Robins (2004) \\“A structural approach to selection bias\\”; Cinelli, Forney & Pearl (2022) \\“A Crash Course in Good and Bad Controls\\”; VanderWeele & Shpitser (2011) \\“A new criterion for confounder selection\\”; Pearl (2011) bias amplification"
+          "refs": "Pearl (2009) \\§3.3 M-bias; Hern\\án, Hern\\ández-D\\íaz & Robins (2004) “A structural approach to selection bias”; Cinelli, Forney & Pearl (2022) “A Crash Course in Good and Bad Controls”; VanderWeele & Shpitser (2011) “A new criterion for confounder selection”; Pearl (2011) bias amplification"
         }
       },
       {
@@ -1138,44 +1138,44 @@
           "steps": [
             {
               "label": "Mental operation 1: Recognize why naive ML fails for causal estimation",
-              "detail": "We could try: fit E[Y \\mid T, X] via gradient boosting, predict for everyone under T=1 and T=0, average the difference. This is the <b>plug-in (g-computation)</b> estimator. <b>Problem:</b> ML models regularize (shrink toward zero). That shrinkage leaks directly into the causal estimate. In high dimensions, the bias is O(1/\\√n) at best \\— your CI won\\’t cover the truth."
+              "detail": "We could try: fit E[Y \\mid T, X] via gradient boosting, predict for everyone under T=1 and T=0, average the difference. This is the <b>plug-in (g-computation)</b> estimator. <b>Problem:</b> ML models regularize (shrink toward zero). That shrinkage leaks directly into the causal estimate. In high dimensions, the bias is O(1/\\√n) at best — your CI won’t cover the truth."
             },
             {
               "label": "Mental operation 2: Construct an orthogonal score",
-              "detail": "The AIPW score \\ψ has a remarkable property: <b>Neyman orthogonality.</b> The derivative of E[\\ψ] with respect to nuisance parameters (\\μ\\̂, \\ê) is ZERO at the true values. This means first-order errors in the nuisance models cancel out. Only second-order products of errors remain \\— and with cross-fitting, these vanish at 1/\\√n. <b>ML can now be used safely for nuisances.</b>"
+              "detail": "The AIPW score ψ has a remarkable property: <b>Neyman orthogonality.</b> The derivative of E[ψ] with respect to nuisance parameters (μ̂, ê) is ZERO at the true values. This means first-order errors in the nuisance models cancel out. Only second-order products of errors remain — and with cross-fitting, these vanish at 1/\\√n. <b>ML can now be used safely for nuisances.</b>"
             },
             {
               "label": "Mental operation 3: Cross-fit to prevent overfitting",
-              "detail": "<b>Step 1:</b> Split data into 2 folds. <b>Step 2:</b> On fold 1, fit propensity \\ê(X) = P(T=1 \\mid X) and outcome \\μ\\̂_t(X) = E[Y \\mid T=t, X] using gradient boosting. <b>Step 3:</b> On fold 2 (held-out), compute \\ψ_i for each unit using the models from fold 1. <b>Step 4:</b> Swap folds, repeat. <b>Step 5:</b> Pool all \\ψ_i, compute ATE = mean(\\ψ), SE = sd(\\ψ)/\\√n. <b>Why cross-fit:</b> If we fit and evaluate on the same data, the ML overfits and \\ψ inherits the overfitting bias. Cross-fitting ensures the scores are \\“honest.\\”</b>"
+              "detail": "<b>Step 1:</b> Split data into 2 folds. <b>Step 2:</b> On fold 1, fit propensity ê(X) = P(T=1 \\mid X) and outcome μ̂_t(X) = E[Y \\mid T=t, X] using gradient boosting. <b>Step 3:</b> On fold 2 (held-out), compute ψ_i for each unit using the models from fold 1. <b>Step 4:</b> Swap folds, repeat. <b>Step 5:</b> Pool all ψ_i, compute ATE = mean(ψ), SE = sd(ψ)/\\√n. <b>Why cross-fit:</b> If we fit and evaluate on the same data, the ML overfits and ψ inherits the overfitting bias. Cross-fitting ensures the scores are “honest.”</b>"
             },
             {
               "label": "Mental operation 4: Interpret the result",
-              "detail": "Our AIPW estimate: ATE = <b>+0.2437</b>, 95% CI = [0.2280, 0.2594], ground truth = +0.2413. <b>CI covers truth \\✓.</b> SE = 0.008. The estimator recovered the causal effect within 0.002 of the Monte Carlo truth."
+              "detail": "Our AIPW estimate: ATE = <b>+0.2437</b>, 95% CI = [0.2280, 0.2594], ground truth = +0.2413. <b>CI covers truth ✓.</b> SE = 0.008. The estimator recovered the causal effect within 0.002 of the Monte Carlo truth."
             },
             {
               "label": "Conclusion",
-              "detail": "The AIPW score solves three problems at once: (1) <b>Neyman orthogonality:</b> ML nuisances don\\’t contaminate the estimand. (2) <b>Double robustness:</b> consistent if EITHER propensity OR outcome model is correct. (3) <b>Semiparametric efficiency:</b> achieves the lowest possible asymptotic variance among regular estimators."
+              "detail": "The AIPW score solves three problems at once: (1) <b>Neyman orthogonality:</b> ML nuisances don’t contaminate the estimand. (2) <b>Double robustness:</b> consistent if EITHER propensity OR outcome model is correct. (3) <b>Semiparametric efficiency:</b> achieves the lowest possible asymptotic variance among regular estimators."
             }
           ],
           "derivation": {
             "title": "Why the AIPW score is Neyman-orthogonal",
-            "body": "The naive plug-in estimator is:<br>\\τ\\̂_plug-in = (1/n)\\∑_i [\\μ\\̂_1(X_i) - \\μ\\̂_0(X_i)]<br><br>This depends on \\μ\\̂ being accurate. If \\μ\\̂ is biased (as all ML models are), the bias propagates directly.<br><br>The AIPW score adds correction terms:<br>\\ψ_i = (\\μ\\̂_1 - \\μ\\̂_0) + T_i(Y_i - \\μ\\̂_1)/\\ê_i - (1-T_i)(Y_i - \\μ\\̂_0)/(1-\\ê_i)<br><br>The corrections are <b>inverse-probability-weighted residuals.</b> Their expectation is zero when either \\μ\\̂ or \\ê is correct. More deeply:<br>\\∂/\\∂\\η E[\\ψ(T,Y,X; \\θ, \\η)]|_{{\\η}={\\η}_0} = 0<br>where \\η = (\\μ, e) are the nuisance parameters. This is the definition of Neyman orthogonality (Chernozhukov et al. 2018, Def. 2.1)."
+            "body": "The naive plug-in estimator is:<br>τ̂_plug-in = (1/n)∑_i [μ̂_1(X_i) - μ̂_0(X_i)]<br><br>This depends on μ̂ being accurate. If μ̂ is biased (as all ML models are), the bias propagates directly.<br><br>The AIPW score adds correction terms:<br>ψ_i = (μ̂_1 - μ̂_0) + T_i(Y_i - μ̂_1)/ê_i - (1-T_i)(Y_i - μ̂_0)/(1-ê_i)<br><br>The corrections are <b>inverse-probability-weighted residuals.</b> Their expectation is zero when either μ̂ or ê is correct. More deeply:<br>∂/∂η E[ψ(T,Y,X; θ, η)]|_{{η}={η}_0} = 0<br>where η = (μ, e) are the nuisance parameters. This is the definition of Neyman orthogonality (Chernozhukov et al. 2018, Def. 2.1)."
           },
           "logic": [
             {
-              "if": "Propensity model \\ê(X) is correctly specified",
+              "if": "Propensity model ê(X) is correctly specified",
               "then": "IPW alone gives a consistent estimate of ATE",
               "holds": true,
               "note": "Robins, Rotnitzky & Zhao (1994)"
             },
             {
-              "if": "Outcome model \\μ\\̂_t(X) is correctly specified",
+              "if": "Outcome model μ̂_t(X) is correctly specified",
               "then": "G-computation alone gives a consistent estimate of ATE",
               "holds": true,
               "note": "Standard regression adjustment"
             },
             {
-              "if": "At least one of \\ê or \\μ\\̂ is correct",
+              "if": "At least one of ê or μ̂ is correct",
               "then": "AIPW is consistent (double robustness)",
               "holds": true,
               "note": "Even if both are slightly misspecified, the orthogonal score reduces bias"
@@ -1189,17 +1189,17 @@
           ],
           "pitfalls": [
             {
-              "mistake": "\\“Use ML predictions as a plug-in: ATE = mean(\\μ\\̂_1 - \\μ\\̂_0)\\”",
-              "consequence": "The ML\\’s regularization bias (shrinkage) propagates directly into the causal estimate. In nD settings, the bias can be as large as the effect itself.",
+              "mistake": "“Use ML predictions as a plug-in: ATE = mean(μ̂_1 - μ̂_0)”",
+              "consequence": "The ML’s regularization bias (shrinkage) propagates directly into the causal estimate. In nD settings, the bias can be as large as the effect itself.",
               "why": "ML minimizes prediction error, not causal error. The orthogonal score debiases ML predictions for causal use."
             },
             {
-              "mistake": "\\“Skip cross-fitting to save time\\”",
-              "consequence": "The estimator inherits the ML\\’s overfitting. CI coverage drops below nominal. The estimate may look precise but is centered on the wrong value.",
+              "mistake": "“Skip cross-fitting to save time”",
+              "consequence": "The estimator inherits the ML’s overfitting. CI coverage drops below nominal. The estimate may look precise but is centered on the wrong value.",
               "why": "Chernozhukov et al. (2018): cross-fitting is essential for \\√n-consistency with data-adaptive nuisances."
             }
           ],
-          "refs": "Chernozhukov et al. (2018) \\“Double/debiased machine learning for treatment and structural parameters\\” <i>Econometrics J</i> 21(1); Robins, Rotnitzky & Zhao (1994) \\“Estimation of regression coefficients...\\” <i>JASA</i>; Van der Laan & Rose (2011) <i>Targeted Learning</i>; Kennedy (2023) \\“Semiparametric doubly robust targeted double machine learning\\”"
+          "refs": "Chernozhukov et al. (2018) “Double/debiased machine learning for treatment and structural parameters” <i>Econometrics J</i> 21(1); Robins, Rotnitzky & Zhao (1994) “Estimation of regression coefficients...” <i>JASA</i>; Van der Laan & Rose (2011) <i>Targeted Learning</i>; Kennedy (2023) “Semiparametric doubly robust targeted double machine learning”"
         }
       },
       {
@@ -1221,37 +1221,37 @@
           "steps": [
             {
               "label": "Mental operation 1: State the untestable assumption",
-              "detail": "Our ATE estimate (+0.2437) rests on the assumption of <b>no unmeasured confounding</b>: {Y(0), Y(1)} \\⊥ T \\mid {W, rain, weekend, payday}. But this assumption is <b>untestable from the data alone</b>. No statistical test can verify it. We need to quantify: how wrong could we be if this assumption fails?"
+              "detail": "Our ATE estimate (+0.2437) rests on the assumption of <b>no unmeasured confounding</b>: {Y(0), Y(1)} ⊥ T \\mid {W, rain, weekend, payday}. But this assumption is <b>untestable from the data alone</b>. No statistical test can verify it. We need to quantify: how wrong could we be if this assumption fails?"
             },
             {
               "label": "Mental operation 2: Convert ATE to risk ratio scale",
-              "detail": "Our adjusted ATE = +0.2437. After adjustment, treated users have P(Y=1 \\mid T=1, adjusted) = 0.613, untreated have P(Y=1 \\mid T=0, adjusted) = 0.372. <b>RR_obs = 0.613 / 0.372 = 1.67.</b> This means treated users are 1.67\\× as likely to order as untreated users, after accounting for measured covariates."
+              "detail": "Our adjusted ATE = +0.2437. After adjustment, treated users have P(Y=1 \\mid T=1, adjusted) = 0.613, untreated have P(Y=1 \\mid T=0, adjusted) = 0.372. <b>RR_obs = 0.613 / 0.372 = 1.67.</b> This means treated users are 1.67× as likely to order as untreated users, after accounting for measured covariates."
             },
             {
               "label": "Mental operation 3: Compute the E-value",
-              "detail": "Plug RR = 1.67 into the formula: <b>E-value = 1.67 + \\√(1.67 \\× 0.67) = 1.67 + \\√(1.119) = 1.67 + 1.058 = 2.73.</b> An unmeasured confounder would need a risk ratio of <b>at least 2.73 with BOTH T and Y</b>, above and beyond the 4 measured covariates, to reduce the true effect to zero."
+              "detail": "Plug RR = 1.67 into the formula: <b>E-value = 1.67 + \\√(1.67 × 0.67) = 1.67 + \\√(1.119) = 1.67 + 1.058 = 2.73.</b> An unmeasured confounder would need a risk ratio of <b>at least 2.73 with BOTH T and Y</b>, above and beyond the 4 measured covariates, to reduce the true effect to zero."
             },
             {
               "label": "Mental operation 4: Calibrate — is RR=2.73 plausible?",
-              "detail": "Smoking \\→ lung cancer: RR \\≈ 10-20. Moderate exercise \\→ cardiovascular health: RR \\≈ 2-3. Obesity \\→ diabetes: RR \\≈ 3-5. An RR of 2.73 is <b>moderately strong</b> \\— roughly comparable to the exercise-CVD association. Our finding is <b>moderately robust but not ironclad.</b> If a domain expert believes a confounder with RR \\≥ 2.73 exists, the result is at risk."
+              "detail": "Smoking → lung cancer: RR ≈ 10-20. Moderate exercise → cardiovascular health: RR ≈ 2-3. Obesity → diabetes: RR ≈ 3-5. An RR of 2.73 is <b>moderately strong</b> — roughly comparable to the exercise-CVD association. Our finding is <b>moderately robust but not ironclad.</b> If a domain expert believes a confounder with RR ≥ 2.73 exists, the result is at risk."
             },
             {
               "label": "Mental operation 5: Conservative check with CI bound",
-              "detail": "Use the CI lower bound instead of the point estimate: RR_lower = 1.55. E-value_lower = 1.55 + \\√(1.55 \\× 0.55) = 1.55 + 0.923 = <b>2.47.</b> Even at the lower uncertainty bound, the E-value > 2. The result is robust to moderate unmeasured confounding even under parameter uncertainty."
+              "detail": "Use the CI lower bound instead of the point estimate: RR_lower = 1.55. E-value_lower = 1.55 + \\√(1.55 × 0.55) = 1.55 + 0.923 = <b>2.47.</b> Even at the lower uncertainty bound, the E-value > 2. The result is robust to moderate unmeasured confounding even under parameter uncertainty."
             },
             {
               "label": "Conclusion",
-              "detail": "An estimate without a sensitivity analysis is an open-loop claim. The E-value closes the loop: it quantifies the debate about unmeasured confounding in a common, calibratable language. RR \\≥ 2.73 is a concrete claim an adversary must make to dismiss the result."
+              "detail": "An estimate without a sensitivity analysis is an open-loop claim. The E-value closes the loop: it quantifies the debate about unmeasured confounding in a common, calibratable language. RR ≥ 2.73 is a concrete claim an adversary must make to dismiss the result."
             }
           ],
           "derivation": {
             "title": "From the Ding-VanderWeele bound to the E-value formula",
-            "body": "Ding & VanderWeele (2016, <i>Epidemiology</i>) proved the maximum bias bound:<br><br>RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}<br><br>To make the true effect zero (RR_true = 1), set the worst case RR_TU = RR_UY = e:<br><br>RR_{\\text{obs}} \\leq \\frac{e^2}{2e - 1}<br><br>Cross-multiply: RR_obs \\× (2e - 1) = e\\²<br>e\\² - 2 \\× RR_obs \\× e + RR_obs = 0<br><br>Solve the quadratic: e = RR_obs + \\√(RR_obs \\× (RR_obs - 1))<br><br>This is the E-value."
+            "body": "Ding & VanderWeele (2016, <i>Epidemiology</i>) proved the maximum bias bound:<br><br>RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}<br><br>To make the true effect zero (RR_true = 1), set the worst case RR_TU = RR_UY = e:<br><br>RR_{\\text{obs}} \\leq \\frac{e^2}{2e - 1}<br><br>Cross-multiply: RR_obs × (2e - 1) = e²<br>e² - 2 × RR_obs × e + RR_obs = 0<br><br>Solve the quadratic: e = RR_obs + \\√(RR_obs × (RR_obs - 1))<br><br>This is the E-value."
           },
           "logic": [
             {
               "if": "E-value > 5",
-              "then": "Finding is highly robust \\— very strong unmeasured confounding needed",
+              "then": "Finding is highly robust — very strong unmeasured confounding needed",
               "holds": false,
               "note": "Our E-value = 2.73, not > 5"
             },
@@ -1259,28 +1259,28 @@
               "if": "E-value > 2",
               "then": "Finding is moderately robust",
               "holds": true,
-              "note": "Our E-value = 2.73 > 2 \\✓"
+              "note": "Our E-value = 2.73 > 2 ✓"
             },
             {
               "if": "E-value < 1.5",
-              "then": "Finding is fragile \\— modest confounding could explain it away",
+              "then": "Finding is fragile — modest confounding could explain it away",
               "holds": false,
-              "note": "Our E-value = 2.73 > 1.5 \\✓"
+              "note": "Our E-value = 2.73 > 1.5 ✓"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“E-value > 2 means there is no unmeasured confounding\\”",
+              "mistake": "“E-value > 2 means there is no unmeasured confounding”",
               "consequence": "Wrong. The E-value quantifies how strong confounding would need to be, not whether it exists. A large E-value means the result is ROBUST to confounding, not that confounding is absent.",
               "why": "VanderWeele & Ding (2017): the E-value is a sensitivity analysis, not a test for confounding."
             },
             {
-              "mistake": "\\“Large E-value means we can skip adjustment for measured confounders\\”",
-              "consequence": "Wrong. The E-value addresses UNMEASURED confounding, conditional on measured covariates. You still must adjust for measured confounders. The E-value asks: \\“After adjusting for what we measured, how much additional confounding could be hiding?\\”",
+              "mistake": "“Large E-value means we can skip adjustment for measured confounders”",
+              "consequence": "Wrong. The E-value addresses UNMEASURED confounding, conditional on measured covariates. You still must adjust for measured confounders. The E-value asks: “After adjusting for what we measured, how much additional confounding could be hiding?”",
               "why": "The E-value formula uses the adjusted RR. If you skip adjustment, the RR_obs is inflated by measured confounding, giving a falsely reassuring E-value."
             }
           ],
-          "refs": "VanderWeele & Ding (2017) \\“Sensitivity Analysis in Observational Research: Introducing the E-value\\” <i>Annals IM</i> 167(4); Ding & VanderWeele (2016) \\“Sensitivity analysis without assumptions\\” <i>Epidemiology</i>; Cinelli & Hazlett (2020) \\“Making sense of sensitivity\\”; Rosenbaum (2002) <i>Observational Studies</i> Ch.4"
+          "refs": "VanderWeele & Ding (2017) “Sensitivity Analysis in Observational Research: Introducing the E-value” <i>Annals IM</i> 167(4); Ding & VanderWeele (2016) “Sensitivity analysis without assumptions” <i>Epidemiology</i>; Cinelli & Hazlett (2020) “Making sense of sensitivity”; Rosenbaum (2002) <i>Observational Studies</i> Ch.4"
         }
       },
       {
@@ -1297,23 +1297,23 @@
           "steps": [
             {
               "label": "Mental operation 1: Run the placebo test",
-              "detail": "Shuffle T randomly (break any causal link) and re-run the entire pipeline. If our estimator is honest, it should find \\τ\\̂ \\≈ 0. <b>Our result: \\τ\\̂ = +0.0017</b> (within tolerance of 0.013). <b>PASS \\✓.</b> The pipeline does not hallucinate effects from noise."
+              "detail": "Shuffle T randomly (break any causal link) and re-run the entire pipeline. If our estimator is honest, it should find τ̂ ≈ 0. <b>Our result: τ̂ = +0.0017</b> (within tolerance of 0.013). <b>PASS ✓.</b> The pipeline does not hallucinate effects from noise."
             },
             {
               "label": "Mental operation 2: Run the random common cause test",
-              "detail": "Add a random N(0,1) variable to the adjustment set and re-estimate. A spurious variable should not change the estimate. <b>Our result: \\u0394\\τ\\̂ = 7.3\\×10\\u207b\\u2075</b> (effectively zero). <b>PASS \\✓.</b> The estimate is not sensitive to irrelevant covariates."
+              "detail": "Add a random N(0,1) variable to the adjustment set and re-estimate. A spurious variable should not change the estimate. <b>Our result: \\u0394τ̂ = 7.3×10\\u207b\\u2075</b> (effectively zero). <b>PASS ✓.</b> The estimate is not sensitive to irrelevant covariates."
             },
             {
               "label": "Mental operation 3: Run the subset refuter",
-              "detail": "Re-estimate on a random 80% subset. The estimate should be stable. <b>Our result: \\u0394\\τ\\̂ = 0.0052</b> (within tolerance of 0.019). <b>PASS \\✓.</b> The estimate is not driven by a small subset of the data."
+              "detail": "Re-estimate on a random 80% subset. The estimate should be stable. <b>Our result: \\u0394τ̂ = 0.0052</b> (within tolerance of 0.019). <b>PASS ✓.</b> The estimate is not driven by a small subset of the data."
             },
             {
               "label": "Mental operation 4: Run the negative control test",
-              "detail": "NC (battery drain) shares the confounder U with Y but has NO causal effect from T. Estimate T\\→NC: if our adjustment is correct, this should be ~0. <b>Our result: \\τ\\̂(T\\→NC) = -0.0008</b> (within tolerance of 0.015). <b>PASS \\✓.</b> No evidence of residual confounding."
+              "detail": "NC (battery drain) shares the confounder U with Y but has NO causal effect from T. Estimate T→NC: if our adjustment is correct, this should be ~0. <b>Our result: τ̂(T→NC) = -0.0008</b> (within tolerance of 0.015). <b>PASS ✓.</b> No evidence of residual confounding."
             },
             {
               "label": "Mental operation 5: Verify loop invariants",
-              "detail": "<b>I1:</b> All artifacts carry same graph version \\✓. <b>I2:</b> No adjustment variable is a descendant of T \\✓. <b>I3:</b> EvaluationReport exists with sensitivity parameters recorded \\✓. <b>I4:</b> |SMD| after IPW < 0.1 \\✓. These are the causal equivalent of type-checking."
+              "detail": "<b>I1:</b> All artifacts carry same graph version ✓. <b>I2:</b> No adjustment variable is a descendant of T ✓. <b>I3:</b> EvaluationReport exists with sensitivity parameters recorded ✓. <b>I4:</b> |SMD| after IPW < 0.1 ✓. These are the causal equivalent of type-checking."
             },
             {
               "label": "Conclusion",
@@ -1322,41 +1322,41 @@
           ],
           "derivation": {
             "title": "Why the negative control test works",
-            "body": "NC (battery drain) is chosen because:<br><b>1.</b> NC shares confounder U with Y: U\\→NC (more app use \\→ more battery drain)<br><b>2.</b> T has NO causal effect on NC: T\\↛NC (notifications cannot drain battery)<br><br>Therefore, under correct adjustment for U (via W), the causal effect of T on NC must be zero. A non-zero estimate means:<br>- Either residual confounding remains (the adjustment set is incomplete)<br>- Or the NC assumption is wrong (T actually affects NC)<br><br>In either case, the smoke alarm fires. Lipsitch, Tchetgen Tchetgen & Cohen (2010, <i>Epidemiology</i>) formalized this as a general method for detecting bias in observational studies."
+            "body": "NC (battery drain) is chosen because:<br><b>1.</b> NC shares confounder U with Y: U→NC (more app use → more battery drain)<br><b>2.</b> T has NO causal effect on NC: T\\↛NC (notifications cannot drain battery)<br><br>Therefore, under correct adjustment for U (via W), the causal effect of T on NC must be zero. A non-zero estimate means:<br>- Either residual confounding remains (the adjustment set is incomplete)<br>- Or the NC assumption is wrong (T actually affects NC)<br><br>In either case, the smoke alarm fires. Lipsitch, Tchetgen Tchetgen & Cohen (2010, <i>Epidemiology</i>) formalized this as a general method for detecting bias in observational studies."
           },
           "logic": [
             {
-              "if": "Placebo test fails (\\τ\\̂ significantly \\≠ 0 with random T)",
+              "if": "Placebo test fails (τ̂ significantly ≠ 0 with random T)",
               "then": "Estimator is overfitting or there is data leakage",
               "holds": false,
-              "note": "Our placebo estimate = +0.0017 \\≈ 0 \\✓"
+              "note": "Our placebo estimate = +0.0017 ≈ 0 ✓"
             },
             {
-              "if": "Negative control test fails (\\τ\\̂(T\\→NC) significantly \\≠ 0)",
+              "if": "Negative control test fails (τ̂(T→NC) significantly ≠ 0)",
               "then": "Residual confounding exists; adjustment set is incomplete",
               "holds": false,
-              "note": "Our NC estimate = -0.0008 \\≈ 0 \\✓"
+              "note": "Our NC estimate = -0.0008 ≈ 0 ✓"
             },
             {
-              "if": "Subset test fails (\\τ\\̂_80% \\≠ \\τ\\̂_100%)",
+              "if": "Subset test fails (τ̂_80% ≠ τ̂_100%)",
               "then": "Estimate is driven by a small subset; not reliable",
               "holds": false,
-              "note": "\\u0394 = 0.0052, within tolerance \\✓"
+              "note": "\\u0394 = 0.0052, within tolerance ✓"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "\\“All refuters passed, so the estimate is definitely correct\\”",
+              "mistake": "“All refuters passed, so the estimate is definitely correct”",
               "consequence": "Refuters check necessary conditions, not sufficient ones. You can pass all refutation tests with a wrong adjustment set if the wrong variables happen to be uncorrelated with T and Y in the sample.",
               "why": "Sharma & Kiciman (2020, DoWhy): refuters detect specific failure modes. They increase confidence but do not guarantee correctness."
             },
             {
-              "mistake": "\\“One refuter failed but the estimate looks fine, so I\\’ll ignore it\\”",
+              "mistake": "“One refuter failed but the estimate looks fine, so I’ll ignore it”",
               "consequence": "A failed refuter is a smoke alarm. A failed NC test, in particular, strongly suggests residual confounding. Ignoring it is malpractice.",
               "why": "Lipsitch et al. (2010): negative controls are among the strongest falsification tools available for observational studies."
             }
           ],
-          "refs": "Lipsitch, Tchetgen Tchetgen & Cohen (2010) \\“Negative controls: a tool for detecting confounding and bias\\” <i>Epidemiology</i>; Shi et al. (2020) negative control exposures; DoWhy (Sharma & Kiciman 2020) refutation framework; Hern\\án & Robins (2020) Ch.8 falsification"
+          "refs": "Lipsitch, Tchetgen Tchetgen & Cohen (2010) “Negative controls: a tool for detecting confounding and bias” <i>Epidemiology</i>; Shi et al. (2020) negative control exposures; DoWhy (Sharma & Kiciman 2020) refutation framework; Hern\\án & Robins (2020) Ch.8 falsification"
         }
       },
       {
@@ -1381,15 +1381,15 @@
             },
             {
               "label": "Mental operation 3: Run the monitor on the holiday batch",
-              "detail": "For each endogenous node, fit P(node \\mid parents) on the static reference batch (10k obs), then evaluate log-loss on the holiday batch (10k obs). <b>Results:</b> M (app-open) degradation = +0.024 nats >> alarm threshold 0.02 \\→ <b>DRIFT DETECTED.</b> Y (order) degradation = +0.008 nats < 0.02 \\→ <b>Y mechanism INVARIANT.</b> All other nodes stable."
+              "detail": "For each endogenous node, fit P(node \\mid parents) on the static reference batch (10k obs), then evaluate log-loss on the holiday batch (10k obs). <b>Results:</b> M (app-open) degradation = +0.024 nats >> alarm threshold 0.02 → <b>DRIFT DETECTED.</b> Y (order) degradation = +0.008 nats < 0.02 → <b>Y mechanism INVARIANT.</b> All other nodes stable."
             },
             {
               "label": "Mental operation 4: Localize the drift",
-              "detail": "The monitor correctly identifies <b>M (app-open)</b> as the locus of drift. This is exactly the mechanism we altered in the DGP: the T\\→M coefficient was changed from 1.6 to 0.4 (users habituate to notifications during holidays). The Y mechanism (order given hunger and app-open) is confirmed unchanged."
+              "detail": "The monitor correctly identifies <b>M (app-open)</b> as the locus of drift. This is exactly the mechanism we altered in the DGP: the T→M coefficient was changed from 1.6 to 0.4 (users habituate to notifications during holidays). The Y mechanism (order given hunger and app-open) is confirmed unchanged."
             },
             {
               "label": "Mental operation 5: Fire the actuator",
-              "detail": "Drift detected \\→ actuator fires: <b>re-run the full UCL pass on the holiday regime autonomously.</b> Same DAG, same identification, same estimation pipeline. Holiday ATE = +0.198 (truth = +0.194), CI covers truth \\✓, all refuters green \\✓. <b>The loop closed — zero human intervention.</b>"
+              "detail": "Drift detected → actuator fires: <b>re-run the full UCL pass on the holiday regime autonomously.</b> Same DAG, same identification, same estimation pipeline. Holiday ATE = +0.198 (truth = +0.194), CI covers truth ✓, all refuters green ✓. <b>The loop closed — zero human intervention.</b>"
             },
             {
               "label": "Conclusion",
@@ -1398,20 +1398,20 @@
           ],
           "derivation": {
             "title": "Invariance principle — why it works",
-            "body": "Peters, B\\ühlmann & Meinshausen (2016, JRSS-B 78(5)) proved:<br><br><b>Theorem:</b> The conditional distribution of an effect given its <i>true causal parents</i> is invariant across environments, while conditioning on any other set is not.<br><br>This provides both a <b>discovery method</b> (search for the set that makes the conditional invariant \\→ that set is the causal parents) and a <b>monitoring method</b> (given a known DAG, test whether each P(V \\mid pa(V)) is stable; degradation = possible mechanism change).<br><br>In our holiday regime: the T\\→M coefficient changed (1.6 \\→ 0.4) \\→ P(M \\mid T, U) changed \\→ M\\’s conditional degradation spikes. P(Y \\mid T, M, U, rain, weekend, payday) stayed the same \\→ Y\\’s degradation stays low."
+            "body": "Peters, B\\ühlmann & Meinshausen (2016, JRSS-B 78(5)) proved:<br><br><b>Theorem:</b> The conditional distribution of an effect given its <i>true causal parents</i> is invariant across environments, while conditioning on any other set is not.<br><br>This provides both a <b>discovery method</b> (search for the set that makes the conditional invariant → that set is the causal parents) and a <b>monitoring method</b> (given a known DAG, test whether each P(V \\mid pa(V)) is stable; degradation = possible mechanism change).<br><br>In our holiday regime: the T→M coefficient changed (1.6 → 0.4) → P(M \\mid T, U) changed → M’s conditional degradation spikes. P(Y \\mid T, M, U, rain, weekend, payday) stayed the same → Y’s degradation stays low."
           },
           "logic": [
             {
               "if": "A mechanism P(V \\mid pa(V)) degrades beyond threshold",
-              "then": "Either the parents are wrong OR the mechanism genuinely changed \\→ DRIFT DETECTED",
+              "then": "Either the parents are wrong OR the mechanism genuinely changed → DRIFT DETECTED",
               "holds": true,
-              "note": "M degradation = 0.024 > 0.02 \\→ DRIFT"
+              "note": "M degradation = 0.024 > 0.02 → DRIFT"
             },
             {
               "if": "The Y mechanism is invariant (degradation < threshold)",
-              "then": "The outcome-generating process is stable; the DAG\\’s structure for Y is correct",
+              "then": "The outcome-generating process is stable; the DAG’s structure for Y is correct",
               "holds": true,
-              "note": "Y degradation = 0.008 < 0.02 \\→ INVARIANT"
+              "note": "Y degradation = 0.008 < 0.02 → INVARIANT"
             },
             {
               "if": "Drift is detected and localized",
@@ -1422,17 +1422,17 @@
           ],
           "pitfalls": [
             {
-              "mistake": "\\“The model worked on the training data; it\\’ll work on new data too\\”",
-              "consequence": "Causal systems drift. The T\\→M mechanism weakened by 75% in the holiday regime. Without an EVOLVE station, production systems silently degrade \\— reporting stale estimates from a world that no longer exists.",
+              "mistake": "“The model worked on the training data; it’ll work on new data too”",
+              "consequence": "Causal systems drift. The T→M mechanism weakened by 75% in the holiday regime. Without an EVOLVE station, production systems silently degrade — reporting stale estimates from a world that no longer exists.",
               "why": "Pearl & Bareinboim (2014) transportability: causal effects are not automatically transportable across environments. You must test for invariance."
             },
             {
-              "mistake": "\\“Distribution shift = mechanism shift\\”",
+              "mistake": "“Distribution shift = mechanism shift”",
               "consequence": "Wrong. P(T) changing (more notifications in holidays) is a distribution shift, not a mechanism shift. The EVOLVE monitor checks <b>conditional</b> distributions P(V \\mid parents), not marginals. This distinction is the entire point of the invariance principle.",
               "why": "Sch\\ölkopf et al. (2012): causal mechanisms are independent of the distributions of their causes (ICM principle). Changes in P(cause) do not imply changes in P(effect \\mid cause)."
             }
           ],
-          "refs": "Peters, B\\ühlmann & Meinshausen (2016) \\“Causal inference by using invariant prediction\\” <i>JRSS-B</i> 78(5); Heinze-Deml, Peters & Meinshausen (2018) nonlinear ICP; Pfister et al. (2019) stabilizing variable selection; Arjovsky et al. (2019) Invariant Risk Minimization; Sch\\ölkopf et al. (2021) \\“Toward Causal Representation Learning\\”"
+          "refs": "Peters, B\\ühlmann & Meinshausen (2016) “Causal inference by using invariant prediction” <i>JRSS-B</i> 78(5); Heinze-Deml, Peters & Meinshausen (2018) nonlinear ICP; Pfister et al. (2019) stabilizing variable selection; Arjovsky et al. (2019) Invariant Risk Minimization; Sch\\ölkopf et al. (2021) “Toward Causal Representation Learning”"
         }
       }
     ],
@@ -1490,7 +1490,7 @@
         "from_station": "test",
         "to_station": "evolve",
         "symbolic_link": "\\text{All refuters green } \\checkmark \\;\\longrightarrow\\; \\text{Monitor } \\Delta\\log\\text{-loss}(V \\mid pa(V)) \\text{ on new data batch}",
-        "narrative": "The pipeline passes all tests in the static regime. But the world changes — the holiday season alters the T\\→M mechanism. The mechanism-stability monitor detects, localizes, and responds to this drift autonomously, closing the self-evolving loop.",
+        "narrative": "The pipeline passes all tests in the static regime. But the world changes — the holiday season alters the T→M mechanism. The mechanism-stability monitor detects, localizes, and responds to this drift autonomously, closing the self-evolving loop.",
         "key_question": "Is the world still the one we modeled, and if not — what changed and what do we do about it?"
       }
     ],
@@ -1509,7 +1509,7 @@
           "name": "Intervention (Doing)",
           "symbolic": "E[Y \\mid do(T=1)] - E[Y \\mid do(T=0)] = +0.241",
           "thought": "I encode my causal beliefs as a DAG. I prove identifiability via the back-door criterion: Z = {W, rain, weekend, payday} blocks all back-door paths. I estimate via AIPW with cross-fitting. The adjusted estimate (+0.244) matches the Monte Carlo truth (+0.241) within 0.002. The confounding gap of +0.104 has been removed.",
-          "limitation": "Answers \\“what is the average effect?\\” but not \\“was THIS specific user\\’s order caused by the notification?\\” Averages over all units; cannot condition on individual outcomes."
+          "limitation": "Answers “what is the average effect?” but not “was THIS specific user’s order caused by the notification?” Averages over all units; cannot condition on individual outcomes."
         },
         {
           "rung": 3,
@@ -1524,7 +1524,7 @@
       {
         "name": "DoWhy",
         "authors": "Sharma & Kiciman (2020), Microsoft Research",
-        "what": "Causal effect estimation library with explicit identification step (graph \\→ ID \\→ estimation \\→ refutation). The refutation API directly inspired our Station 7.",
+        "what": "Causal effect estimation library with explicit identification step (graph → ID → estimation → refutation). The refutation API directly inspired our Station 7.",
         "url": "https://github.com/py-why/dowhy"
       },
       {
