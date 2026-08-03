@@ -79,6 +79,15 @@ details.think .think-body h4:first-child{margin-top:0}
 .think-derivation .der-body{padding:8px 14px;font-size:.84rem;line-height:1.7;border-top:1px solid var(--border)}
 .expand-all-btn{display:inline-block;padding:4px 12px;background:var(--purple);color:#fff;border:none;border-radius:4px;font-size:.78rem;cursor:pointer;margin-left:12px;font-weight:600}
 .expand-all-btn:hover{opacity:.85}
+/* Layered thinking */
+.think-layer{display:flex;align-items:center;gap:8px;margin:8px 0;padding:6px 12px;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer}
+.think-layer.l1{background:#e8f4fd;color:#2563eb}.think-layer.l2{background:#f0fdf4;color:#059669}
+.think-layer.l3{background:#fef7ed;color:#d97706}.think-layer.l4{background:#f8f0ff;color:#7c3aed}
+.think-layer.l5{background:#fef2f2;color:#dc2626}
+.think-layer .lvl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.think-layer.l1 .lvl-dot{background:#2563eb}.think-layer.l2 .lvl-dot{background:#059669}
+.think-layer.l3 .lvl-dot{background:#d97706}.think-layer.l4 .lvl-dot{background:#7c3aed}
+.think-layer.l5 .lvl-dot{background:#dc2626}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
 var D=null,activeRegime="static",dagZoom=1;
 fetch("data.json?v=8").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
@@ -183,47 +192,123 @@ function buildIDFlow(v){
   return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
 }
 
+function buildCompareCard(v){
+  if(!v)return"";
+  var h='<div class="card" style="border-left:4px solid #2ecc71"><h3 style="margin-top:0">'+v.title+'</h3>';
+  h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin:8px 0">';
+  // Correct
+  h+='<div style="flex:1;min-width:200px;background:#f0fdf4;padding:12px;border-radius:8px;border:1px solid #bbf7d0">';
+  h+='<div style="font-weight:700;color:#059669;font-size:.9rem">&#10003; '+v.correct.label+'</div>';
+  h+='<div style="font-size:1.3rem;font-weight:800;color:#059669;margin:4px 0">'+(v.correct.ate>=0?'+':'')+v.correct.ate.toFixed(4)+'</div>';
+  h+='<div style="font-size:.78rem;color:#64748b">Bias vs truth: '+(v.correct.bias>=0?'+':'')+v.correct.bias.toFixed(4)+'</div></div>';
+  // Wrong
+  h+='<div style="flex:1;min-width:200px;background:#fef2f2;padding:12px;border-radius:8px;border:1px solid #fecaca">';
+  h+='<div style="font-weight:700;color:#dc2626;font-size:.9rem">&#10007; '+v.wrong.label+'</div>';
+  h+='<div style="font-size:1.3rem;font-weight:800;color:#dc2626;margin:4px 0">'+(v.wrong.ate>=0?'+':'')+v.wrong.ate.toFixed(4)+'</div>';
+  h+='<div style="font-size:.78rem;color:#64748b">Bias vs truth: '+(v.wrong.bias>=0?'+':'')+v.wrong.bias.toFixed(4)+'</div></div>';
+  // Truth
+  h+='<div style="flex:1;min-width:120px;background:#eff6ff;padding:12px;border-radius:8px;border:1px solid #bfdbfe;text-align:center">';
+  h+='<div style="font-weight:700;color:#2563eb;font-size:.9rem">Ground Truth</div>';
+  h+='<div style="font-size:1.3rem;font-weight:800;color:#2563eb;margin:4px 0">'+(v.truth>=0?'+':'')+v.truth.toFixed(4)+'</div></div>';
+  h+='</div><div class="callout cw"><b>'+v.insight+'</b></div></div>';
+  return h;
+}
+
+function buildBalanceChart(v){
+  if(!v)return"";
+  var W=440,H=30+v.variables.length*50,barX=130,barW=260;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<text x="220" y="20" text-anchor="middle" font-size="11" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  h+='<line x1="'+barX+'" y1="28" x2="'+(barX+barW)+'" y2="28" stroke="#e2e8f0" stroke-width="1"/>';
+  var maxSMD=Math.max.apply(null,v.variables.map(function(x){return Math.max(x.smd_before,x.smd_after)}))*1.5;
+  for(var i=0;i<v.variables.length;i++){
+    var vv=v.variables[i],y=45+i*50;
+    h+='<text x="125" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#475569">'+vv.name+'</text>';
+    var bw=Math.max(vv.smd_before/maxSMD*barW,2),aw=Math.max(vv.smd_after/maxSMD*barW,2);
+    h+='<rect x="'+barX+'" y="'+(y-6)+'" width="'+bw+'" height="12" rx="3" fill="#e74c3c" opacity="0.6"/>';
+    h+='<text x="'+(barX+bw+4)+'" y="'+(y+4)+'" font-size="8" fill="#e74c3c">'+vv.smd_before.toFixed(3)+'</text>';
+    h+='<rect x="'+barX+'" y="'+(y+10)+'" width="'+aw+'" height="12" rx="3" fill="#2ecc71" opacity="0.8"/>';
+    h+='<text x="'+(barX+aw+4)+'" y="'+(y+20)+'" font-size="8" fill="#2ecc71">'+vv.smd_after.toFixed(3)+'</text>';
+  }
+  var tx=barX+v.threshold/maxSMD*barW;
+  h+='<line x1="'+tx+'" y1="30" x2="'+tx+'" y2="'+(H-10)+'" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="4,2"/>';
+  h+='<text x="'+(tx+4)+'" y="40" font-size="7" fill="#f39c12">|SMD|=0.1</text>';
+  h+='<text x="220" y="'+(H-3)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Red = before IPW. Green = after IPW. Dashed = 0.1 threshold.</text>';
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
+function buildStabilityChart(v){
+  if(!v)return"";
+  var W=460,H=30+v.nodes.length*40,barX=80,barW=300;
+  var maxD=Math.max.apply(null,v.nodes.map(function(x){return x.degradation}))*1.5;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<text x="230" y="20" text-anchor="middle" font-size="11" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  var tx=barX+v.threshold/maxD*barW;
+  for(var i=0;i<v.nodes.length;i++){
+    var n=v.nodes[i],y=40+i*40,w=Math.max(n.degradation/maxD*barW,3);
+    var c=n.alarm?'#dc2626':'#2ecc71';
+    h+='<text x="'+(barX-4)+'" y="'+(y+8)+'" text-anchor="end" font-size="10" fill="#475569">'+n.name+'</text>';
+    h+='<rect x="'+barX+'" y="'+(y-4)+'" width="'+w+'" height="18" rx="4" fill="'+c+'" opacity="0.75"/>';
+    h+='<text x="'+(barX+w+4)+'" y="'+(y+10)+'" font-size="9" font-weight="600" fill="'+c+'">'+n.degradation.toFixed(4)+'</text>';
+    if(n.alarm)h+='<text x="'+(barX+w+60)+'" y="'+(y+10)+'" font-size="8" fill="#dc2626" font-weight="700">DRIFT</text>';
+  }
+  h+='<line x1="'+tx+'" y1="30" x2="'+tx+'" y2="'+(H-10)+'" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="6,3"/>';
+  h+='<text x="'+(tx+4)+'" y="36" font-size="7" fill="#f39c12">alarm='+v.threshold.toFixed(2)+'</text>';
+  h+='<text x="230" y="'+(H-3)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Green = invariant. Red = mechanism drift detected (log-loss degradation).</text>';
+  h+='</svg>';
+  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
 function buildThinking(th){
   if(!th)return"";
-  var h='<details class="think"><summary>Thought Process</summary><div class="think-body">';
-  // I. Symbolic formulation
-  if(th.symbolic){
-    h+='<h4>I. Symbolic Formulation</h4>';
-    h+='<div class="formula" style="display:block;padding:10px 14px;font-size:.9em;line-height:1.8">'+M(th.symbolic)+'</div>';
-  }
-  // II. Reasoning chain
+  var h='';
+  // LAYER 1: Key Points — always visible summary
+  h+='<details class="think" open><summary>Layer 1: Key Points</summary><div class="think-body">';
+  if(th.takeaway)h+='<div class="callout cg" style="margin-bottom:10px"><b>Takeaway:</b> '+th.takeaway+'</div>';
+  if(th.symbolic)h+='<div class="formula" style="display:block;padding:10px 14px;font-size:.9em;line-height:1.8">'+M(th.symbolic)+'</div>';
+  h+='</div></details>';
+  // LAYER 2: Reasoning Chain — the "why"
   if(th.steps&&th.steps.length>0){
-    h+='<h4>II. Reasoning Chain</h4>';
+    h+='<details class="think"><summary>Layer 2: Reasoning Chain</summary><div class="think-body">';
     for(var i=0;i<th.steps.length;i++){
       var s=th.steps[i];
       h+='<div class="reason-step"><div class="rs-num">'+(i+1)+'</div><div><span class="rs-label">'+s.label+'</span>'+s.detail+'</div></div>';
     }
+    h+='</div></details>';
   }
-  // Key derivation (nested collapsible)
-  if(th.derivation&&th.derivation.body){
-    h+='<details class="think-derivation"><summary>'+(th.derivation.title||"Where does this come from?")+'</summary><div class="der-body">'+th.derivation.body+'</div></details>';
+  // LAYER 3: Concrete Operations — the "how"
+  var hasHow = (th.derivation&&th.derivation.body);
+  if(hasHow){
+    h+='<details class="think"><summary>Layer 3: Concrete Operations</summary><div class="think-body">';
+    h+='<details class="think-derivation" open><summary>'+(th.derivation.title||"Derivation")+'</summary><div class="der-body">'+th.derivation.body+'</div></details>';
+    h+='</div></details>';
   }
-  // III. Logic checks
+  // LAYER 4: Verification — logic checks
   if(th.logic&&th.logic.length>0){
-    h+='<h4>III. Logic Verification</h4>';
+    h+='<details class="think"><summary>Layer 4: Logic Verification</summary><div class="think-body">';
     for(var i=0;i<th.logic.length;i++){
       var lc=th.logic[i],cls=lc.holds?"logic-row":"logic-row lr-false";
-      h+='<div class="'+cls+'"><span class="lr-symbol">'+(lc.holds?'\✓':'\✗')+'</span><div><span class="lr-if">IF</span> '+lc["if"]+' <span class="lr-then">THEN</span> '+lc.then;
+      h+='<div class="'+cls+'"><span class="lr-symbol">'+(lc.holds?'✓':'✗')+'</span><div><span class="lr-if">IF</span> '+lc["if"]+' <span class="lr-then">THEN</span> '+lc.then;
       if(lc.note)h+=' <span style="font-size:.76rem;color:var(--muted)">('+lc.note+')</span>';
       h+='</div></div>';
     }
+    h+='</div></details>';
   }
-  // IV. Pitfalls
-  if(th.pitfalls&&th.pitfalls.length>0){
-    h+='<h4>IV. Common Pitfalls</h4>';
-    for(var i=0;i<th.pitfalls.length;i++){
-      var pf=th.pitfalls[i];
-      h+='<div class="pitfall"><div class="pf-mistake">'+(i+1)+'. '+pf.mistake+'</div><div class="pf-consequence">\→ '+pf.consequence+'</div><div class="pf-why">'+pf.why+'</div></div>';
+  // LAYER 5: Pitfalls & References
+  var hasPitfalls = (th.pitfalls&&th.pitfalls.length>0);
+  if(hasPitfalls||th.refs){
+    h+='<details class="think"><summary>Layer 5: Pitfalls & References</summary><div class="think-body">';
+    if(th.pitfalls&&th.pitfalls.length>0){
+      h+='<h4>Common Pitfalls</h4>';
+      for(var i=0;i<th.pitfalls.length;i++){
+        var pf=th.pitfalls[i];
+        h+='<div class="pitfall"><div class="pf-mistake">'+(i+1)+'. '+pf.mistake+'</div><div class="pf-consequence">→ '+pf.consequence+'</div><div class="pf-why">'+pf.why+'</div></div>';
+      }
     }
+    if(th.refs)h+='<div class="think-refs">References: '+th.refs+'</div>';
+    h+='</div></details>';
   }
-  // References
-  if(th.refs)h+='<div class="think-refs">References: '+th.refs+'</div>';
-  h+='</div></details>';
   return h;
 }
 
@@ -345,8 +430,10 @@ function build(){
     }
   }
   if(D.visuals&&D.visuals.confounding_gap)h+=buildConfoundingBars(D.visuals.confounding_gap);
+  if(D.comparisons&&D.comparisons.collider_bias)h+=buildCompareCard(D.comparisons.collider_bias);
   h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
   if(D.visuals&&D.visuals.evalue_gauge)h+=buildEvalueGauge(D.visuals.evalue_gauge);
+  if(D.balance_chart)h+=buildBalanceChart(D.balance_chart);
   if(c.evalue_deep_dive){var ev=c.evalue_deep_dive;
     h+='<div class="card"><p>The E-value: how strong must an unmeasured confounder be to explain away our result?</p><div class="callout cr">'+ev.definition+'</div>';
     h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p><p>Our estimate: <b>E-value = '+rd.e_value.toFixed(2)+'</b> (RR = '+rd.risk_ratio.toFixed(2)+')</p>';
@@ -354,6 +441,7 @@ function build(){
     h+='</table><div class="callout">'+ev.example+'</div></div>';}
   h+='<h2 id="s5"><span class="cn">5</span> When the World Changes</h2>';
   h+='<div class="card"><p>Static = normal. Holiday = T->M drops 1.6->0.4 (users habituate). The EVOLVE station detects this shift.</p>';
+  if(D.stability_chart)h+=buildStabilityChart(D.stability_chart);
   if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
     h+='<table><tr><th>Node</th><th>Degradation</th><th>Status</th></tr>';for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
     h+='</table><p><b>Drift: '+D.evolve.worst+'</b> - exactly the mechanism we changed.</p>';}
