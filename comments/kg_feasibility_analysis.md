@@ -1,5 +1,8 @@
 # Knowledge Graph for Causal Science — Feasibility Analysis
 
+> **Status: IMPLEMENTED** (2026-08-05) — The KG is live at `kg/` with 133 nodes, 154 relationships.  
+> See [README.md](../README.md#-knowledge-graph-kg) and the [interactive browser](../docs/demo/kg_browser.html).
+
 ## 1. What Already Exists (Seed Material)
 
 The project already contains substantial semi-structured knowledge that could seed a KG:

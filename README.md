@@ -108,6 +108,37 @@ or a reproduction.
 | Basque terrorism | Synthetic control | GDP gap opens after 1970 |
 | Sachs proteins | PC/FCI discovery | 24 edges recovered vs 16 interventional ground truth |
 
+### 🧠 Knowledge Graph (`kg/`)
+
+A Neo4j graph database capturing the full intellectual ecosystem of causal science — 133 nodes, 154 relationships across 8 disciplines (philosophy, statistics, econometrics, epidemiology, CS/AI, psychology, biostatistics, causal inference).
+
+| Entity Type | Count | Description |
+|---|---|---|
+| Concept | 57 | Causal concepts with definitions, formal notation, rung level |
+| Reference | 28 | Key papers and books from Hume (1748) to Scholkopf (2021) |
+| Method | 7 | Estimators and discovery algorithms with assumption links |
+| Station | 9 | UCL workflow stations with input/output contracts |
+| Variable | 14 | NomNom DAG nodes with causal roles |
+| BridgeLevel | 6 | Math bridge curriculum levels with insights |
+| GalleryCase | 6 | Tier-1 reproductions linked to concepts and methods |
+| Principle | 6 | Design principles (P1–P6) with implementation links |
+
+**Query examples:** Trace AIPW assumptions to Rubin (1974) → Discover all prerequisites for the back-door criterion → Find gallery cases that demonstrate confounding → Map the philosophy foundations of causal inference (Hume → Lewis → Woodward → Cartwright).
+
+**Interfaces:**
+- **Neo4j Browser:** `http://localhost:7474` (Docker: `neo4j-causal`)
+- **Interactive D3 Browser:** [`docs/demo/kg_browser.html`](docs/demo/kg_browser.html) — force-directed graph, search, click-to-inspect
+- **SQLite:** `kg/causal_kg.sqlite` — portable 78KB database
+- **JSON:** `docs/demo/causal_kg.json` — for web consumption
+
+```bash
+# Full rebuild from scratch
+bash kg/bootstrap.sh
+
+# Run 15 pre-built queries
+cat kg/queries.cypher | docker exec -i neo4j-causal cypher-shell -u neo4j -p causal123
+```
+
 ---
 
 ## Quickstart
@@ -162,7 +193,8 @@ Causality-and-Association-in-nD/
 ├── docs/                        GitHub Pages: landing page + interactive browser demo
 ├── loops/                       Event-driven UCL runner
 ├── scripts/                     Notebook builder, .ipynb converter
-├── docs/                        GitHub Pages landing page
+├── kg/                           Knowledge Graph (Neo4j + SQLite, 133 nodes)
+├── docs/                        GitHub Pages: landing page + demo + KG browser
 ├── .github/workflows/           CI: test pyramid + math bridge + gallery on push
 └── runs/                        Generated artifact chains (JSON reports)
 ```

@@ -233,6 +233,7 @@ Causality-and-Association-in-nD/
 │   ├── math_bridge/                  # Level 0–5 notebooks (§6)
 │   ├── tier1_gallery/                # real-life case reproductions (§5.1)
 │   └── nomnom_endtoend/              # UCL passes on the reference use case
+├── kg/                               # Knowledge Graph: Neo4j + SQLite, 133 nodes, 154 relationships
 ├── loops/                            # loop-engineering integration (event triggers, agent runners)
 └── docs/                             # decisions, changelogs, TARGET-style report templates
 ```
