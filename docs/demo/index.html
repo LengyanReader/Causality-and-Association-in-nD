@@ -179,6 +179,11 @@ function buildLadderSVG(ladder){
   return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
+// Wrap SVG in a pannable graph panel with toolbar (MUST be defined before use)
+function wrapGraph(svgHtml){
+  return '<div class="graph-panel"><div class="graph-bar"><button class="gb-zoomin" title="Zoom in">+</button><button class="gb-zoomout" title="Zoom out">-</button><button class="gb-reset" title="Reset">↺</button><span class="gb-hint">Drag to pan · Scroll to zoom</span></div>'+svgHtml+'</div>';
+}
+
 function buildConfoundingBars(v){
   if(!v)return"";
   var W=500,H=140,barW=360,barX=90,barH=28,gap=12;
@@ -772,11 +777,6 @@ function setupGraphPanels(){
       bar.querySelector(".gb-reset").addEventListener("click",function(e){e.stopPropagation();tx=0;ty=0;scale=1;apply()});
     }
   })(panels[i])}
-}
-
-// Wrap SVG in a pannable graph panel with toolbar
-function wrapGraph(svgHtml){
-  return '<div class="graph-panel"><div class="graph-bar"><button class="gb-zoomin" title="Zoom in">+</button><button class="gb-zoomout" title="Zoom out">−</button><button class="gb-reset" title="Reset">↺</button><span class="gb-hint">Drag to pan · Scroll to zoom</span></div>'+svgHtml+'</div>';
 }
 function dagPopup(ev,nodeId){
   var p=document.getElementById("dagpopup");if(!p)return;var nd=null;
