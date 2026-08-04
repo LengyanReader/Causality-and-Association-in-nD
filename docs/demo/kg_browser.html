@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Causal Science Knowledge Graph</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--purple:#a855f7;--teal:#14b8a6;--pink:#ec4899}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+#app{display:flex;height:100vh}
+#sidebar{width:340px;background:var(--card);padding:20px;overflow-y:auto;border-right:1px solid #334155;flex-shrink:0}
+#sidebar h1{font-size:1.3rem;margin-bottom:4px}#sidebar .sub{font-size:.78rem;color:var(--muted);margin-bottom:16px}
+.stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:#334155;padding:6px 12px;border-radius:16px;font-size:.72rem;display:flex;align-items:center;gap:6px}
+.stat .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#search{width:100%;padding:8px 12px;border:1px solid #475569;border-radius:8px;background:#1e293b;color:var(--text);font-size:.82rem;margin-bottom:12px}
+#search:focus{outline:none;border-color:var(--blue)}
+#info{padding:12px;background:#334155;border-radius:8px;font-size:.8rem;line-height:1.6;min-height:80px}
+#info .name{font-size:.95rem;font-weight:700;margin-bottom:4px}
+#info .type{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+#info .def{color:var(--muted);margin-top:4px}
+#info .rel{margin-top:8px;font-size:.74rem}
+#info .rel b{color:var(--blue)}
+#legend{font-size:.72rem;margin-top:16px}
+#legend .row{display:flex;align-items:center;gap:6px;margin:3px 0}
+#graph{flex:1;position:relative;cursor:grab}
+#graph:active{cursor:grabbing}
+#graph svg{width:100%;height:100%}
+.link{stroke:#475569;stroke-opacity:0.4;stroke-width:1px}
+.link.PROVES{stroke:var(--green)}.link.REQUIRES{stroke:var(--red)}
+.link.PREREQUISITE_FOR{stroke:var(--purple)}.link.TEACHES{stroke:var(--teal)}
+.link.PRECEDES{stroke:var(--blue)}.link.CAUSES{stroke:var(--orange)}
+.node{cursor:pointer;stroke-width:1.5px}
+.node:hover{stroke-width:3px;filter:brightness(1.3)}
+.node.Concept{fill:var(--blue)}.node.Reference{fill:var(--green)}
+.node.Method{fill:var(--orange)}.node.Station{fill:var(--purple)}
+.node.Variable{fill:var(--red)}.node.GalleryCase{fill:var(--teal)}
+.node.Principle{fill:var(--pink)}.node.BridgeLevel{fill:#fbbf24}
+text{fill:var(--text);font-size:7px;pointer-events:none;text-shadow:0 0 3px var(--bg)}
+.zoom-controls{position:absolute;bottom:20px;right:20px;display:flex;gap:4px}
+.zoom-controls button{width:36px;height:36px;border:1px solid #475569;border-radius:8px;background:var(--card);color:var(--text);font-size:1.2rem;cursor:pointer}
+.zoom-controls button:hover{background:var(--blue);border-color:var(--blue)}
+.back-link{display:block;margin-bottom:12px;color:var(--blue);font-size:.78rem;text-decoration:none}
+.back-link:hover{text-decoration:underline}
+</style></head><body><div id="app">
+<aside id="sidebar">
+  <a href="index.html" class="back-link">← Back to Demo</a>
+  <h1>Knowledge Graph</h1>
+  <div class="sub">Causal Science — 133 nodes, 154 relationships across 8 disciplines</div>
+  <input id="search" placeholder="Search concepts, methods, references..." oninput="searchNodes(this.value)">
+  <div class="stat-row" id="stats"></div>
+  <div id="info"><p style="color:var(--muted);font-size:.82rem">Click any node to see details.<br>Drag to pan, scroll to zoom.</p></div>
+  <div id="legend"></div>
+</aside>
+<div id="graph"></div>
+</div>
+<script>
+var G={nodes:[],edges:[]},simulation,svg,gLink,gNode,zoom;
+
+fetch("causal_kg.json?v=1").then(r=>r.json()).then(function(d){
+  G.nodes=d.nodes.map(function(n){
+    return {id:n.id,_type:n._type,name:n.name||n.short||n.id,
+      definition:n.definition||n.full||n.statement||n.insight||n.result||"",
+      rung:n.rung,role:n.role,year:n.year,question:n.question,
+      formal_def:n.formal_def,glossary:n.glossary,doi:n.doi,output:n.output}
+  });
+  G.edges=d.edges;
+  build();
+});
+
+function typeColor(t){return{'Concept':'var(--blue)','Reference':'var(--green)','Method':'var(--orange)','Station':'var(--purple)','Variable':'var(--red)','GalleryCase':'var(--teal)','Principle':'var(--pink)','BridgeLevel':'#fbbf24'}[t]||'#94a3b8'}
+
+function build(){
+  var W=document.getElementById("graph").clientWidth;
+  var H=document.getElementById("graph").clientHeight;
+
+  // Stats
+  var counts={};
+  G.nodes.forEach(function(n){counts[n._type]=(counts[n._type]||0)+1});
+  var sh='';
+  for(var t in counts){sh+='<div class="stat"><span class="dot" style="background:'+typeColor(t)+'"></span>'+t+' ('+counts[t]+')</div>'}
+  document.getElementById("stats").innerHTML=sh;
+
+  // Legend
+  var lh='';
+  var edgeTypes={};
+  G.edges.forEach(function(e){edgeTypes[e.relationship]=(edgeTypes[e.relationship]||0)+1});
+  for(var r in edgeTypes){lh+='<div class="row"><span style="color:'+({'PROVES':'var(--green)','REQUIRES':'var(--red)','PREREQUISITE_FOR':'var(--purple)','TEACHES':'var(--teal)','PRECEDES':'var(--blue)','CAUSES':'var(--orange)'}[r]||'var(--muted)')+'">—— '+r+'</span> ('+edgeTypes[r]+')</div>'}
+  document.getElementById("legend").innerHTML='<b>Relationships</b>'+lh;
+
+  // Force simulation
+  svg=d3.select("#graph").append("svg").attr("width",W).attr("height",H);
+  zoom=d3.zoom().scaleExtent([0.1,6]).on("zoom",function(e){svg.selectAll("g").attr("transform",e.transform)});
+  svg.call(zoom);
+  var g=svg.append("g");
+
+  simulation=d3.forceSimulation(G.nodes)
+    .force("link",d3.forceLink(G.edges).id(function(d){return d.id}).distance(80))
+    .force("charge",d3.forceManyBody().strength(-200))
+    .force("center",d3.forceCenter(W/2,H/2))
+    .force("collide",d3.forceCollide(20));
+
+  gLink=g.append("g").selectAll("line").data(G.edges).join("line")
+    .attr("class",function(d){return"link "+d.relationship})
+    .attr("stroke-width",function(d){return d.relationship==="CAUSES"?2:1});
+
+  gNode=g.append("g").selectAll("g").data(G.nodes).join("g")
+    .attr("class",function(d){return"node "+d._type})
+    .call(d3.drag().on("start",function(e,d){if(!e.active)simulation.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y})
+      .on("drag",function(e,d){d.fx=e.x;d.fy=e.y})
+      .on("end",function(e,d){if(!e.active)simulation.alphaTarget(0);d.fx=null;d.fy=null}))
+    .on("click",function(e,d){e.stopPropagation();showInfo(d)});
+
+  gNode.append("circle").attr("r",function(d){return d._type==="Concept"?8:d._type==="Reference"?6:d._type==="Station"?8:d._type==="Variable"?7:d._type==="BridgeLevel"?7:5});
+  gNode.append("text").text(function(d){return d.name.length>35?d.name.substring(0,33)+"...":d.name})
+    .attr("dx",10).attr("dy",3);
+
+  simulation.on("tick",function(){
+    gLink.attr("x1",function(d){return d.source.x}).attr("y1",function(d){return d.source.y})
+         .attr("x2",function(d){return d.target.x}).attr("y2",function(d){return d.target.y});
+    gNode.attr("transform",function(d){return"translate("+d.x+","+d.y+")"});
+  });
+}
+
+function showInfo(d){
+  var h='<div class="type">'+d._type+'</div>';
+  h+='<div class="name">'+d.name+'</div>';
+  if(d.definition)h+='<div class="def">'+d.definition.substring(0,300)+'</div>';
+  if(d.rung)h+='<div style="margin-top:4px">Rung: <b>'+d.rung+'</b></div>';
+  if(d.role)h+='<div style="margin-top:4px">Role: <b>'+d.role+'</b></div>';
+  if(d.year)h+='<div style="margin-top:4px">Year: <b>'+d.year+'</b></div>';
+  if(d.formal_def)h+='<div style="margin-top:4px;font-family:monospace;font-size:.72rem">'+d.formal_def+'</div>';
+  // Find connected nodes
+  var neighbors=[];
+  G.edges.forEach(function(e){
+    if(e.from_id===d.id){neighbors.push({dir:'out',rel:e.relationship,target:e.to_id})}
+    if(e.to_id===d.id){neighbors.push({dir:'in',rel:e.relationship,target:e.from_id})}
+  });
+  if(neighbors.length>0){
+    h+='<div class="rel"><b>'+neighbors.length+' connections:</b> ';
+    h+=neighbors.slice(0,5).map(function(n){return (n.dir==='in'?'← ':'→ ')+n.rel+' '+(G.nodes.find(function(x){return x.id===n.target})||{}).name||n.target}).join(', ');
+    if(neighbors.length>5)h+=' ...';
+    h+='</div>';
+  }
+  document.getElementById("info").innerHTML=h;
+}
+
+function searchNodes(q){
+  if(!svg)return;
+  gNode.attr("opacity",function(d){
+    if(!q)return 1;
+    var m=(d.name||'').toLowerCase().indexOf(q.toLowerCase())>=0 ||
+          (d.definition||'').toLowerCase().indexOf(q.toLowerCase())>=0;
+    return m?1:0.1;
+  });
+}
+</script></body></html>
