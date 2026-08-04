@@ -301,28 +301,28 @@ data["content"] = {
     },
     "concept_sketch": {
         "title": "The Core Problem — A Sketch Before the Formal DAG",
-        "width": 720, "height": 300,
-        "hidden_box": {"x": 10, "y": 25, "w": 160, "h": 255, "label": "What the platform CANNOT see", "color": "#fef2f2"},
-        "observed_box": {"x": 195, "y": 25, "w": 205, "h": 255, "label": "What the platform CAN see", "color": "#f0fdf4"},
-        "outcome_box": {"x": 425, "y": 65, "w": 275, "h": 155, "label": "What we want to affect", "color": "#eff6ff"},
+        "width": 720, "height": 320,
+        "hidden_box": {"x": 10, "y": 30, "w": 160, "h": 268, "label": "What the platform CANNOT see", "color": "#fef2f2"},
+        "observed_box": {"x": 195, "y": 30, "w": 205, "h": 268, "label": "What the platform CAN see", "color": "#f0fdf4"},
+        "outcome_box": {"x": 425, "y": 75, "w": 275, "h": 160, "label": "What we want to affect", "color": "#eff6ff"},
         "nodes": [
-            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 125, "color": "#e74c3c", "r": 22},
-            {"id": "W", "label": "W: App-use (proxy)", "x": 270, "y": 82, "color": "#f39c12", "r": 22},
-            {"id": "T", "label": "T: Notification sent", "x": 270, "y": 218, "color": "#2ecc71", "r": 22},
-            {"id": "Y", "label": "Y: Order placed", "x": 550, "y": 130, "color": "#2ecc71", "r": 22},
-            {"id": "C", "label": "rain\nweekend\npayday", "x": 400, "y": 172, "color": "#95a5a6", "r": 18}
+            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 135, "color": "#e74c3c", "r": 22},
+            {"id": "W", "label": "W: App-use history", "x": 270, "y": 90, "color": "#f39c12", "r": 22},
+            {"id": "T", "label": "T: Notification sent", "x": 270, "y": 228, "color": "#2ecc71", "r": 22},
+            {"id": "Y", "label": "Y: Order placed", "x": 550, "y": 140, "color": "#2ecc71", "r": 22},
+            {"id": "C", "label": "Context:\nrain\nweekend\npayday", "x": 405, "y": 180, "color": "#95a5a6", "r": 18}
         ],
         "edges": [
-            {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives app use"},
-            {"from": "U", "to": "Y", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives orders directly"},
+            {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger → app use"},
+            {"from": "U", "to": "Y", "color": "#e74c3c", "dash": "6,2", "label": "hunger → orders (confounding)"},
             {"from": "W", "to": "T", "color": "#64748b", "dash": "", "label": "platform targets based on W"},
             {"from": "T", "to": "Y", "color": "#2ecc71", "dash": "", "label": "causal effect — is it real?"},
             {"from": "C", "to": "T", "color": "#95a5a6", "dash": "4,2", "label": ""},
             {"from": "C", "to": "Y", "color": "#95a5a6", "dash": "4,2", "label": ""}
         ],
         "annotations": [
-            {"x": 70, "y": 52, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
-            {"x": 495, "y": 52, "text": "Is this causal or just confounding?", "color": "#e74c3c", "size": 9}
+            {"x": 70, "y": 55, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
+            {"x": 500, "y": 55, "text": "Is the green arrow causal or confounding?", "color": "#e74c3c", "size": 9}
         ]
     },
     "decomposition_diagram": {

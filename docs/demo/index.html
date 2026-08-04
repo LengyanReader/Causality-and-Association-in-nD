@@ -225,14 +225,14 @@ function buildConceptSketch(v){
   var W=v.width,H=v.height,h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto">';
   var hb=v.hidden_box;
   h+='<rect x="'+hb.x+'" y="'+hb.y+'" width="'+hb.w+'" height="'+hb.h+'" rx="8" fill="'+hb.color+'" stroke="#ccc" stroke-width="1.5" stroke-dasharray="8,3"/>';
-  h+='<text x="'+(hb.x+hb.w/2)+'" y="'+(hb.y-4)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+hb.label+'</text>';
+  h+='<text x="'+(hb.x+hb.w/2)+'" y="'+(hb.y+15)+'" text-anchor="middle" font-size="8" fill="#94a3b8">'+hb.label+'</text>';
   var ob=v.observed_box;
   h+='<rect x="'+ob.x+'" y="'+ob.y+'" width="'+ob.w+'" height="'+ob.h+'" rx="8" fill="'+ob.color+'" stroke="#bbf7d0" stroke-width="1.5"/>';
-  h+='<text x="'+(ob.x+ob.w/2)+'" y="'+(ob.y-4)+'" text-anchor="middle" font-size="9" fill="#059669">'+ob.label+'</text>';
+  h+='<text x="'+(ob.x+ob.w/2)+'" y="'+(ob.y+15)+'" text-anchor="middle" font-size="8" fill="#059669">'+ob.label+'</text>';
   var ob2=v.outcome_box;
   h+='<rect x="'+ob2.x+'" y="'+ob2.y+'" width="'+ob2.w+'" height="'+ob2.h+'" rx="8" fill="'+ob2.color+'" stroke="#bfdbfe" stroke-width="1.5"/>';
-  h+='<text x="'+(ob2.x+ob2.w/2)+'" y="'+(ob2.y-4)+'" text-anchor="middle" font-size="9" fill="#2563eb">'+ob2.label+'</text>';
-  h+='<text x="'+(W/2)+'" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  h+='<text x="'+(ob2.x+ob2.w/2)+'" y="'+(ob2.y+15)+'" text-anchor="middle" font-size="8" fill="#2563eb">'+ob2.label+'</text>';
+  h+='<text x="'+(W/2)+'" y="16" text-anchor="middle" font-size="11" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
   for(var i=0;i<v.edges.length;i++){
     var e=v.edges[i],fn=null,tn=null;
     for(var j=0;j<v.nodes.length;j++){if(v.nodes[j].id===e.from)fn=v.nodes[j];if(v.nodes[j].id===e.to)tn=v.nodes[j];}
@@ -705,21 +705,57 @@ function dagReset(){dagZoom=1;updateDagZoom()}
 function updateDagZoom(){var s=document.getElementById("dagsvg");if(s)s.style.transform="scale("+dagZoom+")"}
 
 // Generic pan + zoom for any graph panel
+// Shift+drag on any text label moves just that label
 function setupGraphPanels(){
   var panels=document.querySelectorAll(".graph-panel");
   for(var i=0;i<panels.length;i++){(function(panel){
     var svg=panel.querySelector("svg");if(!svg)return;
     var tx=0,ty=0,scale=1,panning=false,px=0,py=0;
+    var draggingLabel=null,dlx=0,dly=0;
     function apply(){svg.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")"}
-    panel.addEventListener("mousedown",function(e){panning=true;px=e.clientX;py=e.clientY;e.preventDefault()});
-    window.addEventListener("mousemove",function(e){if(!panning)return;tx+=e.clientX-px;ty+=e.clientY-py;px=e.clientX;py=e.clientY;apply()});
-    window.addEventListener("mouseup",function(){panning=false});
+    // Make all text labels show tooltip about Shift+drag
+    var texts=svg.querySelectorAll("text");
+    for(var ti=0;ti<texts.length;ti++){
+      var t=texts[ti];
+      if(!t.textContent||t.textContent.length<2)continue;
+      if(!t.querySelector("title")){
+        var tt=document.createElementNS("http://www.w3.org/2000/svg","title");
+        tt.textContent="Shift+drag to reposition this label";
+        t.appendChild(tt);
+      }
+    }
+    panel.addEventListener("mousedown",function(e){
+      if(e.shiftKey&&e.target&&e.target.nodeName==="text"){
+        // Shift+drag: move individual label
+        draggingLabel=e.target;dlx=e.clientX;dly=e.clientY;
+        e.preventDefault();e.stopPropagation();return;
+      }
+      panning=true;px=e.clientX;py=e.clientY;e.preventDefault();
+    });
+    window.addEventListener("mousemove",function(e){
+      if(draggingLabel){
+        var dx=e.clientX-dlx,dy=e.clientY-dly,cur=parseFloat(draggingLabel.getAttribute("x")||0);
+        if(draggingLabel.getAttribute("text-anchor")==="middle"){
+          // For center-anchored text, adjust x and y
+          var cx=parseFloat(draggingLabel.getAttribute("x")||0)+dx;
+          var cy=parseFloat(draggingLabel.getAttribute("y")||0)+dy;
+          draggingLabel.setAttribute("x",cx);draggingLabel.setAttribute("y",cy);
+        }else{
+          draggingLabel.setAttribute("x",(parseFloat(draggingLabel.getAttribute("x")||0)+dx));
+          draggingLabel.setAttribute("y",(parseFloat(draggingLabel.getAttribute("y")||0)+dy));
+        }
+        dlx=e.clientX;dly=e.clientY;return;
+      }
+      if(!panning)return;
+      tx+=e.clientX-px;ty+=e.clientY-py;px=e.clientX;py=e.clientY;apply();
+    });
+    window.addEventListener("mouseup",function(){panning=false;draggingLabel=null});
     panel.addEventListener("wheel",function(e){e.preventDefault();var z=scale*(e.deltaY<0?1.15:1/1.15);scale=Math.max(0.3,Math.min(4,z));apply()});
-    // Touch support
+    // Touch
     panel.addEventListener("touchstart",function(e){if(e.touches.length===1){panning=true;px=e.touches[0].clientX;py=e.touches[0].clientY}});
-    window.addEventListener("touchmove",function(e){if(!panning)return;tx+=e.touches[0].clientX-px;ty+=e.touches[0].clientY-py;px=e.touches[0].clientX;py=e.touches[0].clientY;apply()});
+    window.addEventListener("touchmove",function(e){if(!panning||draggingLabel)return;tx+=e.touches[0].clientX-px;ty+=e.touches[0].clientY-py;px=e.touches[0].clientX;py=e.touches[0].clientY;apply()});
     window.addEventListener("touchend",function(){panning=false});
-    // Buttons in toolbar
+    // Toolbar buttons
     var bar=panel.querySelector(".graph-bar");
     if(bar){
       bar.querySelector(".gb-zoomin").addEventListener("click",function(e){e.stopPropagation();scale=Math.min(4,scale*1.2);apply()});
