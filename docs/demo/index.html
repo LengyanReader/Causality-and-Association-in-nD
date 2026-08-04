@@ -138,7 +138,7 @@ details.think .think-body h4:first-child{margin-top:0}
 .tbl-legend span{background:#f1f5f9;padding:2px 8px;border-radius:10px;white-space:nowrap}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
 var D=null,activeRegime="static";
-fetch("data.json?v=8").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
+fetch("data.json?v=9").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;try{build()}catch(e){document.getElementById("content").innerHTML='<div class="card"><h3>JS Error</h3><p>'+e.message+'</p><pre>'+e.stack+'</pre></div>'}}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data.json</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
 function cov(dd){return dd.ci_low<=dd.truth&&dd.truth<=dd.ci_high}
@@ -580,15 +580,6 @@ function build(){
     h+='<p><b>7. LLM + graph databases / KGs.</b> When the domain has an existing knowledge graph (e.g., a company ontology linking "notification" → "user engagement" → "order"), the LLM can ground its causal hypotheses in structured, versioned knowledge. The KG provides the vocabulary and known relationships; the LLM fills gaps and proposes causal directions. The resulting DAG is version-controlled alongside the KG.</p>';
     h+='<div class="callout cw"><b>Key principle:</b> All methods — classical and AI-powered — converge on the same requirement: the graph must be <b>testable</b>. Every absent edge implies a conditional independence that can be checked against data. A graph that makes no testable predictions (every node connected to every other) is unfalsifiable and useless. The NomNom DAG above has <b>54 absent edges</b> — each one is a statement that can be empirically challenged.</div></div>';
 
-    h+='<div class="card"><h3>The Story This Graph Tells</h3>';
-    h+='<p>A user\'s true hunger level (U) is something no platform can measure — but it drives everything. Hungry users use the app more (U→W), so the platform\'s targeting algorithm — which only sees W — sends them more notifications (W→T). Hungry users also order more food regardless of notifications (U→Y). This creates a <b>back-door path</b>: T ← W ← U → Y. Association flows backwards from T to U through W, then forwards from U to Y — producing a spurious correlation between notifications and orders that has nothing to do with causation.</p>';
-    h+='<p>To close this back door, we condition on W. Because W is the only channel through which U affects T, conditioning on W blocks the entire confounding path. This is why W is the most important variable in the graph — <b>without W in the adjustment set, the ATE is not identified</b>.</p>';
-    h+='<p>The other variables play supporting but crucial roles:</p>';
-    h+='<ul style="margin-left:20px;font-size:.9rem"><li><b>M (app open):</b> Part of <i>how</i> notifications work — they cause app opens, which cause orders. We want to measure the total effect (T→Y + T→M→Y), so we must <b>not</b> adjust for M — doing so would block the mediated path and bias the estimate downward.</li>';
-    h+='<li><b>S (engagement):</b> Computed from both notifications and orders (T→S←Y). If we condition on "high engagement," we select users who either got notified OR ordered — creating a spurious negative association between T and Y. This is Berkson\'s bias: <b>never</b> condition on a collider.</li>';
-    h+='<li><b>Z (jitter):</b> Randomized by the experiment platform — affects whether a notification is delivered but has no other path to Y. A valid instrument for IV estimation if needed.</li>';
-    h+='<li><b>NC (battery):</b> Correlated with U (more app use → more battery drain) but NOT caused by T. If our adjustment is correct, the T→NC effect should be zero — a non-zero result is a smoke alarm for residual confounding.</li></ul></div>';
-
   h+='<div class="callout"><b>Key insight:</b> W is the most important node. The platform targets on W (proxy for U). Conditioning on W blocks the back-door path, making the ATE identifiable. <b>Without W, the ATE is not identified.</b></div>';
   if(D.visuals&&D.visuals.identification_flow)h+=buildIDFlow(D.visuals.identification_flow);
   h+='<h2 id="s3"><span class="cn">3</span> The Estimation</h2>';
@@ -795,4 +786,6 @@ function dagPopup(ev,nodeId){
   p.classList.add("on");p.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+"px";p.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+"px";
 }
 document.addEventListener("click",function(e){var p=document.getElementById("dagpopup");if(p&&!e.target.closest(".dagn")&&!e.target.closest(".dagpop"))p.classList.remove("on")});
-</script></body></html>
+}
+</script>
+</body></html>
