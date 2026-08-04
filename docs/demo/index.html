@@ -693,7 +693,7 @@ function build(){
       h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem;color:var(--muted)">Show marginal-distribution shifts ('+makeys.length+' variables monitored)</summary>';
       h+='<table style="margin-top:6px"><tr><th>Variable</th><th>z-score</th><th>Interpretation</th></tr>';
       for(var j=0;j<makeys.length;j++){var kn=makeys[j],kv=ma[kn],alarm=kv.z_score>4;
-        h+='<tr><td><b>'+kn+'</b></td><td style="color:'+(alarm?'var(--red)':'var(--green))+'">'+kv.z_score.toFixed(1)+'</td><td>'+(alarm?'<b>Shift detected</b> — marginal distribution changed':'Stable — within normal range')+'</td></tr>';
+        h+='<tr><td><b>'+kn+'</b></td><td style="color:'+(alarm?'#dc2626':'#059669')+'">'+kv.z_score.toFixed(1)+'</td><td>'+(alarm?'<b>Shift detected</b> - marginal distribution changed':'Stable - within normal range')+'</td></tr>';
       }
       h+='</table><p style="font-size:.76rem;color:var(--muted);margin-top:4px">Marginal shifts are distinct from mechanism drift under the invariance principle (Peters et al. 2016): a change in P(X) does not imply a change in P(Y|pa(Y)). The holiday regime intentionally shifted p_rain (0.30->0.15) alongside the T->M mechanism change.</p></details>';}
     }
