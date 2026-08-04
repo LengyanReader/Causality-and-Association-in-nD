@@ -44,26 +44,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-info"><b>Key insight:</b> The graph is a <b>scientific model</b>, not a statistical summary. You cannot learn it from data alone without assumptions — at best, data can tell you which graphs are <i>consistent</i> with observed patterns, not which one is <i>correct</i>.</div>
 </div>
 
-<h2>2. The NomNom DAG — How We Built It</h2>
-<div class="card">
-<p>For the NomNom Eats use case, the graph was constructed primarily through <b>expert elicitation</b> combined with <b>domain constraints</b>:</p>
-<table>
-<tr><th>Edge</th><th>Justification</th><th>Source of Knowledge</th></tr>
-<tr><td>U → W</td><td>Hungrier users open the app more frequently, producing higher app-use metrics</td><td>Domain knowledge (product analytics)</td></tr>
-<tr><td>U → Y</td><td>Hungrier users order more food, regardless of notifications</td><td>Domain knowledge (user behavior)</td></tr>
-<tr><td>W → T</td><td>The targeting algorithm sends notifications based on observed app-use patterns</td><td>Engineering knowledge (system design)</td></tr>
-<tr><td>T → M</td><td>Receiving a notification increases the probability of opening the app</td><td>Prior A/B test results</td></tr>
-<tr><td>M → Y</td><td>Users who open the app are more likely to place an order</td><td>Funnel analytics</td></tr>
-<tr><td>T → Y</td><td>The causal target — does notification directly cause orders?</td><td>The question we are trying to answer</td></tr>
-<tr><td>Z → T</td><td>Randomized send-time jitter affects whether a notification is delivered</td><td>Engineering knowledge (experiment platform)</td></tr>
-<tr><td>T → S, Y → S</td><td>Engagement score is computed from notifications sent AND orders placed</td><td>Engineering knowledge (metric definition)</td></tr>
-<tr><td>U → NC</td><td>More app use → more battery drain; notifications don't drain batteries</td><td>Domain knowledge + physics</td></tr>
-<tr><td>rain, weekend, payday → T, Y</td><td>Weather and calendar affect both targeting strategy and ordering behavior</td><td>Domain knowledge + historical data</td></tr>
-</table>
-<div class="callout-warn"><b>54 absent edges.</b> Every pair of nodes without an arrow between them represents a deliberate claim: "there is NO direct causal relationship here." These absent edges are what make the graph <b>falsifiable</b> — each implies a conditional independence that data can test.</div>
-</div>
-
-<h2>3. Classical Methods for Building Causal Graphs</h2>
+<h2>2. Classical Methods for Building Causal Graphs</h2>
 
 <div class="card">
 <h3>3.1 Expert Elicitation</h3>
@@ -109,7 +90,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <b>Limitations:</b> Strong parametric assumptions (linearity, non-Gaussian noise); doesn't handle latent confounders well.</p>
 </div>
 
-<h2>4. Agentic AI & LLM-Powered Methods</h2>
+<h2>3. Agentic AI & LLM-Powered Methods</h2>
 
 <div class="card">
 <h3>4.1 LLM-Assisted Causal Elicitation</h3>
@@ -147,7 +128,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>This approach is particularly valuable in enterprise settings where knowledge is distributed across teams, documents, and databases.</p>
 </div>
 
-<h2>5. Synthesis — How to Build a Graph in Practice</h2>
+<h2>4. Synthesis — How to Build a Graph in Practice</h2>
 <div class="card">
 <p>In practice, graph construction is <b>iterative</b> and <b>multi-method</b>. A realistic workflow:</p>
 <ol style="margin-left:20px">
@@ -161,7 +142,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout"><b>Core principle:</b> A causal graph is never "finished" — it is a living hypothesis about how the world works. It must be <b>testable</b> (via absent edges), <b>versioned</b> (so estimates are traceable), and <b>evolvable</b> (so new evidence can revise it). The NomNom DAG has 54 absent edges — each one is an invitation to falsify.</div>
 </div>
 
-<h2>6. Method Comparison — When to Use What</h2>
+<h2>5. Method Comparison — When to Use What</h2>
 <div class="card">
 <table>
 <tr><th>Method</th><th>Best for</th><th>Data needed</th><th>Handles latents?</th><th>Orients edges?</th></tr>
@@ -177,7 +158,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-info"><b>Practical recommendation:</b> For most applied work, start with expert elicitation + literature review, then use PC/FCI to test the proposed graph against data. LLM methods are best used as <b>accelerators</b> for the elicitation step — they help experts consider edges they might have missed.</div>
 </div>
 
-<h2>7. Graph Evaluation — Is Your DAG Any Good?</h2>
+<h2>6. Graph Evaluation — Is Your DAG Any Good?</h2>
 <div class="card">
 <p>Once built, a causal graph should be evaluated against several criteria beyond just "it feels right":</p>
 
@@ -197,7 +178,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>Have <b>multiple independent experts</b> draw the graph for the same domain. Where they agree, confidence is higher. Where they disagree, those edges need investigation — they are the highest-value targets for experiments or data-driven testing.</p>
 </div>
 
-<h2>8. Critical Analysis — What Causal Graphs Can and Cannot Do</h2>
+<h2>7. Critical Analysis — What Causal Graphs Can and Cannot Do</h2>
 
 <div class="card">
 <h3>8.1 Philosophical Foundations</h3>
@@ -276,7 +257,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-red"><b>Principled position:</b> LLM outputs are <b>associational patterns in text</b>, not causal knowledge. They may correlate with causal truth (texts often describe real causal relationships) but they provide no guarantee. Every LLM-proposed edge must be validated against domain expertise and, where possible, data — exactly like human-proposed edges.</div>
 </div>
 
-<h2>9. Classic Examples Beyond NomNom</h2>
+<h2>8. Classic Examples Beyond NomNom</h2>
 <div class="card">
 <p>The graph-construction principles above apply universally. Here are three classic causal graphs from other domains that illustrate the same challenges:</p>
 
@@ -287,7 +268,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Education → Earnings (Griliches, 1970s).</b> Does more schooling cause higher wages? The graph must contend with unobserved ability (A) causing both education and earnings (A→Ed, A→Wage), family background confounding, and measurement error in schooling. Griliches used <b>instrumental variables</b> (family background as instrument for education) — a graph-based identification strategy — to estimate the causal effect. The graph drove the choice of method.</p>
 </div>
 
-<h2>10. Software & Tools</h2>
+<h2>9. Software & Tools</h2>
 <div class="card">
 <table>
 <tr><th>Tool</th><th>Methods</th><th>Best for</th></tr>
@@ -299,7 +280,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>11. Key References</h2>
+<h2>10. Key References</h2>
 <div class="card">
 <p>Spirtes, P., Glymour, C., & Scheines, R. (2000). <i>Causation, Prediction, and Search</i> (2nd ed.). MIT Press. — The foundational text on constraint-based causal discovery.</p>
 <p>Chickering, D. M. (2002). Optimal structure identification with greedy search. <i>JMLR</i>, 3, 507–554. — GES algorithm.</p>
