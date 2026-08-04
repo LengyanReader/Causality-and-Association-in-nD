@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019060857265231234, 'tolerance': 0.013343857862967658}"
+        "detail": "{'estimate': 0.0019300651114831733, 'tolerance': 0.013343510437933782}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 4.5449175861800306e-05, 'tolerance': 0.008025246941125557}"
+        "detail": "{'delta': 1.4432543299830458e-05, 'tolerance': 0.008025929370633636}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005233439027656994, 'tolerance': 0.01855679304460208}"
+        "detail": "{'delta': 0.005168270412131443, 'tolerance': 0.018544880108807442}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.000800831751509714, 'tolerance': 0.014537221609559788}"
+        "detail": "{'estimate': -0.0008248509762688933, 'tolerance': 0.014538997493528445}"
       }
     ],
     "naive": 0.3467,
@@ -52,7 +52,7 @@
   "holiday": {
     "ate": 0.1925,
     "ci_low": 0.177,
-    "ci_high": 0.2081,
+    "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
     "mu1": 0.5755,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0043279032100097805, 'tolerance': 0.013361576643328026}"
+        "detail": "{'estimate': 0.00434000568620475, 'tolerance': 0.013360654777680281}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012548270091504998, 'tolerance': 0.007932065152634608}"
+        "detail": "{'delta': 0.001263284139299159, 'tolerance': 0.00793214982098192}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005058537101351457, 'tolerance': 0.018335174244236457}"
+        "detail": "{'delta': 0.00507163495349483, 'tolerance': 0.018334477299036915}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004346678076020684, 'tolerance': 0.014168598174408045}"
+        "detail": "{'estimate': -0.004388551551759421, 'tolerance': 0.014173921048174238}"
       }
     ],
     "naive": 0.297,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.008
+      "Y": 0.0081
     },
     "worst": "M",
     "alarm": 0.02
@@ -563,10 +563,14 @@
       "rung 3": "Pearl's third rung: Counterfactuals. P(Y(0)=0 | T=1,Y=1) — same unit, different treatment. 'Was it the notification that caused THIS order?'"
     },
     "assumption_tooltips": {
+      "Ignorability": "Also called 'no unmeasured confounding' or 'conditional exchangeability'. The assumption that {Y(0),Y(1)} ⊥ T | X — all common causes of T and Y are measured and adjusted for. Untestable from data alone.",
       "ignorability": "Also called 'no unmeasured confounding' or 'conditional exchangeability'. The assumption that {Y(0),Y(1)} ⊥ T | X — all common causes of T and Y are measured and adjusted for. Untestable from data alone.",
+      "Positivity": "Also called 'overlap'. Every unit must have 0 < P(T=1 | X=x) < 1 — non-zero probability of receiving either treatment. Without positivity, the ATE requires extrapolation.",
       "positivity": "Also called 'overlap'. Every unit must have 0 < P(T=1 | X=x) < 1 — non-zero probability of receiving either treatment. Without positivity, the ATE requires extrapolation.",
       "SUTVA": "Stable Unit Treatment Value Assumption. Two parts: (1) No interference — one user's notification doesn't affect another's order. (2) Consistency — the treatment is well-defined and identical for all treated units.",
+      "Consistency": "The observed outcome Y equals the potential outcome Y(t) under the treatment actually received: Y = T·Y(1) + (1-T)·Y(0). Links counterfactual notation to observed data.",
       "consistency": "The observed outcome Y equals the potential outcome Y(t) under the treatment actually received: Y = T·Y(1) + (1-T)·Y(0). Links counterfactual notation to observed data.",
+      "Estimand": "The quantity we aim to estimate. Here, the ATE: E[Y(1) − Y(0)] — the expected difference in order probability if everyone vs. no one were notified.",
       "estimand": "The quantity we aim to estimate. Here, the ATE: E[Y(1) − Y(0)] — the expected difference in order probability if everyone vs. no one were notified.",
       "target trial": "The idealized RCT we would run if ethics and logistics allowed: randomize notifications, compare order rates. Specifying it first prevents method-driven (rather than question-driven) analysis (Hernán & Robins 2016).",
       "ATE": "Average Treatment Effect. E[Y(1) − Y(0)]. The expected difference in outcomes if the entire population received treatment vs. if no one did. A Rung-2 quantity.",
@@ -574,72 +578,72 @@
     },
     "concept_sketch": {
       "title": "The Core Problem — A Sketch Before the Formal DAG",
-      "width": 640,
-      "height": 240,
+      "width": 660,
+      "height": 260,
       "hidden_box": {
-        "x": 30,
-        "y": 20,
-        "w": 130,
-        "h": 200,
+        "x": 20,
+        "y": 30,
+        "w": 140,
+        "h": 210,
         "label": "What the platform CANNOT see",
-        "color": "#e8e8e8"
+        "color": "#fef2f2"
       },
       "observed_box": {
-        "x": 200,
-        "y": 20,
-        "w": 180,
-        "h": 200,
+        "x": 190,
+        "y": 30,
+        "w": 200,
+        "h": 210,
         "label": "What the platform CAN see",
         "color": "#f0fdf4"
       },
       "outcome_box": {
-        "x": 450,
-        "y": 60,
-        "w": 160,
-        "h": 120,
+        "x": 430,
+        "y": 70,
+        "w": 200,
+        "h": 130,
         "label": "What we want to affect",
         "color": "#eff6ff"
       },
       "nodes": [
         {
           "id": "U",
-          "label": "U: True hunger",
-          "x": 80,
-          "y": 80,
+          "label": "U: Hunger (latent)",
+          "x": 70,
+          "y": 100,
           "color": "#e74c3c",
           "r": 22
         },
         {
           "id": "W",
-          "label": "W: App-use history",
+          "label": "W: App-use (proxy)",
           "x": 260,
-          "y": 70,
+          "y": 85,
           "color": "#f39c12",
           "r": 22
         },
         {
           "id": "T",
-          "label": "T: Notification sent",
+          "label": "T: Notification",
           "x": 260,
-          "y": 170,
+          "y": 190,
           "color": "#2ecc71",
           "r": 22
         },
         {
           "id": "Y",
           "label": "Y: Order placed",
-          "x": 500,
-          "y": 110,
+          "x": 510,
+          "y": 130,
           "color": "#2ecc71",
           "r": 22
         },
         {
           "id": "C",
-          "label": "rain, weekend, payday",
-          "x": 320,
-          "y": 125,
+          "label": "Context:\nrain, weekend, payday",
+          "x": 340,
+          "y": 140,
           "color": "#95a5a6",
-          "r": 18
+          "r": 20
         }
       ],
       "edges": [
@@ -655,14 +659,14 @@
           "to": "Y",
           "color": "#e74c3c",
           "dash": "6,2",
-          "label": "hunger drives orders"
+          "label": "hunger drives orders directly"
         },
         {
           "from": "W",
           "to": "T",
           "color": "#64748b",
           "dash": "",
-          "label": "platform targets on W"
+          "label": "platform targets based on W"
         },
         {
           "from": "T",
@@ -688,22 +692,22 @@
       ],
       "annotations": [
         {
-          "x": 80,
-          "y": 35,
+          "x": 70,
+          "y": 48,
           "text": "The hidden confounder",
           "color": "#e74c3c",
           "size": 9
         },
         {
-          "x": 375,
-          "y": 155,
+          "x": 440,
+          "y": 55,
           "text": "Is this path causal?",
           "color": "#2ecc71",
           "size": 9
         },
         {
-          "x": 375,
-          "y": 168,
+          "x": 440,
+          "y": 68,
           "text": "Or just confounding?",
           "color": "#e74c3c",
           "size": 9
@@ -711,24 +715,24 @@
       ]
     },
     "decomposition_diagram": {
-      "title": "Decomposing the Naive Association",
-      "width": 560,
+      "title": "Decomposing the Naive Association — What the Data Show vs. Reality",
+      "width": 640,
       "height": 200,
       "bars": [
         {
-          "label": "Naive: P(Y|T=1) − P(Y|T=0)",
+          "label": "Rung 1 — Naive: P(Y|T=1) − P(Y|T=0)",
           "value_key": "naive",
           "color": "#e74c3c",
-          "rung": "Rung 1"
+          "rung": "Observation"
         },
         {
-          "label": "True ATE: E[Y(1) − Y(0)]",
+          "label": "Rung 2 — True ATE: E[Y(1) − Y(0)]",
           "value_key": "truth",
           "color": "#2ecc71",
-          "rung": "Rung 2"
+          "rung": "Causal Truth"
         },
         {
-          "label": "Confounding Bias",
+          "label": "Confounding Bias (Gap)",
           "value_key": "gap",
           "color": "#f39c12",
           "rung": "Spurious"

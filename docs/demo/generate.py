@@ -286,10 +286,14 @@ data["content"] = {
         "rung 3": "Pearl's third rung: Counterfactuals. P(Y(0)=0 | T=1,Y=1) — same unit, different treatment. 'Was it the notification that caused THIS order?'"
     },
     "assumption_tooltips": {
+        "Ignorability": "Also called 'no unmeasured confounding' or 'conditional exchangeability'. The assumption that {Y(0),Y(1)} ⊥ T | X — all common causes of T and Y are measured and adjusted for. Untestable from data alone.",
         "ignorability": "Also called 'no unmeasured confounding' or 'conditional exchangeability'. The assumption that {Y(0),Y(1)} ⊥ T | X — all common causes of T and Y are measured and adjusted for. Untestable from data alone.",
+        "Positivity": "Also called 'overlap'. Every unit must have 0 < P(T=1 | X=x) < 1 — non-zero probability of receiving either treatment. Without positivity, the ATE requires extrapolation.",
         "positivity": "Also called 'overlap'. Every unit must have 0 < P(T=1 | X=x) < 1 — non-zero probability of receiving either treatment. Without positivity, the ATE requires extrapolation.",
         "SUTVA": "Stable Unit Treatment Value Assumption. Two parts: (1) No interference — one user's notification doesn't affect another's order. (2) Consistency — the treatment is well-defined and identical for all treated units.",
+        "Consistency": "The observed outcome Y equals the potential outcome Y(t) under the treatment actually received: Y = T·Y(1) + (1-T)·Y(0). Links counterfactual notation to observed data.",
         "consistency": "The observed outcome Y equals the potential outcome Y(t) under the treatment actually received: Y = T·Y(1) + (1-T)·Y(0). Links counterfactual notation to observed data.",
+        "Estimand": "The quantity we aim to estimate. Here, the ATE: E[Y(1) − Y(0)] — the expected difference in order probability if everyone vs. no one were notified.",
         "estimand": "The quantity we aim to estimate. Here, the ATE: E[Y(1) − Y(0)] — the expected difference in order probability if everyone vs. no one were notified.",
         "target trial": "The idealized RCT we would run if ethics and logistics allowed: randomize notifications, compare order rates. Specifying it first prevents method-driven (rather than question-driven) analysis (Hernán & Robins 2016).",
         "ATE": "Average Treatment Effect. E[Y(1) − Y(0)]. The expected difference in outcomes if the entire population received treatment vs. if no one did. A Rung-2 quantity.",
@@ -297,38 +301,38 @@ data["content"] = {
     },
     "concept_sketch": {
         "title": "The Core Problem — A Sketch Before the Formal DAG",
-        "width": 640, "height": 240,
-        "hidden_box": {"x": 30, "y": 20, "w": 130, "h": 200, "label": "What the platform CANNOT see", "color": "#e8e8e8"},
-        "observed_box": {"x": 200, "y": 20, "w": 180, "h": 200, "label": "What the platform CAN see", "color": "#f0fdf4"},
-        "outcome_box": {"x": 450, "y": 60, "w": 160, "h": 120, "label": "What we want to affect", "color": "#eff6ff"},
+        "width": 660, "height": 260,
+        "hidden_box": {"x": 20, "y": 30, "w": 140, "h": 210, "label": "What the platform CANNOT see", "color": "#fef2f2"},
+        "observed_box": {"x": 190, "y": 30, "w": 200, "h": 210, "label": "What the platform CAN see", "color": "#f0fdf4"},
+        "outcome_box": {"x": 430, "y": 70, "w": 200, "h": 130, "label": "What we want to affect", "color": "#eff6ff"},
         "nodes": [
-            {"id": "U", "label": "U: True hunger", "x": 80, "y": 80, "color": "#e74c3c", "r": 22},
-            {"id": "W", "label": "W: App-use history", "x": 260, "y": 70, "color": "#f39c12", "r": 22},
-            {"id": "T", "label": "T: Notification sent", "x": 260, "y": 170, "color": "#2ecc71", "r": 22},
-            {"id": "Y", "label": "Y: Order placed", "x": 500, "y": 110, "color": "#2ecc71", "r": 22},
-            {"id": "C", "label": "rain, weekend, payday", "x": 320, "y": 125, "color": "#95a5a6", "r": 18}
+            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 100, "color": "#e74c3c", "r": 22},
+            {"id": "W", "label": "W: App-use (proxy)", "x": 260, "y": 85, "color": "#f39c12", "r": 22},
+            {"id": "T", "label": "T: Notification", "x": 260, "y": 190, "color": "#2ecc71", "r": 22},
+            {"id": "Y", "label": "Y: Order placed", "x": 510, "y": 130, "color": "#2ecc71", "r": 22},
+            {"id": "C", "label": "Context:\nrain, weekend, payday", "x": 340, "y": 140, "color": "#95a5a6", "r": 20}
         ],
         "edges": [
             {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives app use"},
-            {"from": "U", "to": "Y", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives orders"},
-            {"from": "W", "to": "T", "color": "#64748b", "dash": "", "label": "platform targets on W"},
+            {"from": "U", "to": "Y", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives orders directly"},
+            {"from": "W", "to": "T", "color": "#64748b", "dash": "", "label": "platform targets based on W"},
             {"from": "T", "to": "Y", "color": "#2ecc71", "dash": "", "label": "causal effect — is it real?"},
             {"from": "C", "to": "T", "color": "#95a5a6", "dash": "4,2", "label": ""},
             {"from": "C", "to": "Y", "color": "#95a5a6", "dash": "4,2", "label": ""}
         ],
         "annotations": [
-            {"x": 80, "y": 35, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
-            {"x": 375, "y": 155, "text": "Is this path causal?", "color": "#2ecc71", "size": 9},
-            {"x": 375, "y": 168, "text": "Or just confounding?", "color": "#e74c3c", "size": 9}
+            {"x": 70, "y": 48, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
+            {"x": 440, "y": 55, "text": "Is this path causal?", "color": "#2ecc71", "size": 9},
+            {"x": 440, "y": 68, "text": "Or just confounding?", "color": "#e74c3c", "size": 9}
         ]
     },
     "decomposition_diagram": {
-        "title": "Decomposing the Naive Association",
-        "width": 560, "height": 200,
+        "title": "Decomposing the Naive Association — What the Data Show vs. Reality",
+        "width": 640, "height": 200,
         "bars": [
-            {"label": "Naive: P(Y|T=1) − P(Y|T=0)", "value_key": "naive", "color": "#e74c3c", "rung": "Rung 1"},
-            {"label": "True ATE: E[Y(1) − Y(0)]", "value_key": "truth", "color": "#2ecc71", "rung": "Rung 2"},
-            {"label": "Confounding Bias", "value_key": "gap", "color": "#f39c12", "rung": "Spurious"}
+            {"label": "Rung 1 — Naive: P(Y|T=1) − P(Y|T=0)", "value_key": "naive", "color": "#e74c3c", "rung": "Observation"},
+            {"label": "Rung 2 — True ATE: E[Y(1) − Y(0)]", "value_key": "truth", "color": "#2ecc71", "rung": "Causal Truth"},
+            {"label": "Confounding Bias (Gap)", "value_key": "gap", "color": "#f39c12", "rung": "Spurious"}
         ],
         "annotation": "Red = what the data show (Rung 1). Green = the causal truth (Rung 2). Orange = the spurious gap that adjustment must remove."
     },

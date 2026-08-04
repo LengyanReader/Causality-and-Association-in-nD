@@ -32,7 +32,7 @@ th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left;font-size:
 .cw{background:#fffbeb;border-left-color:var(--orange)}.cg{background:#ecfdf5;border-left-color:var(--green)}.cr{background:#fef2f2;border-left-color:var(--red)}
 select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;width:100%;margin-bottom:10px;background:var(--card)}
 .term{color:var(--blue);font-weight:600;border-bottom:1px dotted var(--blue);cursor:help;position:relative}
-.term:hover::after{content:attr(data-tip);position:absolute;bottom:22px;left:0;background:var(--dark);color:#fff;padding:6px 10px;border-radius:4px;font-size:.75rem;font-weight:400;white-space:normal;z-index:100;pointer-events:none;max-width:320px}
+.term:hover::after{content:attr(data-tip);position:absolute;bottom:22px;left:0;background:var(--dark);color:#fff;padding:8px 14px;border-radius:6px;font-size:.78rem;font-weight:400;white-space:normal;z-index:100;pointer-events:none;max-width:420px;width:max-content;min-width:200px;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:4px 0}
 .step-box{background:#f8fafc;border:1px dashed var(--border);border-radius:var(--radius);padding:14px 18px;margin:10px 0;font-size:.85rem}.step-box b{color:var(--blue)}
 .cn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--blue);color:#fff;border-radius:50%;font-size:.85rem;font-weight:800;margin-right:8px}
@@ -113,6 +113,21 @@ details.think .think-body h4:first-child{margin-top:0}
 .decomp-wrap svg{display:block}
 /* Section indicator */
 .section-indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--blue);color:#fff;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:16px}
+/* World toggle */
+.world-toggle{background:rgba(255,255,255,.06);border-radius:8px;padding:12px;margin:10px 0}
+.world-toggle .wt-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:4px}
+.world-toggle .wt-badge{display:block;padding:6px 10px;border-radius:6px;font-size:.78rem;font-weight:600;text-align:center;margin-bottom:4px}
+.world-toggle .wt-badge.static{background:#065f46;color:#d1fae5}.world-toggle .wt-badge.static b{color:#fff}
+.world-toggle .wt-badge.holiday{background:#92400e;color:#fde68a}.world-toggle .wt-badge.holiday b{color:#fff}
+.world-toggle .wt-desc{font-size:.7rem;color:#94a3b8;margin-top:6px;line-height:1.5}
+.world-toggle select{padding:6px 8px;border:1px solid rgba(255,255,255,.15);border-radius:6px;font-size:.76rem;width:100%;background:rgba(255,255,255,.08);color:#e2e8f0}
+/* Sidebar glossary */
+.side-glossary{margin-top:12px;font-size:.74rem}
+.side-glossary summary{cursor:pointer;color:#34d399;font-weight:700;padding:4px 0;font-size:.78rem;user-select:none}
+.side-glossary summary:hover{color:#6ee7b7}
+/* Table legend */
+.tbl-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:.7rem;color:var(--muted)}
+.tbl-legend span{background:#f1f5f9;padding:2px 8px;border-radius:10px;white-space:nowrap}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
 var D=null,activeRegime="static",dagZoom=1;
 fetch("data.json?v=8").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
@@ -250,7 +265,8 @@ function renderMiniDataTable(dp){
     h+='</tr>';
   }
   h+='</table></div>';
-  h+='<div style="font-size:.7rem;color:var(--muted);margin-top:4px"><b>Green cells</b> = T=1 or Y=1. T and Y co-occur in raw data — that is confounding, not causation. Hover column headers for descriptions.</div>';
+  h+='<div class="tbl-legend"><span>🟢 <b>Green cells</b> = T=1 or Y=1</span><span>T,Y,M,S,NC,Z = binary (0/1)</span><span>W = continuous proxy</span><span>rain,weekend,payday = binary confounders</span></div>';
+  h+='<div style="font-size:.68rem;color:var(--muted);margin-top:3px">T and Y co-occur in raw data due to confounding — not causation. <b>Hover column headers</b> for full descriptions.</div>';
   h+='</div>';
   return h;
 }
@@ -261,29 +277,39 @@ function applyTooltips(text,tooltips){
   var keys=Object.keys(tooltips).sort(function(a,b){return b.length-a.length});
   for(var i=0;i<keys.length;i++){
     var k=keys[i],escaped=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    var re=new RegExp('(^|[^>])('+escaped+')([^<]|$)','g');
-    result=result.replace(re,function(m,before,match,after){
-      return before+'<span class="term" data-tip="'+tooltips[k].replace(/"/g,'&quot;')+'">'+match+'</span>'+after;
-    });
+    // Use \b word boundaries for simple word terms to avoid matching inside other words
+    var isSimpleWord=/^[A-Za-z0-9 ]+$/.test(k);
+    if(isSimpleWord){
+      var re=new RegExp('\\b('+escaped+')\\b','g');
+      result=result.replace(re,function(match){
+        return '<span class="term" data-tip="'+tooltips[k].replace(/"/g,'&quot;')+'">'+match+'</span>';
+      });
+    }else{
+      // For terms with special chars (do(T), Y(1), rung 1, etc.), use original regex
+      var re=new RegExp('(^|[^>\\w])('+escaped+')([^<\\w]|$)','g');
+      result=result.replace(re,function(m,before,match,after){
+        return before+'<span class="term" data-tip="'+tooltips[k].replace(/"/g,'&quot;')+'">'+match+'</span>'+after;
+      });
+    }
   }
   return result;
 }
 
 function buildDecompositionDiagram(v,rd){
   if(!v)return"";
-  var W=v.width,H=v.height,barX=100,barW=300,barH=28,gap=14;
+  var W=v.width,H=v.height,barX=180,barW=280,barH=28,gap=14;
   var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
   h+='<text x="'+(W/2)+'" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
   var vals=[rd.naive||0,rd.truth||0,rd.gap||0];
   var maxVal=Math.max.apply(null,vals)*1.25;
   for(var i=0;i<v.bars.length;i++){
-    var b=v.bars[i],y=40+i*(barH+gap),w=(vals[i]/maxVal)*barW;
-    h+='<text x="'+(barX-4)+'" y="'+(y+18)+'" text-anchor="end" font-size="10" fill="#475569">'+b.label+'</text>';
+    var b=v.bars[i],y=40+i*(barH+gap),w=Math.max((vals[i]/maxVal)*barW,3);
+    h+='<text x="'+(barX-6)+'" y="'+(y+18)+'" text-anchor="end" font-size="9" fill="#475569">'+b.label+'</text>';
     h+='<rect x="'+barX+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'" opacity="0.8"/>';
-    h+='<text x="'+(barX+w+6)+'" y="'+(y+18)+'" font-size="11" font-weight="700" fill="'+b.color+'">'+(vals[i]>=0?'+':'')+vals[i].toFixed(3)+'</text>';
-    h+='<text x="'+(barX+w+65)+'" y="'+(y+18)+'" font-size="8" fill="#94a3b8">'+b.rung+'</text>';
+    h+='<text x="'+(barX+w+8)+'" y="'+(y+18)+'" font-size="11" font-weight="700" fill="'+b.color+'">'+(vals[i]>=0?'+':'')+vals[i].toFixed(3)+'</text>';
+    h+='<text x="'+(barX+w+70)+'" y="'+(y+18)+'" font-size="8" fill="#94a3b8">'+b.rung+'</text>';
   }
-  h+='<text x="'+(W/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">'+v.annotation+'</text>';
+  h+='<text x="'+(W/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">'+v.annotation+'</text>';
   h+='</svg>';
   return '<div class="card"><div class="decomp-wrap">'+h+'</div></div>';
 }
@@ -639,14 +665,23 @@ function buildStation(s,rd){
 }
 
 function buildSidebar(){
-  var h='<h2>Causal Science</h2><div class="sub">A Guided Walkthrough</div>';
-  h+='<div class="navbox"><div class="nht">NAVIGATION</div>';
-  h+='<a href="deep_evalue.html" class="nd">E-value Deep Dive</a><a href="deep_backdoor.html" class="nd">Back-Door Deep Dive</a>';
-  h+='<div class="nht" style="margin-top:8px">On This Page</div>';
+  var h='<h2>📐 Causal Science</h2><div class="sub">A Guided Walkthrough</div>';
+  // Deep Dives section
+  h+='<div class="navbox"><div class="nht">📖 DEEP DIVES (separate pages)</div>';
+  h+='<a href="deep_dgp.html" class="nd">🔬 How the Data Is Generated</a>';
+  h+='<a href="deep_backdoor.html" class="nd">🔍 The Back-Door Criterion</a>';
+  h+='<a href="deep_evalue.html" class="nd">⚠️ The E-value Sensitivity</a></div>';
+  // On This Page navigation
+  h+='<div class="navbox"><div class="nht">📍 ON THIS PAGE</div>';
   h+='<a href="#s1" class="nm">1. The Question</a><a href="#s2" class="nm">2. Causal Graph</a><a href="#s3" class="nm">3. Estimation</a><a href="#s4" class="nm">4. Sensitivity</a><a href="#s5" class="nm">5. Evolution</a><a href="#s6" class="nm">6. Counterfactuals</a><a href="#s7" class="nm">7. Summary</a></div>';
-  h+='<div class="rb '+activeRegime+'">WORLD: '+activeRegime.toUpperCase()+'</div><p style="font-size:.72rem;color:#94a3b8;margin-bottom:10px">Static = normal. Holiday = T->M drops 1.6->0.4. Toggle to compare.</p>';
-  h+='<select onchange="switchRegime(this.value)"><option value="static"'+(activeRegime==="static"?" selected":"")+'>Static (baseline)</option><option value="holiday"'+(activeRegime==="holiday"?" selected":"")+'>Holiday (drifted)</option></select>';
-  if(D&&D.content&&D.content.glossary){h+='<h3>Glossary</h3>';for(var i=0;i<D.content.glossary.length;i++){var g=D.content.glossary[i];h+='<div class="gt"><b>'+g.term+'</b>: '+g.def+'</div>'}}
+  // World toggle — more prominent
+  h+='<div class="world-toggle">';
+  h+='<div class="wt-label">🌍 DATA REGIME</div>';
+  h+='<div class="wt-badge '+activeRegime+'">Currently viewing: <b>'+activeRegime.toUpperCase()+'</b></div>';
+  h+='<select onchange="switchRegime(this.value)" style="margin:8px 0"><option value="static"'+(activeRegime==="static"?" selected":"")+'>🏠 Static (baseline — normal conditions)</option><option value="holiday"'+(activeRegime==="holiday"?" selected":"")+'>🎄 Holiday (drifted — T→M drops 1.6→0.4)</option></select>';
+  h+='<p class="wt-desc">In the holiday regime, users habituate to notifications — the mechanism that converts notifications into app-opens weakens. Toggle to compare estimates across worlds.</p></div>';
+  // Glossary — collapsible
+  if(D&&D.content&&D.content.glossary){h+='<details class="side-glossary"><summary>📚 Glossary ('+D.content.glossary.length+' terms)</summary>';for(var i=0;i<D.content.glossary.length;i++){var g=D.content.glossary[i];h+='<div class="gt"><b>'+g.term+'</b>: '+g.def+'</div>'}h+='</details>';}
   document.getElementById("sidebar").innerHTML=h;
 }
 function switchRegime(v){activeRegime=v;build()}

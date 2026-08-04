@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dive: How the Data Is Generated — NomNom DGP</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--dark:#0f172a;--border:#e2e8f0;--radius:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout{background:#eff6ff;border-left:4px solid var(--blue);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.callout-green{background:#f0fdf4;border-left-color:var(--green)}
+.callout-red{background:#fef2f2;border-left-color:var(--red)}
+.callout-orange{background:#fffbeb;border-left-color:var(--orange)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:6px 0;font-size:.92em}
+code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.88em;color:var(--red)}
+pre{background:#1e293b;color:#e2e8f0;padding:16px 20px;border-radius:var(--radius);overflow-x:auto;font-size:.82rem;line-height:1.6;margin:12px 0}
+pre .kw{color:#93c5fd}.pre .str{color:#a5d6a7}.pre .cm{color:#64748b}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back{display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;color:var(--muted);text-decoration:none;font-size:.88rem}
+nav{display:flex;gap:12px;margin-bottom:20px;font-size:.88rem;flex-wrap:wrap}
+nav a{padding:4px 12px;border:1px solid var(--border);border-radius:20px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .15s}
+nav a:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.var-table td:first-child{font-family:monospace;font-weight:700;white-space:nowrap}
+</style></head><body>
+
+<nav>
+<a href="index.html">← Main Walkthrough</a>
+<a href="deep_dgp.html" class="current">DGP</a>
+<a href="deep_backdoor.html">Back-Door</a>
+<a href="deep_evalue.html">E-value</a>
+</nav>
+
+<h1>🔬 Deep Dive: How the Data Is Generated</h1>
+<p style="color:var(--muted)">The NomNom Data-Generating Process — a structural causal model with known ground truth.<br>
+See: <code>nomnom/dgp.py</code> · <code>nomnom/regimes.py</code> · <code>nomnom/graph.py</code></p>
+
+<h2>1. Why a Synthetic DGP?</h2>
+<div class="card">
+<p>On real data, the true causal effect is <b>unknown</b>. An estimator that returns +0.24 could be correct, or it could be +0.35 biased down to +0.24 by regularization — you cannot tell. This makes causal inference uniquely hard to test.</p>
+<p>The NomNom DGP solves this: it is a <b>flight simulator for causal inference</b>. Every structural equation, every coefficient, every noise distribution is specified by us. We can compute the exact ATE by Monte Carlo — draw 200,000 units, run the SCM twice (do(T=1) vs do(T=0)) with the <i>same</i> noise, and average the difference. This gives us the ground truth against which every estimator is checked.</p>
+<div class="callout-green"><b>Design principle P5:</b> Methods graduate to real data only after passing synthetic acceptance tests. If an estimator cannot recover truth when we <i>know</i> the answer, it should not be trusted on data where we don't.</div>
+</div>
+
+<h2>2. The Causal Graph (Quick Reference)</h2>
+<div class="card">
+<p>The DGP implements this causal structure. <b>17 edges</b> across 11 variables (1 latent):</p>
+<table>
+<tr><th>Role</th><th>Variable</th><th>Type</th><th>Causal Parents</th></tr>
+<tr><td>Confounder</td><td><code>U</code> (hunger)</td><td>N(0,1)</td><td>— (exogenous, latent)</td></tr>
+<tr><td>Proxy</td><td><code>W</code> (app-use)</td><td>continuous</td><td>U</td></tr>
+<tr><td>Instrument</td><td><code>Z</code> (jitter)</td><td>Bernoulli(0.5)</td><td>— (exogenous, randomized)</td></tr>
+<tr><td>Treatment</td><td><code>T</code> (notification)</td><td>Bernoulli</td><td>W, Z, wknd, rain, payday</td></tr>
+<tr><td>Mediator</td><td><code>M</code> (app-open)</td><td>Bernoulli</td><td>T, U</td></tr>
+<tr><td>Outcome</td><td><code>Y</code> (order)</td><td>Bernoulli</td><td>T, M, U, wknd, rain, payday, D</td></tr>
+<tr><td>Collider</td><td><code>S</code> (engagement)</td><td>Bernoulli</td><td>T, Y</td></tr>
+<tr><td>Neg. control</td><td><code>NC</code> (battery)</td><td>Bernoulli</td><td>U</td></tr>
+<tr><td>RDD cutoff</td><td><code>D</code> (coupon)</td><td>Bernoulli</td><td>L (loyalty points)</td></tr>
+</table>
+</div>
+
+<h2>3. The Structural Equations — Exact Code</h2>
+<div class="card">
+<p>Each endogenous variable is generated by a <b>structural equation</b> of the form:</p>
+<p class="formula"><span id="eq-scm"></span></p>
+<p>where <code>f</code> is a deterministic function and <code>ε</code> is independent exogenous noise. The key insight (Haavelmo 1943): these are <b>autonomous mechanisms</b> — changing one leaves the others intact. This is what makes the do-operator well-defined.</p>
+</div>
+
+<h3>3.1 Exogenous Variables</h3>
+<div class="card">
+<p>These are drawn <b>independently</b> at the start of each sample. They represent "nature's coin flips":</p>
+<table class="var-table">
+<tr><th>Variable</th><th>Distribution</th><th>Interpretation</th></tr>
+<tr><td><code>segment</code></td><td>Bernoulli(0.6)</td><td>1 = loyal user (60%), 0 = new user (40%)</td></tr>
+<tr><td><code>weekend</code></td><td>Bernoulli(0.28)</td><td>~2/7 of days are weekend days</td></tr>
+<tr><td><code>rain</code></td><td>Bernoulli(0.30)</td><td>30% of days have rain (static); 15% in holiday</td></tr>
+<tr><td><code>payday</code></td><td>Bernoulli(0.14)</td><td>~1/7 of days are paydays</td></tr>
+<tr><td><code>ε_U</code> (hunger)</td><td>N(0, 1)</td><td><b>Latent</b> — the platform cannot observe this</td></tr>
+<tr><td><code>ε_W</code> (app-use noise)</td><td>N(0, 0.5)</td><td>Measurement noise around true hunger</td></tr>
+<tr><td><code>Z</code> (jitter)</td><td>Bernoulli(0.5)</td><td>Randomized send-time jitter — <b>instrument</b></td></tr>
+<tr><td><code>L</code> (loyalty pts)</td><td>N(480, 60)</td><td>Normally distributed around 480</td></tr>
+</table>
+</div>
+
+<h3>3.2 Endogenous Equations</h3>
+<div class="card">
+<p>Each variable is computed from its <b>causal parents</b> (the right-hand side of the DAG arrows pointing into it):</p>
+
+<h4>W — App-Use History (Measured Proxy)</h4>
+<p class="formula"><span id="eq-w"></span></p>
+<p>W is the platform's <b>only window</b> into hunger. It correlates with U (ρ ≈ 0.89) but is not U itself. The platform targets notifications based on W, not U — which is why conditioning on W blocks the back-door path.</p>
+
+<h4>T — Notification Sent (Treatment)</h4>
+<p class="formula"><span id="eq-t"></span></p>
+<p>The targeting algorithm uses <b>observed</b> variables only: W (app-use), weekend, rain, payday, and Z (jitter). The coefficient on Z (1.1) is deliberately <b>strong</b> — it makes Z a valid instrument. Note: U does NOT appear here — the platform cannot see true hunger. This is the <b>only</b> reason the back-door criterion works.</p>
+
+<h4>M — App Opened (Mediator)</h4>
+<p class="formula"><span id="eq-m"></span></p>
+<p>where <code>β_TM = <b>1.6</b></code> in the static regime and <code><b>0.4</b></code> in the holiday regime. U also affects M directly (hungrier users open the app more). This is the <b>only mechanism that changes</b> between static and holiday — everything else is invariant.</p>
+
+<h4>D — Loyalty Coupon (RDD Assignment)</h4>
+<p class="formula"><span id="eq-d"></span></p>
+<p>Sharp RDD at 500 loyalty points. Users above the threshold get a free-delivery coupon which increases order probability. This creates a <b>regression discontinuity design</b> episode at <code>nomnom/episodes/rdd_coupon.py</code>.</p>
+
+<h4>Y — Order Placed (Outcome)</h4>
+<p class="formula"><span id="eq-y"></span></p>
+<p>Coefficients: U=0.5 (hunger drives orders), weekend=0.55, rain=0.35, payday=0.3, M=0.9 (mediation), D=0.5 (coupon). Treatment effect depends on segment:</p>
+<table>
+<tr><th>Segment</th><th>τ (direct T→Y, logit scale)</th><th>Probability uplift</th></tr>
+<tr><td>New users (40%)</td><td>0.4</td><td>~1.5 pp</td></tr>
+<tr><td>Loyal users (60%)</td><td>1.1</td><td>~3.5 pp</td></tr>
+</table>
+<p>The <b>total effect</b> includes the mediated path: T→M (+1.6 × M→Y 0.9 = +1.44 on logit scale via M). This is why the total ATE (~+0.24 on probability scale) is larger than the direct effect alone.</p>
+
+<h4>S — Engagement Score (Collider)</h4>
+<p class="formula"><span id="eq-s"></span></p>
+<p>Since T and Y are both causes of S, conditioning on S opens a back-door path between T and Y (Berkson's bias). <b>NEVER adjust for S.</b></p>
+
+<h4>NC — Battery Drain (Negative Control Outcome)</h4>
+<p class="formula"><span id="eq-nc"></span></p>
+<p>NC shares confounder U with Y but has <b>no causal effect from T</b>. If our adjustment is correct, the estimated T→NC effect should be ~zero. A non-zero result is a smoke alarm: residual confounding exists.</p>
+</div>
+
+<h2>4. Regime Switching (Holiday Drift)</h2>
+<div class="card">
+<p>The <code>nomnom/regimes.py</code> module defines environment switches via a frozen dataclass:</p>
+<pre>@dataclass(frozen=True)
+class Regime:
+    name: str = "static"
+    beta_tm: float = 1.6      <span class="cm"># T → M coefficient</span>
+    base_open: float = -1.2   <span class="cm"># intercept of M equation</span>
+    p_rain: float = 0.30
+
+STATIC  = Regime()
+HOLIDAY = Regime(name="holiday", beta_tm=0.4, base_open=-0.6, p_rain=0.15)</pre>
+<p>The holiday regime changes <b>exactly one causal mechanism</b> — the T→M coefficient drops from 1.6 to 0.4. Users habituate to notifications during holidays: seeing a notification is less likely to make them open the app. The base rate shifts (base_open from -1.2 to -0.6) and rain probability drops (0.30 to 0.15 — fewer rainy days in holiday season).</p>
+<div class="callout-orange"><b>Key property:</b> The Y mechanism (order given hunger, app-open, and context) is <b>invariant</b> across regimes. The EVOLVE station's mechanism-stability monitor detects that M's conditional distribution degrades while Y's does not — correctly localizing the drift to exactly the mechanism we changed.</div>
+</div>
+
+<h2>5. Monte Carlo Ground Truth</h2>
+<div class="card">
+<p>The <code>ground_truth()</code> function computes the exact ATE by simulating the do-operator:</p>
+<pre><span class="kw">def</span> ground_truth(regime=STATIC, n_mc=200_000, seed=999):
+    rng = np.random.default_rng(seed)
+    exo = _draw_exogenous(n_mc, rng, regime, DEFAULT_PARAMS)
+    <span class="cm"># Run SCM twice with SAME noise, different T</span>
+    y1 = _structural(exo, regime, DEFAULT_PARAMS, t_value=np.ones(n_mc, int))[<span class="str">"Y"</span>]
+    y0 = _structural(exo, regime, DEFAULT_PARAMS, t_value=np.zeros(n_mc, int))[<span class="str">"Y"</span>]
+    ate = float(y1.mean() - y0.mean())
+    <span class="cm"># Also compute CATE by segment</span>
+    ...
+    <span class="kw">return</span> {<span class="str">"ate"</span>: ate, <span class="str">"mu1"</span>: y1.mean(), <span class="str">"mu0"</span>: y0.mean(), ...}</pre>
+<p>This directly computes <code>E[Y | do(T=1)] − E[Y | do(T=0)]</code> by forcing T to 1 (or 0) for <b>every</b> unit, regardless of what the targeting algorithm would normally assign. The noise is shared between the two runs — each unit serves as its own control.</p>
+<p>With n=200,000, the Monte Carlo standard error is ~0.001 — more than precise enough for checking whether an estimator's 95% CI covers the truth.</p>
+<div class="callout-green"><b>Typical values — static regime:</b> ATE ≈ +0.241 (μ₁ ≈ 0.613, μ₀ ≈ 0.372). <b>Holiday regime:</b> ATE ≈ +0.191 (smaller because the mediation path T→M→Y is weaker).</div>
+</div>
+
+<h2>6. Why This Design Exercises Every Causal Concept</h2>
+<div class="card">
+<table>
+<tr><th>Concept</th><th>How the DGP exercises it</th></tr>
+<tr><td>Confounding</td><td>U→W→T creates a back-door path; without adjusting for W, the naive estimate is biased up by ~0.10</td></tr>
+<tr><td>Mediation</td><td>T→M→Y means the total effect ≠ the direct effect; adjusting for M blocks the mediated path</td></tr>
+<tr><td>Collider bias</td><td>T→S←Y — conditioning on S (engagement) opens a spurious path; the DGP's S equation guarantees this</td></tr>
+<tr><td>Instrument</td><td>Z→T with strong coefficient (1.1), Z↛Y directly, Z independent of confounders — valid IV</td></tr>
+<tr><td>Negative control</td><td>NC shares U with Y but has no T→NC path — a built-in falsification test for residual confounding</td></tr>
+<tr><td>Heterogeneity</td><td>τ differs by segment (0.4 vs 1.1) — CATE ≠ ATE; the ATE weights them by P(segment)</td></tr>
+<tr><td>RDD</td><td>D = 1[L≥500] creates a sharp discontinuity — exercises local randomization and bandwidth selection</td></tr>
+<tr><td>Drift detection</td><td>Holiday regime changes β_TM alone — the mechanism-stability monitor must localize the drift to M</td></tr>
+</table>
+</div>
+
+<h2>7. Key References</h2>
+<div class="card">
+<p>Haavelmo, T. (1943). The statistical implications of a system of simultaneous equations. <i>Econometrica</i>, 11(1), 1–12.</p>
+<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">DOI</a> — Ch. 7: structural counterfactuals.</p>
+<p>Peters, J., Bühlmann, P., & Meinshausen, N. (2016). Causal inference by using invariant prediction. <i>JRSS-B</i>, 78(5), 947–1012. <a href="https://doi.org/10.1111/rssb.12167">DOI</a> — the invariance principle used in the EVOLVE station.</p>
+<p>Hernán, M. A. & Robins, J. M. (2020). <i>Causal Inference: What If</i>. Chapman & Hall/CRC. <a href="https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/">Free online</a> — Ch. 2: target trial emulation.</p>
+</div>
+
+<script>
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+document.getElementById("eq-scm").innerHTML=M("V_j = f_j(pa(V_j), \\varepsilon_j), \\quad \\varepsilon_j \\perp\\\!\\!\\!\\perp \\varepsilon_k \\; (j \\neq k)");
+document.getElementById("eq-w").innerHTML=M("W = U + \\varepsilon_W, \\quad \\varepsilon_W \\sim N(0, 0.5)");
+document.getElementById("eq-t").innerHTML=M("T \\sim \\text{Bernoulli}\\big(\\sigma(-0.6 + 0.9\\cdot W + 0.5\\cdot wknd + 0.3\\cdot rain + 0.4\\cdot payday + 1.1\\cdot Z)\\big)");
+document.getElementById("eq-m").innerHTML=M("M \\sim \\text{Bernoulli}\\big(\\sigma(\\beta_0 + \\beta_{TM}\\cdot T + 0.5\\cdot U)\\big)");
+document.getElementById("eq-d").innerHTML=M("D = \\mathbf{1}[L \\geq 500], \\quad L \\sim N(480, 60)");
+document.getElementById("eq-y").innerHTML=M("Y \\sim \\text{Bernoulli}\\big(\\sigma(-1.3 + 0.5U + 0.55\\cdot wknd + 0.35\\cdot rain + 0.3\\cdot payday + 0.9\\cdot M + \\tau_{seg}\\cdot T + 0.5\\cdot D)\\big)");
+document.getElementById("eq-s").innerHTML=M("S \\sim \\text{Bernoulli}\\big(\\sigma(-0.5 + 0.9\\cdot T + 1.2\\cdot Y)\\big)");
+document.getElementById("eq-nc").innerHTML=M("NC \\sim \\text{Bernoulli}\\big(\\sigma(-1.0 + 0.7\\cdot U)\\big)");
+</script>
+</body>
+</html>
