@@ -88,6 +88,31 @@ details.think .think-body h4:first-child{margin-top:0}
 .think-layer.l1 .lvl-dot{background:#2563eb}.think-layer.l2 .lvl-dot{background:#059669}
 .think-layer.l3 .lvl-dot{background:#d97706}.think-layer.l4 .lvl-dot{background:#7c3aed}
 .think-layer.l5 .lvl-dot{background:#dc2626}
+/* Hero quote */
+.hero-quote{background:linear-gradient(135deg,#eff6ff,#f8fafc);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:var(--radius);padding:22px 26px;margin:18px 0}
+.hero-quote .hq-setup{font-size:.88rem;color:var(--muted);margin-bottom:10px}
+.hero-quote .hq-question{font-size:1.2rem;font-weight:700;color:var(--text);line-height:1.5;font-style:italic}
+/* Roadmap */
+.roadmap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px;margin:12px 0}
+.roadmap-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:#f8fafc;border-radius:6px;font-size:.8rem;line-height:1.4;border:1px solid var(--border);transition:background .15s}
+.roadmap-item:hover{background:#eff6ff}
+.roadmap-item .ri-num{flex-shrink:0;width:22px;height:22px;background:var(--blue);color:#fff;border-radius:50%;text-align:center;line-height:22px;font-size:.7rem;font-weight:700}
+.roadmap-item .ri-name{font-weight:700;color:var(--blue);white-space:nowrap}
+.roadmap-item .ri-question{color:var(--muted);font-size:.74rem}
+/* Mini data table */
+.mini-data{font-size:.74rem;margin:10px 0}
+.mini-data table{border-collapse:collapse;width:auto}
+.mini-data th{background:var(--dark);color:#fff;padding:4px 8px;font-size:.7rem}
+.mini-data td{padding:4px 8px;border-bottom:1px solid var(--border);text-align:center}
+.mini-data .md-cap{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+/* Concept sketch */
+.sketch-wrap{position:relative;overflow-x:auto;background:#fff;border-radius:8px;border:1px solid var(--border)}
+.sketch-wrap svg{display:block;min-width:600px}
+/* Decomposition diagram */
+.decomp-wrap{overflow-x:auto;background:#fff;border-radius:8px;border:1px solid var(--border);margin:10px 0}
+.decomp-wrap svg{display:block}
+/* Section indicator */
+.section-indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--blue);color:#fff;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:16px}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
 var D=null,activeRegime="static",dagZoom=1;
 fetch("data.json?v=8").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
@@ -170,6 +195,109 @@ function buildEvalueGauge(v){
   h+='<text x="260" y="110" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Higher E-value = more robust to unmeasured confounding</text>';
   h+='</svg>';
   return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+}
+
+function buildConceptSketch(v){
+  if(!v)return"";
+  var W=v.width,H=v.height,h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto">';
+  var hb=v.hidden_box;
+  h+='<rect x="'+hb.x+'" y="'+hb.y+'" width="'+hb.w+'" height="'+hb.h+'" rx="8" fill="'+hb.color+'" stroke="#ccc" stroke-width="1.5" stroke-dasharray="8,3"/>';
+  h+='<text x="'+(hb.x+hb.w/2)+'" y="'+(hb.y-4)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+hb.label+'</text>';
+  var ob=v.observed_box;
+  h+='<rect x="'+ob.x+'" y="'+ob.y+'" width="'+ob.w+'" height="'+ob.h+'" rx="8" fill="'+ob.color+'" stroke="#bbf7d0" stroke-width="1.5"/>';
+  h+='<text x="'+(ob.x+ob.w/2)+'" y="'+(ob.y-4)+'" text-anchor="middle" font-size="9" fill="#059669">'+ob.label+'</text>';
+  var ob2=v.outcome_box;
+  h+='<rect x="'+ob2.x+'" y="'+ob2.y+'" width="'+ob2.w+'" height="'+ob2.h+'" rx="8" fill="'+ob2.color+'" stroke="#bfdbfe" stroke-width="1.5"/>';
+  h+='<text x="'+(ob2.x+ob2.w/2)+'" y="'+(ob2.y-4)+'" text-anchor="middle" font-size="9" fill="#2563eb">'+ob2.label+'</text>';
+  h+='<text x="'+(W/2)+'" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  for(var i=0;i<v.edges.length;i++){
+    var e=v.edges[i],fn=null,tn=null;
+    for(var j=0;j<v.nodes.length;j++){if(v.nodes[j].id===e.from)fn=v.nodes[j];if(v.nodes[j].id===e.to)tn=v.nodes[j];}
+    if(!fn||!tn)continue;
+    var dx=tn.x-fn.x,dy=tn.y-fn.y,len=Math.sqrt(dx*dx+dy*dy);if(len>0){dx/=len;dy/=len}
+    var bx=tn.x-dx*tn.r,by=tn.y-dy*tn.r;
+    h+='<line x1="'+(fn.x+dx*fn.r)+'" y1="'+(fn.y+dy*fn.r)+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="'+e.color+'" stroke-width="2" stroke-dasharray="'+(e.dash||"none")+'" opacity="0.6"/>';
+    var perpx=-dy,perpy=dx,tipx=bx,tipy=by;
+    h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(bx-dx*8+perpx*4).toFixed(1)+','+(by-dy*8+perpy*4).toFixed(1)+' '+(bx-dx*8-perpx*4).toFixed(1)+','+(by-dy*8-perpy*4).toFixed(1)+'" fill="'+e.color+'" opacity="0.6"/>';
+    if(e.label){var mx=(fn.x+tn.x)/2,my=(fn.y+tn.y)/2-8;h+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="8" fill="'+e.color+'">'+e.label+'</text>'}
+  }
+  for(var i=0;i<v.nodes.length;i++){
+    var n=v.nodes[i];
+    h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+n.r+'" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+    h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="'+((n.r||22)>20?'9':'8')+'" font-weight="700" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
+    h+='<text x="'+n.x+'" y="'+(n.y-n.r-7)+'" text-anchor="middle" font-size="8" fill="#1a1a2e">'+n.label+'</text>';
+  }
+  for(var i=0;i<v.annotations.length;i++){
+    var a=v.annotations[i];
+    h+='<text x="'+a.x+'" y="'+a.y+'" text-anchor="middle" font-size="'+(a.size||8)+'" fill="'+a.color+'" font-style="italic">'+a.text+'</text>';
+  }
+  h+='</svg>';
+  return '<div class="card"><div class="sketch-wrap">'+h+'</div></div>';
+}
+
+function renderMiniDataTable(dp){
+  if(!dp||!dp.rows)return"";
+  var h='<div class="mini-data"><div class="md-cap">'+dp.caption+'</div>';
+  h+='<div style="overflow-x:auto"><table><tr>';
+  for(var j=0;j<dp.columns.length;j++)h+='<th title="'+(dp.column_descriptions[dp.columns[j]]||"")+'">'+dp.columns[j]+'</th>';
+  h+='</tr>';
+  for(var j=0;j<dp.rows.length;j++){
+    h+='<tr>';
+    for(var k=0;k<dp.rows[j].length;k++){
+      var v=dp.rows[j][k],hl=(dp.columns[k]==="T"&&v===1)||(dp.columns[k]==="Y"&&v===1);
+      h+='<td style="'+(hl?"background:#d5f5e3;font-weight:700":"")+'">'+(typeof v==="number"?(Math.abs(v)<10?v.toFixed(2):v.toFixed(1)):v)+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</table></div>';
+  h+='<div style="font-size:.7rem;color:var(--muted);margin-top:4px"><b>Green cells</b> = T=1 or Y=1. T and Y co-occur in raw data — that is confounding, not causation. Hover column headers for descriptions.</div>';
+  h+='</div>';
+  return h;
+}
+
+function applyTooltips(text,tooltips){
+  if(!tooltips)return text;
+  var result=text;
+  var keys=Object.keys(tooltips).sort(function(a,b){return b.length-a.length});
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],escaped=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp('(^|[^>])('+escaped+')([^<]|$)','g');
+    result=result.replace(re,function(m,before,match,after){
+      return before+'<span class="term" data-tip="'+tooltips[k].replace(/"/g,'&quot;')+'">'+match+'</span>'+after;
+    });
+  }
+  return result;
+}
+
+function buildDecompositionDiagram(v,rd){
+  if(!v)return"";
+  var W=v.width,H=v.height,barX=100,barW=300,barH=28,gap=14;
+  var h='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:100%;height:auto;background:#fff">';
+  h+='<text x="'+(W/2)+'" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1a2e">'+v.title+'</text>';
+  var vals=[rd.naive||0,rd.truth||0,rd.gap||0];
+  var maxVal=Math.max.apply(null,vals)*1.25;
+  for(var i=0;i<v.bars.length;i++){
+    var b=v.bars[i],y=40+i*(barH+gap),w=(vals[i]/maxVal)*barW;
+    h+='<text x="'+(barX-4)+'" y="'+(y+18)+'" text-anchor="end" font-size="10" fill="#475569">'+b.label+'</text>';
+    h+='<rect x="'+barX+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'" opacity="0.8"/>';
+    h+='<text x="'+(barX+w+6)+'" y="'+(y+18)+'" font-size="11" font-weight="700" fill="'+b.color+'">'+(vals[i]>=0?'+':'')+vals[i].toFixed(3)+'</text>';
+    h+='<text x="'+(barX+w+65)+'" y="'+(y+18)+'" font-size="8" fill="#94a3b8">'+b.rung+'</text>';
+  }
+  h+='<text x="'+(W/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">'+v.annotation+'</text>';
+  h+='</svg>';
+  return '<div class="card"><div class="decomp-wrap">'+h+'</div></div>';
+}
+
+function buildRoadmap(rm){
+  if(!rm)return"";
+  var h='<details class="think" style="margin:12px 0"><summary style="background:linear-gradient(135deg,#2563eb,#1d4ed8)">📍 The 9-Station Journey Ahead (click to expand)</summary>';
+  h+='<div class="think-body"><div class="roadmap-grid">';
+  for(var i=0;i<rm.length;i++){
+    var r=rm[i];
+    h+='<div class="roadmap-item"><div class="ri-num">'+r.station+'</div><div><span class="ri-name">'+r.emoji+' '+r.name+'</span><br><span class="ri-question">'+r.question+'</span><br><span style="font-size:.72rem;color:var(--muted)">'+r.brief+'</span></div></div>';
+  }
+  h+='</div></div></details>';
+  return h;
 }
 
 function buildIDFlow(v){
@@ -317,12 +445,35 @@ function build(){
   h+='<h1>Causal Science - A Guided Walkthrough</h1>';
   h+='<p style="font-size:1.05rem;color:var(--muted)">NomNom Eats: Does sending push notifications <i>cause</i> users to order?</p>';
   h+='<h2 id="s1"><span class="cn">1</span> The Question</h2>';
-  h+='<div class="card"><p style="font-size:1.02rem"><i>'+c.background.use_case+'</i></p><p>'+c.background.problem+'</p></div>';
+  h+='<div class="section-indicator">📍 Station 0 of 9 — FRAME: What decision does this inform?</div>';
+  // Hero quote: setup + question split across two lines
+  h+='<div class="hero-quote"><div class="hq-setup">'+c.background.setup+'</div>';
+  h+='<div class="hq-question">"'+c.background.question+'"</div></div>';
+  // Roadmap — collapsible 9-station preview
+  if(c.roadmap)h+=buildRoadmap(c.roadmap);
+  // Key insight — what the reader will learn
+  if(c.key_insight_preview)h+='<div class="callout cg">🔑 <b>What you\'ll learn:</b> '+c.key_insight_preview+'</div>';
+  // Concept sketch — preview diagram before the formal DAG
+  if(c.concept_sketch)h+=buildConceptSketch(c.concept_sketch);
+  // Problem statement
+  h+='<div class="card"><p>'+c.background.problem+'</p><p style="font-size:.85rem;color:var(--muted)">'+c.background.premise+'</p></div>';
+  // Diagnosis + mini data table
   if(c.problem_formulation){var pf=c.problem_formulation;
-    h+='<div class="callout cw"><b>Diagnosis:</b> '+pf.why_causal+'</div>';
-    if(pf.confounding_breakdown){h+='<div class="card"><ol style="font-size:.9rem;line-height:1.9;margin-left:20px">';for(var j=0;j<pf.confounding_breakdown.length;j++)h+='<li>'+pf.confounding_breakdown[j]+'</li>';h+='</ol></div>';}
-    h+='<div class="card"><p><b>Target trial:</b> '+pf.target_trial+'</p><p><b>Estimand:</b> <span class="formula">'+M("\\text{ATE} = E[Y(1) - Y(0)]")+'</span></p><p><b>Assumptions:</b></p><ol>';
-    h+='<li><b>Ignorability:</b> no unmeasured confounders beyond W</li><li><b>Positivity:</b> 0&lt;P(T=1|X)&lt;1</li><li><b>SUTVA:</b> no interference</li><li><b>Consistency:</b> Y = T*Y(1)+(1-T)*Y(0)</li></ol></div>';}
+    h+='<div class="callout cw"><b>Diagnosis:</b> '+applyTooltips(pf.why_causal,c.decomposition_tooltips)+'</div>';
+    if(c.data_snippet)h+=renderMiniDataTable(c.data_snippet);
+    // Decomposition diagram: visual bars showing naive vs truth vs bias
+    if(c.decomposition_diagram)h+=buildDecompositionDiagram(c.decomposition_diagram,rd);
+    // Breakdown list with hover tooltips
+    if(pf.confounding_breakdown){h+='<div class="card"><h3>Step-by-Step Decomposition</h3><ol style="font-size:.9rem;line-height:1.9;margin-left:20px">';for(var j=0;j<pf.confounding_breakdown.length;j++)h+='<li>'+applyTooltips(pf.confounding_breakdown[j],c.decomposition_tooltips)+'</li>';h+='</ol></div>';}
+    // Target trial + assumptions with tooltips
+    h+='<div class="card"><h3>The Target Trial & Assumptions</h3>';
+    h+='<p>'+applyTooltips(pf.target_trial,c.assumption_tooltips)+'</p>';
+    h+='<p><b>Estimand:</b> <span class="formula">'+M("\\text{ATE} = E[Y(1) - Y(0)]")+'</span> — the expected difference in order probability if every user were notified vs. if no user were notified. '+applyTooltips("(ATE = Average Treatment Effect)",c.assumption_tooltips)+'</p>';
+    h+='<p><b>Four identifying assumptions (hover for details):</b></p><ol>';
+    h+='<li><b>'+applyTooltips('Ignorability',c.assumption_tooltips)+':</b> {Y(0), Y(1)} ⊥ T | {W, rain, weekend, payday} — no unmeasured confounding beyond what W captures</li>';
+    h+='<li><b>'+applyTooltips('Positivity',c.assumption_tooltips)+':</b> 0 < P(T=1 | X=x) < 1 for all covariate patterns x</li>';
+    h+='<li><b>'+applyTooltips('SUTVA',c.assumption_tooltips)+':</b> one user\'s notification does not affect another user\'s order</li>';
+    h+='<li><b>'+applyTooltips('Consistency',c.assumption_tooltips)+':</b> the observed outcome under T=t equals the potential outcome Y(t)</li></ol></div>';}
   h+='<h2 id="s2"><span class="cn">2</span> The Causal Graph <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';

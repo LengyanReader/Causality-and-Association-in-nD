@@ -232,7 +232,8 @@ data["content"] = {
     "title": "Causal Science — The Complete Workflow",
     "subtitle": "NomNom Eats: Do push notifications cause user orders?",
     "background": {
-        "use_case": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager asks: <i>\"Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?\"</i>",
+        "setup": "You are the data science team at NomNom Eats, a food-delivery platform. The product manager walks over to your desk and asks:",
+        "question": "Do push notifications actually cause users to order, or are we just sending them to people who would order anyway?",
         "problem": "This is a causal question. The platform's targeting algorithm sends more notifications to users it predicts are hungry — and hungry users order more regardless. The naive association overstates the true effect due to confounding.",
         "premise": "We work with the NomNom DGP (Data-Generating Process) — a synthetic world with known ground truth, like a flight simulator for causal inference. Every estimate is checked against the true ATE computed by Monte Carlo under do(T=1) vs do(T=0).",
         "rungs": "Pearl's ladder of causation: (1) Association: P(Y|T), (2) Intervention: P(Y|do(T)), (3) Counterfactuals: P(Y(0)=0 | T=1, Y=1). This walkthrough climbs all three.",
@@ -257,6 +258,92 @@ data["content"] = {
             "Consistency: the observed outcome under T=t equals the potential outcome Y(t)"
         ],
         "ladder_climbed": "Rung 1 (P(Y|T): naive association) → Rung 2 (P(Y|do(T)): ATE identified via back-door) → Rung 3 (P(Y(0)=0 | T=1, Y=1): probability of necessity via abduction-action-prediction)"
+    },
+    "roadmap": [
+        {"station": 0, "name": "FRAME", "emoji": "🎯", "question": "What decision does this inform?", "brief": "Define the target trial and estimand before choosing methods"},
+        {"station": 1, "name": "ASSUME", "emoji": "📐", "question": "What causal structure do we believe?", "brief": "Encode beliefs as a versioned DAG — every absent edge is testable"},
+        {"station": 2, "name": "IDENTIFY", "emoji": "🔍", "question": "Can the effect be computed from observables?", "brief": "Graph surgery: find the adjustment set via the back-door criterion"},
+        {"station": 3, "name": "DATA", "emoji": "📊", "question": "Do the data support identification?", "brief": "Check positivity, measure the rung-1 vs rung-2 gap"},
+        {"station": 4, "name": "FEATURE", "emoji": "🔧", "question": "What enters — and what must not?", "brief": "Compile feature spec from DAG: exclude mediators and colliders"},
+        {"station": 5, "name": "MODEL", "emoji": "🧮", "question": "How do we estimate?", "brief": "AIPW with cross-fitting: ML for nuisances, orthogonality for the estimand"},
+        {"station": 6, "name": "EVALUATE", "emoji": "⚠️", "question": "How wrong could we be?", "brief": "E-value sensitivity: how strong must hidden confounding be to nullify?"},
+        {"station": 7, "name": "TEST", "emoji": "🧪", "question": "Does the machinery refute itself?", "brief": "Placebo, random cause, subset, negative control — stress-test the pipeline"},
+        {"station": 8, "name": "EVOLVE", "emoji": "🔄", "question": "Is the world still the one we modeled?", "brief": "Invariance monitor detects mechanism drift, actuator re-estimates autonomously"}
+    ],
+    "key_insight_preview": "By the end of this walkthrough, you'll see how a data scientist climbs Pearl's ladder: from 'the data says notifications boost orders by +0.347' (<b>Rung 1 — Seeing</b>), to 'the causal effect is +0.241' (<b>Rung 2 — Doing</b>), to '37% of these orders were actually caused by the notification' (<b>Rung 3 — Imagining</b>).",
+    "decomposition_tooltips": {
+        "P(Y|T=1)": "Probability of ordering given a notification was sent — a purely observational (Rung 1) quantity",
+        "P(Y|T=0)": "Probability of ordering given no notification — the untreated baseline (Rung 1)",
+        "U": "True hunger — the latent (unmeasured) confounder. The platform CANNOT see this variable.",
+        "W": "App-use history — the measured proxy for hunger. The platform targets notifications based on W.",
+        "do(T)": "The do-operator (Pearl): graph surgery that forces T to a value by cutting all incoming arrows. This is Rung 2.",
+        "Y(1)": "Potential outcome: what WOULD happen if the user received a notification (counterfactual, Rung 3)",
+        "Y(0)": "Potential outcome: what WOULD happen if the user did NOT receive a notification (counterfactual, Rung 3)",
+        "confounding bias": "The spurious difference between treated and untreated groups caused by shared causes (here: hunger U)",
+        "back-door path": "A non-causal path like T←W←U→Y — association flows through it without any causal effect of T on Y",
+        "rung 1": "Pearl's first rung: Association. P(Y|T) — passive observation, no intervention. 'What do the data show?'",
+        "rung 2": "Pearl's second rung: Intervention. P(Y|do(T)) — external manipulation, graph surgery. 'What happens if we force T?'",
+        "rung 3": "Pearl's third rung: Counterfactuals. P(Y(0)=0 | T=1,Y=1) — same unit, different treatment. 'Was it the notification that caused THIS order?'"
+    },
+    "assumption_tooltips": {
+        "ignorability": "Also called 'no unmeasured confounding' or 'conditional exchangeability'. The assumption that {Y(0),Y(1)} ⊥ T | X — all common causes of T and Y are measured and adjusted for. Untestable from data alone.",
+        "positivity": "Also called 'overlap'. Every unit must have 0 < P(T=1 | X=x) < 1 — non-zero probability of receiving either treatment. Without positivity, the ATE requires extrapolation.",
+        "SUTVA": "Stable Unit Treatment Value Assumption. Two parts: (1) No interference — one user's notification doesn't affect another's order. (2) Consistency — the treatment is well-defined and identical for all treated units.",
+        "consistency": "The observed outcome Y equals the potential outcome Y(t) under the treatment actually received: Y = T·Y(1) + (1-T)·Y(0). Links counterfactual notation to observed data.",
+        "estimand": "The quantity we aim to estimate. Here, the ATE: E[Y(1) − Y(0)] — the expected difference in order probability if everyone vs. no one were notified.",
+        "target trial": "The idealized RCT we would run if ethics and logistics allowed: randomize notifications, compare order rates. Specifying it first prevents method-driven (rather than question-driven) analysis (Hernán & Robins 2016).",
+        "ATE": "Average Treatment Effect. E[Y(1) − Y(0)]. The expected difference in outcomes if the entire population received treatment vs. if no one did. A Rung-2 quantity.",
+        "Monte Carlo": "A computational method that draws many random samples from a known distribution to approximate quantities (here: the true ATE). Only possible because the NomNom DGP is a synthetic world with known equations."
+    },
+    "concept_sketch": {
+        "title": "The Core Problem — A Sketch Before the Formal DAG",
+        "width": 640, "height": 240,
+        "hidden_box": {"x": 30, "y": 20, "w": 130, "h": 200, "label": "What the platform CANNOT see", "color": "#e8e8e8"},
+        "observed_box": {"x": 200, "y": 20, "w": 180, "h": 200, "label": "What the platform CAN see", "color": "#f0fdf4"},
+        "outcome_box": {"x": 450, "y": 60, "w": 160, "h": 120, "label": "What we want to affect", "color": "#eff6ff"},
+        "nodes": [
+            {"id": "U", "label": "U: True hunger", "x": 80, "y": 80, "color": "#e74c3c", "r": 22},
+            {"id": "W", "label": "W: App-use history", "x": 260, "y": 70, "color": "#f39c12", "r": 22},
+            {"id": "T", "label": "T: Notification sent", "x": 260, "y": 170, "color": "#2ecc71", "r": 22},
+            {"id": "Y", "label": "Y: Order placed", "x": 500, "y": 110, "color": "#2ecc71", "r": 22},
+            {"id": "C", "label": "rain, weekend, payday", "x": 320, "y": 125, "color": "#95a5a6", "r": 18}
+        ],
+        "edges": [
+            {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives app use"},
+            {"from": "U", "to": "Y", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives orders"},
+            {"from": "W", "to": "T", "color": "#64748b", "dash": "", "label": "platform targets on W"},
+            {"from": "T", "to": "Y", "color": "#2ecc71", "dash": "", "label": "causal effect — is it real?"},
+            {"from": "C", "to": "T", "color": "#95a5a6", "dash": "4,2", "label": ""},
+            {"from": "C", "to": "Y", "color": "#95a5a6", "dash": "4,2", "label": ""}
+        ],
+        "annotations": [
+            {"x": 80, "y": 35, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
+            {"x": 375, "y": 155, "text": "Is this path causal?", "color": "#2ecc71", "size": 9},
+            {"x": 375, "y": 168, "text": "Or just confounding?", "color": "#e74c3c", "size": 9}
+        ]
+    },
+    "decomposition_diagram": {
+        "title": "Decomposing the Naive Association",
+        "width": 560, "height": 200,
+        "bars": [
+            {"label": "Naive: P(Y|T=1) − P(Y|T=0)", "value_key": "naive", "color": "#e74c3c", "rung": "Rung 1"},
+            {"label": "True ATE: E[Y(1) − Y(0)]", "value_key": "truth", "color": "#2ecc71", "rung": "Rung 2"},
+            {"label": "Confounding Bias", "value_key": "gap", "color": "#f39c12", "rung": "Spurious"}
+        ],
+        "annotation": "Red = what the data show (Rung 1). Green = the causal truth (Rung 2). Orange = the spurious gap that adjustment must remove."
+    },
+    "data_snippet": {
+        "caption": "A glimpse of the raw data — what the analyst actually sees (5 of 20,000 rows):",
+        "columns": ["T", "Y", "W", "rain", "weekend", "payday"],
+        "column_descriptions": {
+            "T": "Treatment (0/1): notification sent?",
+            "Y": "Outcome (0/1): order placed?",
+            "W": "App-use history (continuous): proxy for hunger",
+            "rain": "Confounder (0/1): raining?",
+            "weekend": "Confounder (0/1): weekend?",
+            "payday": "Confounder (0/1): payday?"
+        },
+        "n_total": 20000
     },
     "dag": {
         "description": "The causal DAG (Directed Acyclic Graph) encodes everything we believe — and everything we DON'T believe — about how notifications and orders relate. Each arrow is an assumption; each absent arrow is a falsifiable claim.",
@@ -663,6 +750,13 @@ data["content"] = {
         {"term": "Positivity", "def": "Every unit has non-zero probability of receiving either treatment; checked at Station 3"},
     ],
 }
+
+# Populate the data_snippet with actual sample rows
+_snip_cols = data["content"]["data_snippet"]["columns"]
+_snip_df = dgp_sample(5, seed=42)[_snip_cols]
+data["content"]["data_snippet"]["rows"] = [
+    list(_snip_df.loc[i, _snip_cols].values) for i in range(5)
+]
 
 # ── Graph metadata (avoids hardcoding in HTML) ──
 from nomnom.graph import nomnom_graph as _nomnom_graph
