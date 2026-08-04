@@ -197,7 +197,86 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>Have <b>multiple independent experts</b> draw the graph for the same domain. Where they agree, confidence is higher. Where they disagree, those edges need investigation — they are the highest-value targets for experiments or data-driven testing.</p>
 </div>
 
-<h2>8. Classic Examples Beyond NomNom</h2>
+<h2>8. Critical Analysis — What Causal Graphs Can and Cannot Do</h2>
+
+<div class="card">
+<h3>8.1 Philosophical Foundations</h3>
+<p>Causal graphs are not discovered — they are <b>constructed</b>. This is a philosophical claim with practical consequences. A DAG is a <b>model</b>, not a measurement. It encodes beliefs about mechanisms (arrows) and absences of mechanisms (missing arrows). The distinction matters because:</p>
+<ul style="margin-left:20px">
+<li>There is no "true" DAG accessible to observation — only DAGs that are more or less consistent with data, domain knowledge, and predictive performance.</li>
+<li>The graph is <b>underdetermined by data</b>: infinitely many DAGs are consistent with any finite dataset. Choosing among them requires assumptions that cannot be empirically justified from the same data.</li>
+<li>This does not make DAGs useless — it makes them <b>honest</b>. A DAG makes assumptions explicit, versioned, and testable. That is precisely their value: they transform invisible assumptions into visible, debatable artifacts.</li>
+</ul>
+<div class="callout-info"><b>Cartwright's dictum (1999):</b> "No causes in, no causes out." A causal graph is only as good as the causal knowledge that went into it. If your experts are wrong, your graph is wrong — and no amount of data can fully rescue it.</div>
+</div>
+
+<div class="card">
+<h3>8.2 Epistemological Limits — What We Cannot Know</h3>
+<p>Every causal graph makes claims that are <b>untestable from observational data alone</b>:</p>
+
+<p><b>The problem of latent confounding.</b> You can never prove there is NO unmeasured confounder. The assumption of "no unmeasured confounding" (ignorability) is fundamentally untestable — it is a statement about what you <i>didn't</i> measure. Sensitivity analysis (E-values, Rosenbaum bounds) quantifies <i>how wrong you could be</i> but cannot tell you <i>whether you are wrong</i>.</p>
+
+<p><b>The problem of causal direction.</b> Given variables X and Y that are dependent, the data alone cannot distinguish X→Y from X←Y from X↔Y (with latent). You need one of: temporal order (causes precede effects), an intervention (do(X) changes Y but do(Y) doesn't change X), or a parametric assumption (non-Gaussianity in LiNGAM). Without these, the direction is unknowable.</p>
+
+<p><b>The problem of mechanism independence.</b> Causal graphs assume mechanisms are <b>modular</b> — changing one equation leaves others intact (Pearl's "autonomous mechanisms"). This assumption is philosophical, not empirical. If mechanisms are not modular (e.g., changing T→Y also changes how rain affects Y), the do-operator is ill-defined and the graph misrepresents reality.</p>
+
+<p><b>The problem of completeness.</b> You can never be sure you have included all relevant variables. An omitted variable that is a common cause of any two included variables <b>changes the graph structure</b> — edges you thought were direct may actually be confounded. Completeness is an aspiration, not an achievable state.</p>
+
+<div class="callout-red"><b>Agnostic conclusion:</b> We can never <i>verify</i> a causal graph. We can only <i>fail to falsify</i> it — and that only for the testable implications (absent edges). The untestable assumptions (no latent confounding, mechanism independence, completeness) remain articles of faith, however well-motivated.</div>
+</div>
+
+<div class="card">
+<h3>8.3 Logical Structure — Internal Consistency Checks</h3>
+<p>While we cannot verify a graph externally, we can check its <b>internal logical consistency</b>:</p>
+<ul style="margin-left:20px">
+<li><b>Acyclicity:</b> The graph must contain no directed cycles. If A→B→C→A, the model is logically inconsistent — each variable would "cause itself" through the loop. This is a hard constraint.</li>
+<li><b>d-separation consistency:</b> The independencies implied by the graph (via d-separation) must match the conditional independencies in the data. A mismatch is a <b>logical contradiction</b> — the graph claims X⊥Y|Z but the data says otherwise.</li>
+<li><b>Adjustment set validity:</b> For every identified causal effect, the adjustment set must satisfy the back-door criterion in the graph. If the graph is changed, all adjustment sets must be recomputed — they are <b>logically entailed</b> by the graph structure.</li>
+<li><b>No self-contradiction:</b> The graph cannot simultaneously imply X causes Y (via one path) and X does not cause Y (via d-separation).</li>
+</ul>
+<p>These are logical checks, not empirical ones. A graph that passes them is <b>internally consistent</b> — but still may be externally false.</p>
+</div>
+
+<div class="card">
+<h3>8.4 Practical Epistemology — How to Act Under Uncertainty</h3>
+<p>Given that we cannot verify causal graphs, how should we use them in practice?</p>
+
+<p><b>1. Version everything.</b> The graph is an assumption artifact. When it changes, record why, who changed it, and what evidence motivated the change. Every downstream result (estimate, policy recommendation) must be traceable to a specific graph version. This is the causal equivalent of git blame.</p>
+
+<p><b>2. Maintain multiple candidate graphs.</b> Rather than committing to a single DAG, maintain a <b>set of plausible graphs</b> — especially for edges where experts disagree. Compute the ATE under each candidate. If all plausible graphs give similar estimates, your conclusion is <b>robust to graph uncertainty</b>. If they diverge, you have identified where more evidence (an experiment) is needed.</p>
+
+<p><b>3. Falsify aggressively.</b> Every absent edge is a testable claim. Compile all d-separation implications into a test battery and run them against every new data batch. A sustained violation that survives multiple testing corrections is evidence that the graph is wrong — treat it like a failing unit test.</p>
+
+<p><b>4. Pre-register graph changes.</b> Before seeing new data that could revise the graph, specify what evidence would change which edges. This prevents post-hoc rationalization ("the graph changed because the estimate looked wrong").</p>
+
+<p><b>5. Quantify graph uncertainty.</b> Sensitivity analysis (E-values, Rosenbaum bounds, Bayesian model averaging over graphs) puts error bars on your causal conclusions that include graph uncertainty, not just sampling uncertainty. An estimate ± 0.01 (from sampling) that varies by ± 0.15 across plausible graphs is <b>dominated by graph uncertainty</b> — and honest reporting must reflect this.</p>
+</div>
+
+<div class="card">
+<h3>8.5 The Limits of Algorithmic Discovery</h3>
+<p>Causal discovery algorithms (PC, FCI, GES, LiNGAM) are valuable tools but they are not a substitute for domain knowledge:</p>
+<ul style="margin-left:20px">
+<li><b>They return equivalence classes, not DAGs.</b> Without additional assumptions, algorithms return a set of observationally equivalent structures — not a unique answer.</li>
+<li><b>They assume the data contain all relevant variables.</b> An omitted latent confounder can invert or create edges. FCI is robust to some latents but not all — and it cannot tell you if a latent it didn't detect actually exists.</li>
+<li><b>They are sensitive to methodological choices.</b> Different conditional independence tests (partial correlation, mutual information, kernel-based) can give different edge sets from the same data. The choice of test is itself an assumption.</li>
+<li><b>They cannot distinguish causation from prediction.</b> A graph that perfectly predicts the data may be causally wrong. High BIC score ≠ causal correctness.</li>
+</ul>
+<div class="callout-warn"><b>Bottom line:</b> Causal discovery algorithms are <b>hypothesis generators</b>, not truth-finding machines. They suggest candidate structures for expert review — they do not replace it. The most reliable approach remains: experts propose, algorithms test, humans judge.</div>
+</div>
+
+<div class="card">
+<h3>8.6 On LLMs and Causal Knowledge</h3>
+<p>The recent interest in using LLMs for causal graph construction deserves specific scrutiny:</p>
+<ul style="margin-left:20px">
+<li><b>LLMs are trained on text, not on interventions.</b> An LLM "knows" that rain correlates with umbrellas — but does it "know" that rain <i>causes</i> umbrella use? It has never intervened on rain. Its causal "knowledge" is extracted from patterns in observational language, which confounds causation with association.</li>
+<li><b>LLMs reflect training biases.</b> If the training corpus over-represents certain causal claims (e.g., "smoking causes cancer" appears 1000× more than "genetics confounds smoking and cancer"), the LLM will reproduce those frequencies — not necessarily the truth.</li>
+<li><b>LLMs are not calibrated for causal claims.</b> An LLM can state "X causes Y" with equal confidence whether the claim is well-established (T→M from RCTs), plausible but unverified (U→W from correlation), or false. There is no uncertainty quantification.</li>
+<li><b>LLMs can be useful as hypothesis generators.</b> Used as a <b>brainstorming tool</b> — "suggest candidate confounders I might have missed" — LLMs add value. Used as an <b>oracle</b> — "tell me what the causal graph is" — they are dangerous.</li>
+</ul>
+<div class="callout-red"><b>Principled position:</b> LLM outputs are <b>associational patterns in text</b>, not causal knowledge. They may correlate with causal truth (texts often describe real causal relationships) but they provide no guarantee. Every LLM-proposed edge must be validated against domain expertise and, where possible, data — exactly like human-proposed edges.</div>
+</div>
+
+<h2>9. Classic Examples Beyond NomNom</h2>
 <div class="card">
 <p>The graph-construction principles above apply universally. Here are three classic causal graphs from other domains that illustrate the same challenges:</p>
 
@@ -208,7 +287,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Education → Earnings (Griliches, 1970s).</b> Does more schooling cause higher wages? The graph must contend with unobserved ability (A) causing both education and earnings (A→Ed, A→Wage), family background confounding, and measurement error in schooling. Griliches used <b>instrumental variables</b> (family background as instrument for education) — a graph-based identification strategy — to estimate the causal effect. The graph drove the choice of method.</p>
 </div>
 
-<h2>9. Software & Tools</h2>
+<h2>10. Software & Tools</h2>
 <div class="card">
 <table>
 <tr><th>Tool</th><th>Methods</th><th>Best for</th></tr>
@@ -220,7 +299,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>10. Key References</h2>
+<h2>11. Key References</h2>
 <div class="card">
 <p>Spirtes, P., Glymour, C., & Scheines, R. (2000). <i>Causation, Prediction, and Search</i> (2nd ed.). MIT Press. — The foundational text on constraint-based causal discovery.</p>
 <p>Chickering, D. M. (2002). Optimal structure identification with greedy search. <i>JMLR</i>, 3, 507–554. — GES algorithm.</p>
