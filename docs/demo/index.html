@@ -786,6 +786,5 @@ function dagPopup(ev,nodeId){
   p.classList.add("on");p.style.left=Math.min(ev.clientX+10,window.innerWidth-420)+"px";p.style.top=Math.min(ev.clientY+10,window.innerHeight-300)+"px";
 }
 document.addEventListener("click",function(e){var p=document.getElementById("dagpopup");if(p&&!e.target.closest(".dagn")&&!e.target.closest(".dagpop"))p.classList.remove("on")});
-}
 </script>
 </body></html>
