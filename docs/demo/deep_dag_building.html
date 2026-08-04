@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dive: How Causal Graphs Are Built</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--dark:#0f172a;--border:#e2e8f0;--radius:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}h4{font-size:.92rem;margin:14px 0 6px;color:var(--purple)}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout{background:#f0fdf4;border-left:4px solid var(--green);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.callout-warn{background:#fffbeb;border-left-color:var(--orange)}
+.callout-info{background:#eff6ff;border-left-color:var(--blue)}
+.callout-red{background:#fef2f2;border-left-color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:6px 0}
+code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.88em}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+nav{display:flex;gap:12px;margin-bottom:20px;font-size:.88rem;flex-wrap:wrap}
+nav a{padding:4px 12px;border:1px solid var(--border);border-radius:20px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .15s}
+nav a:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+</style></head><body>
+
+<nav>
+<a href="index.html">← Main Walkthrough</a>
+<a href="deep_dgp.html">DGP</a>
+<a href="deep_backdoor.html">Back-Door</a>
+<a href="deep_evalue.html">E-value</a>
+<a href="deep_dag_building.html" class="current">DAG Building</a>
+</nav>
+
+<h1>📐 Deep Dive: How Causal Graphs Are Built</h1>
+<p style="color:var(--muted)">From expert knowledge to algorithmic discovery to LLM-assisted elicitation — the full spectrum of methods for constructing causal DAGs.</p>
+
+<h2>1. Why This Matters</h2>
+<div class="card">
+<p>Building a causal graph is the <b>hardest and most important step</b> in causal inference. The graph determines what you adjust for, what you exclude, what's identifiable, and what's testable. Get it wrong, and every downstream estimate — no matter how sophisticated — is biased.</p>
+<p>Unlike estimation (which can be automated), graph construction requires <b>domain knowledge</b>. No algorithm can tell you that "hunger" (a latent variable) drives both app-use and food orders — a human, familiar with how food-delivery platforms work, must encode that belief as edges in the DAG.</p>
+<div class="callout-info"><b>Key insight:</b> The graph is a <b>scientific model</b>, not a statistical summary. You cannot learn it from data alone without assumptions — at best, data can tell you which graphs are <i>consistent</i> with observed patterns, not which one is <i>correct</i>.</div>
+</div>
+
+<h2>2. The NomNom DAG — How We Built It</h2>
+<div class="card">
+<p>For the NomNom Eats use case, the graph was constructed primarily through <b>expert elicitation</b> combined with <b>domain constraints</b>:</p>
+<table>
+<tr><th>Edge</th><th>Justification</th><th>Source of Knowledge</th></tr>
+<tr><td>U → W</td><td>Hungrier users open the app more frequently, producing higher app-use metrics</td><td>Domain knowledge (product analytics)</td></tr>
+<tr><td>U → Y</td><td>Hungrier users order more food, regardless of notifications</td><td>Domain knowledge (user behavior)</td></tr>
+<tr><td>W → T</td><td>The targeting algorithm sends notifications based on observed app-use patterns</td><td>Engineering knowledge (system design)</td></tr>
+<tr><td>T → M</td><td>Receiving a notification increases the probability of opening the app</td><td>Prior A/B test results</td></tr>
+<tr><td>M → Y</td><td>Users who open the app are more likely to place an order</td><td>Funnel analytics</td></tr>
+<tr><td>T → Y</td><td>The causal target — does notification directly cause orders?</td><td>The question we are trying to answer</td></tr>
+<tr><td>Z → T</td><td>Randomized send-time jitter affects whether a notification is delivered</td><td>Engineering knowledge (experiment platform)</td></tr>
+<tr><td>T → S, Y → S</td><td>Engagement score is computed from notifications sent AND orders placed</td><td>Engineering knowledge (metric definition)</td></tr>
+<tr><td>U → NC</td><td>More app use → more battery drain; notifications don't drain batteries</td><td>Domain knowledge + physics</td></tr>
+<tr><td>rain, weekend, payday → T, Y</td><td>Weather and calendar affect both targeting strategy and ordering behavior</td><td>Domain knowledge + historical data</td></tr>
+</table>
+<div class="callout-warn"><b>54 absent edges.</b> Every pair of nodes without an arrow between them represents a deliberate claim: "there is NO direct causal relationship here." These absent edges are what make the graph <b>falsifiable</b> — each implies a conditional independence that data can test.</div>
+</div>
+
+<h2>3. Classical Methods for Building Causal Graphs</h2>
+
+<div class="card">
+<h3>3.1 Expert Elicitation</h3>
+<p>The oldest and most reliable method: ask people who understand the system.</p>
+<p>Domain experts — product managers, data scientists, engineers, subject-matter experts — draw arrows based on their understanding of <b>how the system actually works</b>. A PM knows the targeting algorithm uses app-use history (W→T). An engineer knows send-time jitter is randomized (Z→T). A data scientist knows engagement scores are computed from notifications and orders (T→S, Y→S).</p>
+<p><b>Strengths:</b> Encodes genuine causal knowledge; no algorithm can replace human understanding of mechanisms.<br>
+<b>Limitations:</b> Experts can disagree; cognitive biases (overconfidence, anchoring); doesn't scale to hundreds of variables. Best combined with data-driven validation.</p>
+</div>
+
+<div class="card">
+<h3>3.2 Literature Review & Prior Evidence</h3>
+<p>Published studies, prior RCTs, and established theory constrain the graph. If prior experiments show that notifications increase app-opens, the edge T→M is supported by evidence — not just intuition. If no plausible physical mechanism exists for notifications to drain batteries, the absent edge T↛NC is a defensible, falsifiable claim.</p>
+<p><b>Strengths:</b> Evidence-based; reproducible; builds on cumulative scientific knowledge.<br>
+<b>Limitations:</b> Published studies may not generalize to your context (transportability problem); literature may be sparse for novel domains.</p>
+</div>
+
+<div class="card">
+<h3>3.3 Constraint-Based Discovery — PC & FCI Algorithms</h3>
+<p>Starting from the data alone, constraint-based algorithms test <b>conditional independence</b> relations to infer graph structure. The core idea (Spirtes, Glymour & Scheines 1991):</p>
+<ol style="margin-left:20px">
+<li>Start with a fully connected undirected graph.</li>
+<li>For each pair (X, Y), test whether X ⊥ Y | Z for some conditioning set Z. If yes, remove the edge X–Y — they are not directly connected.</li>
+<li>Orient edges using collider patterns: if X–Z–Y is in the graph, and Z was NOT conditioned on when X and Y became independent, then Z is a collider (X→Z←Y).</li>
+</ol>
+<p><b>PC algorithm (Spirtes et al. 2000):</b> Assumes no latent confounders. Fast and widely used.<br>
+<b>FCI algorithm (Spirtes et al. 1995):</b> Allows latent variables — correctly leaves U as latent rather than forcing an edge. More conservative but more honest.</p>
+<div class="callout-warn"><b>Key limitation — Markov equivalence:</b> PC cannot distinguish X→Y from X←Y from X↔Y (with latent) when they belong to the same Markov equivalence class. A graph with edges A→B→C is observationally indistinguishable from A←B←C — both imply A ⊥ C | B. <b>You need additional assumptions</b> (temporal order, intervention, domain knowledge) to orient edges.</div>
+</div>
+
+<div class="card">
+<h3>3.4 Score-Based Discovery — GES</h3>
+<p>Score-based methods search over possible graph structures, scoring each by how well it fits the data using information criteria:</p>
+<p class="formula"><span id="eq-bic"></span></p>
+<p><b>Greedy Equivalence Search (Chickering 2002):</b> Start with an empty graph. Greedily add edges that improve the score (forward phase), then remove edges that no longer help (backward phase). Repeat until convergence. The result is the highest-scoring Markov equivalence class.</p>
+<p><b>Strengths:</b> Scalable to many variables; clear optimization objective.<br>
+<b>Limitations:</b> Scores measure <b>fit</b>, not causation. A well-fitting graph may still get causal directions wrong. Like PC, GES returns an equivalence class, not a fully oriented DAG.</p>
+</div>
+
+<div class="card">
+<h3>3.5 Functional Causal Discovery — LiNGAM</h3>
+<p>If you are willing to assume <b>linear, non-Gaussian</b> structural equations, LiNGAM (Shimizu et al. 2006) can uniquely identify the full DAG — including edge directions — from observational data alone. The non-Gaussian assumption breaks the Markov equivalence: the asymmetry in noise distributions reveals causal direction.</p>
+<p><b>Strengths:</b> Full DAG identification without interventions; unique solution.<br>
+<b>Limitations:</b> Strong parametric assumptions (linearity, non-Gaussian noise); doesn't handle latent confounders well.</p>
+</div>
+
+<h2>4. Agentic AI & LLM-Powered Methods</h2>
+
+<div class="card">
+<h3>4.1 LLM-Assisted Causal Elicitation</h3>
+<p>Large language models, prompted with domain context (e.g., "a food-delivery platform's notification system"), can propose candidate causal graphs by drawing on patterns from their training data. The LLM might suggest:</p>
+<ul style="margin-left:20px">
+<li>"Hunger likely confounds both app-use and orders — these should share a latent parent."</li>
+<li>"Engagement scores are typically computed from user actions — they are likely colliders, not confounders."</li>
+<li>"Weather and calendar variables affect both notification strategy and order behavior — they are likely confounders."</li>
+</ul>
+<p>These suggestions are <b>hypotheses to be validated</b>, not final answers. But they dramatically accelerate the elicitation process by providing a structured starting point that domain experts can critique, refine, and correct.</p>
+<p><b>Key references:</b> Kıcıman et al. (2024) "Causal Reasoning and Large Language Models"; Long et al. (2024) "CausalGPT"; Darvariu et al. (2025) "LLMs for Causal Graph Construction."</p>
+<div class="callout-red"><b>Critical caveat:</b> LLMs can hallucinate causal relationships that sound plausible but are false. Every LLM-proposed edge must be validated against domain knowledge and, where possible, data. The LLM is an <b>accelerator</b>, not an oracle.</div>
+</div>
+
+<div class="card">
+<h3>4.2 Agentic Causal Discovery Loops</h3>
+<p>An LLM-powered agent iteratively refines a causal graph through a structured loop:</p>
+<ol style="margin-left:20px">
+<li><b>Propose:</b> Based on variable names, descriptions, and domain context, the agent proposes candidate edges with natural-language justifications.</li>
+<li><b>Test:</b> Each proposed edge is tested against the data using conditional independence tests. Edges that imply testable constraints (d-separation → CI) are empirically evaluated.</li>
+<li><b>Revise:</b> Edges that fail empirical tests are removed or re-oriented. The agent explains <i>why</i> each revision was made in natural language.</li>
+<li><b>Explain:</b> The agent produces an audit trail: which edges were proposed, which survived testing, which were rejected, and the evidence for each decision.</li>
+</ol>
+<p>This combines the scalability of automated discovery with the interpretability of human judgment. The human expert reviews the agent's output and provides feedback, closing the loop.</p>
+</div>
+
+<div class="card">
+<h3>4.3 LLM + Knowledge Graphs (KGs)</h3>
+<p>When the domain has an existing knowledge graph — e.g., a company ontology linking "notification" → "user engagement" → "order" — the LLM can ground its causal hypotheses in structured, versioned knowledge:</p>
+<ul style="margin-left:20px">
+<li>The <b>KG provides vocabulary and known relationships</b> — a machine-readable map of what the organization already knows.</li>
+<li>The <b>LLM fills gaps</b> — proposing causal directions for relationships that are correlated in the KG but not causally annotated.</li>
+<li>The <b>resulting DAG is version-controlled</b> alongside the KG — every edge has provenance (human expert, LLM proposal, data-driven test, or combination).</li>
+</ul>
+<p>This approach is particularly valuable in enterprise settings where knowledge is distributed across teams, documents, and databases.</p>
+</div>
+
+<h2>5. Synthesis — How to Build a Graph in Practice</h2>
+<div class="card">
+<p>In practice, graph construction is <b>iterative</b> and <b>multi-method</b>. A realistic workflow:</p>
+<ol style="margin-left:20px">
+<li><b>Start with expert elicitation</b> — get the obvious edges right using domain knowledge.</li>
+<li><b>Augment with literature</b> — anchor disputed edges in published evidence.</li>
+<li><b>Use LLMs to propose candidates</b> — let the model suggest edges you might have missed. Review critically.</li>
+<li><b>Test with constraint-based discovery</b> — run PC/FCI on data to see which proposed edges are consistent with observed independence patterns. Remove edges that are empirically contradicted.</li>
+<li><b>Validate absent edges</b> — every edge you did NOT draw is a claim. Test it. If the data says two variables are dependent even after conditioning, your absent-edge claim may be wrong.</li>
+<li><b>Version control everything</b> — the graph is an assumption artifact. When it changes, record why, and recompile all downstream results (adjustment sets, estimates, monitors).</li>
+</ol>
+<div class="callout"><b>Core principle:</b> A causal graph is never "finished" — it is a living hypothesis about how the world works. It must be <b>testable</b> (via absent edges), <b>versioned</b> (so estimates are traceable), and <b>evolvable</b> (so new evidence can revise it). The NomNom DAG has 54 absent edges — each one is an invitation to falsify.</div>
+</div>
+
+<h2>6. Key References</h2>
+<div class="card">
+<p>Spirtes, P., Glymour, C., & Scheines, R. (2000). <i>Causation, Prediction, and Search</i> (2nd ed.). MIT Press. — The foundational text on constraint-based causal discovery.</p>
+<p>Chickering, D. M. (2002). Optimal structure identification with greedy search. <i>JMLR</i>, 3, 507–554. — GES algorithm.</p>
+<p>Shimizu, S., Hoyer, P. O., Hyvärinen, A., & Kerminen, A. (2006). A linear non-Gaussian acyclic model for causal discovery. <i>JMLR</i>, 7, 2003–2030. — LiNGAM.</p>
+<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. — Ch. 2: graph fundamentals; Ch. 3: d-separation and testable implications.</p>
+<p>Kıcıman, E. et al. (2024). Causal reasoning and large language models: Opening a new frontier for causality. <i>arXiv:2305.00050</i>.</p>
+<p>Darvariu, V.-A. et al. (2025). Leveraging large language models for causal graph construction. <i>arXiv</i>.</p>
+</div>
+
+<script>
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+document.getElementById("eq-bic").innerHTML=M("\\text{BIC}(G) = -2\\log P(D \\mid \\hat{\\theta}_G) + k \\log n");
+</script>
+</body>
+</html>
