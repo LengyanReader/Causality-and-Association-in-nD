@@ -687,7 +687,16 @@ function build(){
   if(D.stability_chart)h+=buildStabilityChart(D.stability_chart);
   if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
     h+='<table><tr><th>Node</th><th>Degradation</th><th>Status</th></tr>';for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
-    h+='</table><p><b>Drift: '+D.evolve.worst+'</b> - exactly the mechanism we changed.</p>';}
+    h+='</table><p><b>Mechanism drift localized to: '+D.evolve.worst+'</b></p>';
+    // Show marginal alarms too
+    if(D.evolve.marginal_alarms){var ma=D.evolve.marginal_alarms;var makeys=Object.keys(ma).sort(function(a,b){return ma[b].z_score-ma[a].z_score});
+      h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem;color:var(--muted)">Show marginal-distribution shifts ('+makeys.length+' variables monitored)</summary>';
+      h+='<table style="margin-top:6px"><tr><th>Variable</th><th>z-score</th><th>Interpretation</th></tr>';
+      for(var j=0;j<makeys.length;j++){var kn=makeys[j],kv=ma[kn],alarm=kv.z_score>4;
+        h+='<tr><td><b>'+kn+'</b></td><td style="color:'+(alarm?'var(--red)':'var(--green))+'">'+kv.z_score.toFixed(1)+'</td><td>'+(alarm?'<b>Shift detected</b> — marginal distribution changed':'Stable — within normal range')+'</td></tr>';
+      }
+      h+='</table><p style="font-size:.76rem;color:var(--muted);margin-top:4px">Marginal shifts are distinct from mechanism drift under the invariance principle (Peters et al. 2016): a change in P(X) does not imply a change in P(Y|pa(Y)). The holiday regime intentionally shifted p_rain (0.30->0.15) alongside the T->M mechanism change.</p></details>';}
+    }
   if(D.actuator&&c.actuator_section){h+='<div class="callout cg">'+c.actuator_section.explanation+'</div>';
     h+='<table>'+row("Holiday ATE",fmt(D.actuator.ate))+row("Truth",fmt(D.actuator.truth))+row("CI Covers",badge(String(D.actuator.covers),D.actuator.covers))+'</table>';}h+='</div>';
   h+='<h2 id="s6"><span class="cn">6</span> Was THIS Order Caused?</h2>';
@@ -716,7 +725,7 @@ function build(){
 }
 
 function buildStation(s,rd){
-  var h='<div class="card"><h3>Station '+s.number+' '+s.emoji+' '+s.name+'</h3><p style="color:var(--muted);font-size:.92rem"><i>'+s.question+'</i></p>';
+  var h='<div class="card" id="station-'+s.id+'"><h3>Station '+s.number+' '+s.emoji+' '+s.name+'</h3><p style="color:var(--muted);font-size:.92rem"><i>'+s.question+'</i></p>';
   if(s.explanation)h+='<div class="callout">'+s.explanation+'</div>';if(s.formula)h+='<p><span class="formula">'+M(s.formula)+'</span></p>';
   var ds=D.dag_stats||{};
   if(s.id==="data"){h+='<div class="step-box"><b>How:</b> (1) Sample '+rd.n_rows+' obs. (2) Check positivity. (3) Compare rung-1 naive vs rung-2 truth.</div>';h+='<table>'+row("Positivity",badge(String(rd.positivity_ok),rd.positivity_ok))+'</table><table><tr><th>Contrast</th><th>Value</th><th>Rung</th></tr><tr><td>P(Y|T=1)-P(Y|T=0)</td><td><b>'+fmt(rd.naive||0)+'</b></td><td>1</td></tr><tr><td>E[Y|do(T=1)]-E[Y|do(T=0)]</td><td><b>'+fmt(rd.truth||0)+'</b></td><td>2</td></tr><tr><td style="color:var(--red)"><b>Gap</b></td><td style="color:var(--red)"><b>'+fmt(rd.gap||0)+'</b></td></tr></table>';}
