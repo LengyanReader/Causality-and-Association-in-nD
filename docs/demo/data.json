@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.2279,
+    "ci_low": 0.228,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.001890585128565579, 'tolerance': 0.013353651039723738}"
+        "detail": "{'estimate': 0.0019227401921103112, 'tolerance': 0.013352627273266004}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 2.3527158122454983e-05, 'tolerance': 0.00802544988066307}"
+        "detail": "{'delta': 2.143869840973145e-05, 'tolerance': 0.00802584680307581}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005221922125633521, 'tolerance': 0.01855536927679161}"
+        "detail": "{'delta': 0.0051600170364937414, 'tolerance': 0.01853988448477275}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008221001524253589, 'tolerance': 0.014538936579813996}"
+        "detail": "{'estimate': -0.0008030878039962072, 'tolerance': 0.014537070171408366}"
       }
     ],
     "naive": 0.3467,
@@ -52,7 +52,7 @@
   "holiday": {
     "ate": 0.1925,
     "ci_low": 0.177,
-    "ci_high": 0.2081,
+    "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
     "mu1": 0.5755,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004351094534768485, 'tolerance': 0.013361684732977606}"
+        "detail": "{'estimate': 0.004348560522163866, 'tolerance': 0.013361755783479586}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012818144766356676, 'tolerance': 0.007932621049797674}"
+        "detail": "{'delta': 0.0012192937533793413, 'tolerance': 0.0079327641684363}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005063135691607684, 'tolerance': 0.018334445856733193}"
+        "detail": "{'delta': 0.005053411824283011, 'tolerance': 0.01833470738691098}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004310534561434369, 'tolerance': 0.014174772477914302}"
+        "detail": "{'estimate': -0.004541080514697007, 'tolerance': 0.014167024225336278}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0082,
+      "M": 0.0083,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -217,7 +217,7 @@
       },
       {
         "name": "Y",
-        "degradation": 0.0081,
+        "degradation": 0.008,
         "alarm": false
       },
       {
@@ -486,11 +486,11 @@
     },
     "problem_formulation": {
       "question": "Do push notifications cause users to place orders?",
-      "why_causal": "Here is what we observe in the raw data. The naive difference P(Y|T=1) - P(Y|T=0) is approximately <b>+0.343</b>. If we (incorrectly) interpret this as causal, we would conclude notifications boost orders by 34 percentage points. But this number is <b>not</b> the causal effect — it mixes together two fundamentally different things. We will now decompose it, and later verify the decomposition against the ground truth ATE.",
+      "why_causal": "Here is what we observe in the raw data. The naive difference P(Y|T=1) - P(Y|T=0) is approximately <b>+0.347</b>. If we (incorrectly) interpret this as causal, we would conclude notifications boost orders by 34 percentage points. But this number is <b>not</b> the causal effect — it mixes together two fundamentally different things. We will now decompose it, and later verify the decomposition against the ground truth ATE.",
       "confounding_breakdown": [
-        "<b>[Observation] The raw naive difference.</b> Looking at the data: P(Y|T=1) − P(Y|T=0) ≈ +0.343. If we naively interpret this as causal, we would conclude notifications boost orders by 34 percentage points. This is what the raw data shows — but it is rung 1, not rung 2.",
+        "<b>[Observation] The raw naive difference.</b> Looking at the data: P(Y|T=1) − P(Y|T=0) ≈ +0.347. If we naively interpret this as causal, we would conclude notifications boost orders by 34 percentage points. This is what the raw data shows — but it is rung 1, not rung 2.",
         "<b>[Prediction — to be verified] Component A — the true causal effect.</b> Based on the structure of the DGP (which we can inspect because this is a synthetic world), we expect the actual causal effect of notifications on orders to be ≈ +0.241. This prediction will be tested by the estimation pipeline.",
-        "<b>[Prediction — to be verified] Component B — confounding bias.</b> The spurious difference introduced by the platform's targeting: the gap should be ≈ +0.102. This is what the back-door adjustment must remove.",
+        "<b>[Prediction — to be verified] Component B — confounding bias.</b> The spurious difference introduced by the platform's targeting: the gap should be ≈ +0.105. This is what the back-door adjustment must remove.",
         "<b>[Assumption — from domain knowledge] Mechanism 1 — why confounding exists (targeting).</b> True hunger U drives app-use W (U → W), and the platform targets notifications based on W (W → T). As a result, treated users are systematically hungrier than untreated users.",
         "<b>[Assumption — from domain knowledge] Mechanism 2 — why confounding exists (outcome).</b> Hunger U also drives orders directly (U → Y). Even without any causal effect of notifications, hungrier (treated) users would order more.",
         "<b>[Implication] Net result.</b> The treated group has a higher baseline order rate <i>even with no causal effect of notifications</i>. This is the confounding gap. Only by conditioning on W (blocking the back-door path U→W→T ... U→Y) can we separate the causal signal from this confounding noise. We will verify this by comparing the adjusted estimate to the known ground truth."
@@ -1152,7 +1152,7 @@
           "pitfalls": [
             {
               "mistake": "“Just compare P(Y|T=1) and P(Y|T=0)”",
-              "consequence": "The naive associational difference is confounded. In our data it’s +0.343 vs. the true ATE +0.241 — a 42% overestimate.",
+              "consequence": "The naive associational difference is confounded. In our data it’s +0.347 vs. the true ATE +0.241 — a 42% overestimate.",
               "why": "Without adjusting for confounders, the back-door path T←W←U→Y remains open, mixing causal and spurious association."
             },
             {
@@ -1328,16 +1328,16 @@
           "balance_threshold": "|SMD| < 0.1 after IPW weighting"
         },
         "thinking": {
-          "takeaway": "The naive association (+0.343) overstates the truth (+0.241) by 42% — confounding is real and measurable",
+          "takeaway": "The naive association (+0.347) overstates the truth (+0.241) by 42% — confounding is real and measurable",
           "symbolic": "\\text{Positivity: } \\forall x \\text{ where } P(X=x) > 0:\\; 0 < P(T=1 \\mid X=x) < 1 \\\\\n\\text{Confounding decomposition: } \\underbrace{P(Y \\mid T=1) - P(Y \\mid T=0)}_{\\text{rung 1 (naive)}} = \\underbrace{E[Y(1)-Y(0)]}_{\\text{rung 2 (causal)}} + \\underbrace{\\text{confounding bias}}_{\\text{back-door paths}}",
           "steps": [
             {
               "label": "Mental operation 1: Look at the raw numbers",
-              "detail": "We sample 20,000 observations from the NomNom DGP. <b>Raw P(Y=1 \\mid T=1) = 0.613, P(Y=1 \\mid T=0) = 0.268.</b> The naive difference is +0.345. If we (incorrectly) reported this as the causal effect, we would claim notifications increase orders by 34.5 percentage points."
+              "detail": "We sample 20,000 observations from the NomNom DGP. <b>Raw P(Y=1 \\mid T=1) = 0.613, P(Y=1 \\mid T=0) = 0.268.</b> The naive difference is +0.347. If we (incorrectly) reported this as the causal effect, we would claim notifications increase orders by 34.5 percentage points."
             },
             {
               "label": "Mental operation 2: Decompose the naive difference",
-              "detail": "The naive difference = causal effect + confounding bias. From the DGP’s Monte Carlo truth: causal effect = +0.241. So confounding bias = 0.345 − 0.241 = +0.104. <b>42% of the naive association is spurious</b> — it comes from the back-door path T←W←U→Y, not from any causal effect of T on Y."
+              "detail": "The naive difference = causal effect + confounding bias. From the DGP’s Monte Carlo truth: causal effect = +0.241. So confounding bias = +0.347 − +0.241 = +0.105. <b>42% of the naive association is spurious</b> — it comes from the back-door path T←W←U→Y, not from any causal effect of T on Y."
             },
             {
               "label": "Mental operation 3: Check positivity (do the data support the identification?)",
@@ -1349,12 +1349,12 @@
             },
             {
               "label": "Conclusion",
-              "detail": "The rung-1 answer (+0.345) is <b>wrong</b> by ~10 percentage points. No amount of data or statistical sophistication closes this gap. Gap-closing requires <b>assumptions</b> (the DAG) and <b>identification</b> (the back-door criterion). That’s what stations 1 and 2 provided. Now we verify the data meet the conditions."
+              "detail": "The rung-1 answer (+0.347) is <b>wrong</b> by ~10 percentage points. No amount of data or statistical sophistication closes this gap. Gap-closing requires <b>assumptions</b> (the DAG) and <b>identification</b> (the back-door criterion). That’s what stations 1 and 2 provided. Now we verify the data meet the conditions."
             }
           ],
           "derivation": {
             "title": "Decomposing the naive association gap",
-            "body": "Without adjustment:<br>P(Y=1 \\mid T=1) − P(Y=1 \\mid T=0) = 0.613 − 0.268 = <b>+0.345</b><br><br>With adjustment (back-door):<br>E[Y \\mid do(T=1)] − E[Y \\mid do(T=0)] = <b>+0.241</b> (ground truth)<br><br>The gap: 0.345 − 0.241 = <b>+0.104</b><br><br>This +0.104 is the confounding bias — the spurious difference created by the back-door path T←W←U→Y. Treated users are systematically hungrier (U↑), and hungrier users order more (U→Y). The naive comparison attributes this hunger-driven difference to T, but it has nothing to do with notifications."
+            "body": "Without adjustment:<br>P(Y=1 \\mid T=1) − P(Y=1 \\mid T=0) = 0.613 − 0.268 = <b>+0.347</b><br><br>With adjustment (back-door):<br>E[Y \\mid do(T=1)] − E[Y \\mid do(T=0)] = <b>+0.241</b> (ground truth)<br><br>The gap: +0.347 − +0.241 = <b>+0.105</b><br><br>This +0.105 is the confounding bias — the spurious difference created by the back-door path T←W←U→Y. Treated users are systematically hungrier (U↑), and hungrier users order more (U→Y). The naive comparison attributes this hunger-driven difference to T, but it has nothing to do with notifications."
           },
           "logic": [
             {
@@ -1373,13 +1373,13 @@
               "if": "The naive gap ≠ 0",
               "then": "Confounding exists — adjustment is necessary",
               "holds": true,
-              "note": "Gap = +0.104, 42% of naive estimate"
+              "note": "Gap = +0.105, 42% of naive estimate"
             }
           ],
           "pitfalls": [
             {
-              "mistake": "“The naive difference is +0.345, so notifications increase orders by 34.5 pp”",
-              "consequence": "This is NOT the causal effect. It mixes the true ATE (+0.241) with confounding bias (+0.104). The analyst has confused rung 1 (seeing) with rung 2 (doing).",
+              "mistake": "“The naive difference is +0.347, so notifications increase orders by 34.5 pp”",
+              "consequence": "This is NOT the causal effect. It mixes the true ATE (+0.241) with confounding bias (+0.105). The analyst has confused rung 1 (seeing) with rung 2 (doing).",
               "why": "Without adjusting for confounders, the back-door path remains open. Treated and untreated users are not comparable."
             },
             {
@@ -1492,7 +1492,7 @@
             },
             {
               "label": "Mental operation 4: Interpret the result",
-              "detail": "Our AIPW estimate: ATE = <b>+0.2437</b>, 95% CI = [0.2280, 0.2594], ground truth = +0.2413. <b>CI covers truth ✓.</b> SE = 0.008. The estimator recovered the causal effect within 0.002 of the Monte Carlo truth."
+              "detail": "Our AIPW estimate: ATE = <b>+0.2437</b>, 95% CI = [0.2280, 0.2594], ground truth = +0.241. <b>CI covers truth ✓.</b> SE = 0.0080. The estimator recovered the causal effect within 0.002 of the Monte Carlo truth."
             },
             {
               "label": "Conclusion",
@@ -1558,7 +1558,7 @@
           "SMD threshold": "< 0.1 = adequate covariate balance"
         },
         "thinking": {
-          "takeaway": "An estimate without sensitivity analysis is an open-loop claim — E-value = 2.73 means moderately robust",
+          "takeaway": "An estimate without sensitivity analysis is an open-loop claim — E-value = 2.72 means moderately robust",
           "symbolic": "\\text{E-value (VanderWeele & Ding 2017):} \\\\\n\\text{Let } RR_{\\text{obs}} = \\frac{P(Y=1 \\mid T=1)}{P(Y=1 \\mid T=0)} \\text{ (risk ratio)} \\\\\nE\\text{-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}} \\cdot (RR_{\\text{obs}} - 1)} \\\\\n\\text{Interpretation: } \\exists \\text{ unmeasured } U \\text{ that explains away the effect} \\Rightarrow RR_{TU} \\geq E\\text{-value} \\land RR_{UY} \\geq E\\text{-value}",
           "steps": [
             {
@@ -1571,11 +1571,11 @@
             },
             {
               "label": "Mental operation 3: Compute the E-value",
-              "detail": "Plug RR = 1.67 into the formula: <b>E-value = 1.67 + √(1.67 × 0.67) = 1.67 + √(1.119) = 1.67 + 1.058 = 2.73.</b> An unmeasured confounder would need a risk ratio of <b>at least 2.73 with BOTH T and Y</b>, above and beyond the 4 measured covariates, to reduce the true effect to zero."
+              "detail": "Plug RR = 1.67 into the formula: <b>E-value = 1.67 + √(1.67 × 0.67) = 1.67 + √(1.119) = 1.67 + 1.058 = 2.72.</b> An unmeasured confounder would need a risk ratio of <b>at least 2.72 with BOTH T and Y</b>, above and beyond the 4 measured covariates, to reduce the true effect to zero."
             },
             {
-              "label": "Mental operation 4: Calibrate — is RR=2.73 plausible?",
-              "detail": "Smoking → lung cancer: RR ≈ 10-20. Moderate exercise → cardiovascular health: RR ≈ 2-3. Obesity → diabetes: RR ≈ 3-5. An RR of 2.73 is <b>moderately strong</b> — roughly comparable to the exercise-CVD association. Our finding is <b>moderately robust but not ironclad.</b> If a domain expert believes a confounder with RR ≥ 2.73 exists, the result is at risk."
+              "label": "Mental operation 4: Calibrate — is RR=2.72 plausible?",
+              "detail": "Smoking → lung cancer: RR ≈ 10-20. Moderate exercise → cardiovascular health: RR ≈ 2-3. Obesity → diabetes: RR ≈ 3-5. An RR of 2.72 is <b>moderately strong</b> — roughly comparable to the exercise-CVD association. Our finding is <b>moderately robust but not ironclad.</b> If a domain expert believes a confounder with RR ≥ 2.72 exists, the result is at risk."
             },
             {
               "label": "Mental operation 5: Conservative check with CI bound",
@@ -1583,7 +1583,7 @@
             },
             {
               "label": "Conclusion",
-              "detail": "An estimate without a sensitivity analysis is an open-loop claim. The E-value closes the loop: it quantifies the debate about unmeasured confounding in a common, calibratable language. RR ≥ 2.73 is a concrete claim an adversary must make to dismiss the result."
+              "detail": "An estimate without a sensitivity analysis is an open-loop claim. The E-value closes the loop: it quantifies the debate about unmeasured confounding in a common, calibratable language. RR ≥ 2.72 is a concrete claim an adversary must make to dismiss the result."
             }
           ],
           "derivation": {
@@ -1595,19 +1595,19 @@
               "if": "E-value > 5",
               "then": "Finding is highly robust — very strong unmeasured confounding needed",
               "holds": false,
-              "note": "Our E-value = 2.73, not > 5"
+              "note": "Our E-value = 2.72, not > 5"
             },
             {
               "if": "E-value > 2",
               "then": "Finding is moderately robust",
               "holds": true,
-              "note": "Our E-value = 2.73 > 2 ✓"
+              "note": "Our E-value = 2.72 > 2 ✓"
             },
             {
               "if": "E-value < 1.5",
               "then": "Finding is fragile — modest confounding could explain it away",
               "holds": false,
-              "note": "Our E-value = 2.73 > 1.5 ✓"
+              "note": "Our E-value = 2.72 > 1.5 ✓"
             }
           ],
           "pitfalls": [
@@ -1723,7 +1723,7 @@
             },
             {
               "label": "Mental operation 3: Run the monitor on the holiday batch",
-              "detail": "For each endogenous node, fit P(node \\mid parents) on the static reference batch (10k obs), then evaluate log-loss on the holiday batch (10k obs). <b>Results:</b> M (app-open) degradation = +0.024 nats >> alarm threshold 0.02 → <b>DRIFT DETECTED.</b> Y (order) degradation = +0.008 nats < 0.02 → <b>Y mechanism INVARIANT.</b> All other nodes stable."
+              "detail": "For each endogenous node, fit P(node \\mid parents) on the static reference batch (10k obs), then evaluate log-loss on the holiday batch (10k obs). <b>Results:</b> M (app-open) degradation = +0.1163 nats >> alarm threshold 0.02 → <b>DRIFT DETECTED.</b> Y (order) degradation = +0.0080 nats < 0.02 → <b>Y mechanism INVARIANT.</b> All other nodes stable."
             },
             {
               "label": "Mental operation 4: Localize the drift",
@@ -1731,7 +1731,7 @@
             },
             {
               "label": "Mental operation 5: Fire the actuator",
-              "detail": "Drift detected → actuator fires: <b>re-run the full UCL pass on the holiday regime autonomously.</b> Same DAG, same identification, same estimation pipeline. Holiday ATE = +0.198 (truth = +0.194), CI covers truth ✓, all refuters green ✓. <b>The loop closed — zero human intervention.</b>"
+              "detail": "Drift detected → actuator fires: <b>re-run the full UCL pass on the holiday regime autonomously.</b> Same DAG, same identification, same estimation pipeline. Holiday ATE = +0.193 (truth = +0.194), CI covers truth ✓, all refuters green ✓. <b>The loop closed — zero human intervention.</b>"
             },
             {
               "label": "Conclusion",
@@ -1747,13 +1747,13 @@
               "if": "A mechanism P(V \\mid pa(V)) degrades beyond threshold",
               "then": "Either the parents are wrong OR the mechanism genuinely changed → DRIFT DETECTED",
               "holds": true,
-              "note": "M degradation = 0.024 > 0.02 → DRIFT"
+              "note": "M degradation = +0.1163 > 0.02 → DRIFT"
             },
             {
               "if": "The Y mechanism is invariant (degradation < threshold)",
               "then": "The outcome-generating process is stable; the DAG’s structure for Y is correct",
               "holds": true,
-              "note": "Y degradation = 0.008 < 0.02 → INVARIANT"
+              "note": "Y degradation = 0.0080 < 0.02 → INVARIANT"
             },
             {
               "if": "Drift is detected and localized",
@@ -1817,14 +1817,14 @@
       {
         "from_station": "model",
         "to_station": "evaluate",
-        "symbolic_link": "\\hat{\\tau} = 0.2437, \\; 95\\%\\text{CI} = [0.228, 0.259] \\;\\longrightarrow\\; E\\text{-value} = RR + \\sqrt{RR(RR-1)} = 2.73",
+        "symbolic_link": "\\hat{\\tau} = +0.2437, \\; 95\\%\\text{CI} = [0.228, 0.259] \\;\\longrightarrow\\; E\\text{-value} = RR + \\sqrt{RR(RR-1)} = 2.72",
         "narrative": "We have a precise estimate. Now we ask: how wrong could we be? The E-value quantifies the minimum strength an unmeasured confounder would need with BOTH T and Y to explain away the effect. No sensitivity analysis = no closed loop.",
         "key_question": "What is the minimum strength of unmeasured confounding needed to nullify our result?"
       },
       {
         "from_station": "evaluate",
         "to_station": "test",
-        "symbolic_link": "E\\text{-value} = 2.73 \\;\\longrightarrow\\; \\text{Placebo}(T_{\\text{shuffled}}), \\;\\text{RCC}(\\tilde{X}), \\;\\text{Subset}(80\\%), \\;\\text{NC}(T \\to NC)",
+        "symbolic_link": "E\\text{-value} = 2.72 \\;\\longrightarrow\\; \\text{Placebo}(T_{\\text{shuffled}}), \\;\\text{RCC}(\\tilde{X}), \\;\\text{Subset}(80\\%), \\;\\text{NC}(T \\to NC)",
         "narrative": "Sensitivity analysis complete. Now we stress-test the pipeline with four refutation tests — placebo treatment, random common cause, subset refuter, and negative control — plus four loop invariants that must hold in every run.",
         "key_question": "Does the machinery refute itself when we deliberately break it?"
       },
@@ -1842,7 +1842,7 @@
         {
           "rung": 1,
           "name": "Association (Seeing)",
-          "symbolic": "P(Y \\mid T=1) - P(Y \\mid T=0) = +0.345",
+          "symbolic": "P(Y \\mid T=1) - P(Y \\mid T=0) = +0.347",
           "thought": "I observe that notified users order 34.5 pp more. This is a fact about the data. But is it causal? No — I know the platform targets hungrier users, and hungrier users order more regardless. The 34.5 pp mixes causation with confounding. I cannot stop here.",
           "limitation": "Cannot distinguish P(Y \\mid T) from P(Y \\mid do(T)). Passive observation confounds causal and spurious association."
         },
@@ -1850,7 +1850,7 @@
           "rung": 2,
           "name": "Intervention (Doing)",
           "symbolic": "E[Y \\mid do(T=1)] - E[Y \\mid do(T=0)] = +0.241",
-          "thought": "I encode my causal beliefs as a DAG. I prove identifiability via the back-door criterion: Z = {W, rain, weekend, payday} blocks all back-door paths. I estimate via AIPW with cross-fitting. The adjusted estimate (+0.244) matches the Monte Carlo truth (+0.241) within 0.002. The confounding gap of +0.104 has been removed.",
+          "thought": "I encode my causal beliefs as a DAG. I prove identifiability via the back-door criterion: Z = {W, rain, weekend, payday} blocks all back-door paths. I estimate via AIPW with cross-fitting. The adjusted estimate (+0.244) matches the Monte Carlo truth (+0.241) within 0.002. The confounding gap of +0.105 has been removed.",
           "limitation": "Answers “what is the average effect?” but not “was THIS specific user’s order caused by the notification?” Averages over all units; cannot condition on individual outcomes."
         },
         {

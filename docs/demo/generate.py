@@ -231,6 +231,32 @@ data["data_flow"] = {
     ],
 }
 
+# ── Dynamic values for content strings (single source of truth) ──
+_V = {
+    "naive": round(data["static"]["naive"], 3),          # e.g. 0.347
+    "gap":   round(data["static"]["gap"], 3),             # e.g. 0.105
+    "truth": round(data["static"]["truth"], 3),            # e.g. 0.241
+    "ate":   round(data["static"]["ate"], 4),              # e.g. 0.2437
+    "ci_lo": round(data["static"]["ci_low"], 4),           # e.g. 0.2279
+    "ci_hi": round(data["static"]["ci_high"], 4),          # e.g. 0.2594
+    "se":    round(data["static"]["se"], 4),               # e.g. 0.008
+    "e_val": round(data["static"]["e_value"], 2),          # e.g. 2.72
+    "rr":    round(data["static"]["risk_ratio"], 2),       # e.g. 1.67
+    "mu1":   round(data["static"]["mu1"], 3),              # e.g. 0.613
+    "mu0":   round(data["static"]["mu0"], 3),              # e.g. 0.372
+    "h_truth": round(data["holiday"]["truth"], 3),         # e.g. 0.191
+    "h_ate":  round(data["holiday"]["ate"], 4),            # e.g. 0.1925
+    "cate_l": round(data["static"]["cate_loyal"], 4),      # e.g. 0.0349
+    "cate_n": round(data["static"]["cate_new"], 4),        # e.g. 0.0148
+    "pn":     round(data["rung3"]["p_necessity"], 2),      # e.g. 0.37
+    "pn_pct": round(data["rung3"]["p_necessity"] * 100),   # e.g. 37
+}
+# Derive drift worst node + value (drift values are floats, not dicts)
+_drift_items = list(data["evolve"]["drift"].items())
+_drift_worst = max(_drift_items, key=lambda x: x[1]) if _drift_items else ("M", 0.1163)
+_V["drift_node"] = _drift_worst[0]
+_V["drift_val"]  = round(_drift_worst[1], 4)
+
 # ── Content sections (explanatory text, formulas, background) ──
 data["content"] = {
     "title": "Causal Science — The Complete Workflow",
@@ -762,6 +788,81 @@ data["content"] = {
         {"term": "Positivity", "def": "Every unit has non-zero probability of receiving either treatment; checked at Station 3"},
     ],
 }
+
+# ── Dynamic number replacement: sync content strings with live pipeline output ──
+import re as _re
+
+def _replace_in_strings(obj, replacements):
+    """Recursively replace stale numbers in all string values."""
+    if isinstance(obj, str):
+        for pattern, replacement in replacements:
+            obj = _re.sub(pattern, replacement, obj)
+        return obj
+    elif isinstance(obj, dict):
+        return {k: _replace_in_strings(v, replacements) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_replace_in_strings(v, replacements) for v in obj]
+    return obj
+
+# Build replacements: (regex_pattern, replacement_string)
+# Patterns use word boundaries / non-digit guards to avoid partial matches
+_n = _V["naive"]; _g = _V["gap"]; _t = _V["truth"]; _a = _V["ate"]
+_ev = _V["e_val"]; _rr = _V["rr"]; _mu1 = _V["mu1"]; _mu0 = _V["mu0"]
+_ci_lo = _V["ci_lo"]; _ci_hi = _V["ci_hi"]; _se = _V["se"]
+_ht = _V["h_truth"]; _ha = _V["h_ate"]; _cl = _V["cate_l"]; _cn = _V["cate_n"]
+_pn = _V["pn"]; _dv = _V["drift_val"]; _dn = _V["drift_node"]
+
+_REPLS = [
+    # naive observational difference — various stale forms
+    (_re.compile(r"(?<!\d)(\+?0\.34[35])(?!\d)"),      f"+{_n:.3f}"),
+    (_re.compile(r"(?<!\d)0\.34[35](?!\d)"),            f"{_n:.3f}"),
+    # confounding gap — stale forms 0.102, 0.104, +0.102, +0.104
+    (_re.compile(r"(?<!\d)(\+?0\.10[24])(?!\d)"),       f"+{_g:.3f}"),
+    # true ATE — stale form 0.241, +0.241
+    (_re.compile(r"(?<!\d)(\+?0\.2413?)(?!\d)"),         f"+{_t:.3f}"),
+    # estimated ATE — stale form 0.244, +0.244, 0.2437
+    (_re.compile(r"(?<!\d)(\+?0\.2437)(?!\d)"),          f"+{_a:.4f}"),
+    (_re.compile(r"(?<!\d)(\+?0\.244)(?!\d)"),           f"+{_a:.3f}"),
+    # E-value — 2.73
+    (_re.compile(r"(?<!\d)2\.73(?!\d)"),                 f"{_ev:.2f}"),
+    # risk ratio — 1.67
+    (_re.compile(r"(?<!\d)1\.67(?!\d)"),                 f"{_rr:.2f}"),
+    # CI bounds
+    (_re.compile(r"(?<!\d)0\.2280(?!\d)"),               f"{_ci_lo:.4f}"),
+    (_re.compile(r"(?<!\d)0\.2594(?!\d)"),               f"{_ci_hi:.4f}"),
+    # SE
+    (_re.compile(r"(?<!\d)0\.008(?!\d)"),                f"{_se:.4f}"),
+    # mu1 / mu0 oracle means
+    (_re.compile(r"(?<!\d)0\.613(?!\d)"),                f"{_mu1:.3f}"),
+    (_re.compile(r"(?<!\d)0\.372(?!\d)"),                f"{_mu0:.3f}"),
+    # holiday ATE
+    (_re.compile(r"(?<!\d)(\+?0\.1913?)(?!\d)"),         f"+{_ht:.3f}"),
+    (_re.compile(r"(?<!\d)(\+?0\.1925)(?!\d)"),          f"+{_ha:.4f}"),
+    (_re.compile(r"(?<!\d)(\+?0\.198)(?!\d)"),           f"+{_ha:.3f}"),
+    # CATE loyal / new
+    (_re.compile(r"(?<!\d)(\+?0\.0349)(?!\d)"),          f"+{_cl:.4f}"),
+    (_re.compile(r"(?<!\d)(\+?0\.0148)(?!\d)"),          f"+{_cn:.4f}"),
+    # probability of necessity
+    (_re.compile(r"(?<!\d)0\.37(?!\d)"),                 f"{_pn:.2f}"),
+    (_re.compile(r"(?<!\d)37%(?!\d)"),                   f"{_V['pn_pct']}%"),
+    # M-mechanism degradation — stale 0.024
+    (_re.compile(r"(?<!\d)(\+?0\.024)(?!\d)"),           f"+{_dv:.4f}"),
+]
+
+data["content"] = _replace_in_strings(data["content"], _REPLS)
+
+# ── Verify no stale hardcoded numbers remain ──
+_STALE_CHECKS = [
+    ("0.343", "naive ATE"), ("0.345", "naive ATE"),
+    ("0.102", "confounding gap"), ("0.104", "confounding gap"),
+    ("2.73", "E-value"), ("0.2280", "CI low"), ("0.024", "M degradation"),
+]
+for stale_val, desc in _STALE_CHECKS:
+    # Check a few key text fields
+    for st in data["content"]["stations"]:
+        txt = st.get("explanation", "") + st.get("thinking", {}).get("takeaway", "")
+        if stale_val in txt:
+            print(f"WARNING: stale value '{stale_val}' ({desc}) still in station {st['id']}")
 
 # Populate the data_snippet with actual sample rows
 _snip_cols = data["content"]["data_snippet"]["columns"]

@@ -54,3 +54,46 @@ def test_aipw_estimator_pin():
     res = aipw_crossfit(df, "T", "Y", ["weekend", "rain", "payday", "W"], seed=42)
     assert abs(res["ate"] - PIN_STATIC["ate"]) < AIPW_TOL
     assert 0 < res["se"] < 0.02
+
+
+def test_content_numbers_match_pipeline_output():
+    """Regression: content strings must not contain stale hardcoded numbers.
+
+    The demo narrative text must derive from the same pipeline output as the
+    live data.  Any stale hardcoded literal in the content means a number
+    drifted out of sync on regeneration — a content bug.
+    """
+    import json, sys
+    from pathlib import Path
+
+    data_path = Path(__file__).resolve().parents[2] / "docs" / "demo" / "data.json"
+    if not data_path.exists():
+        pytest.skip("data.json not found — run python docs/demo/generate.py first")
+
+    d = json.loads(data_path.read_text(encoding="utf-8"))
+
+    live = d["static"]
+    evolve = d.get("evolve", {})
+
+    # Map of (stale_value, live_getter, tolerance_check, label)
+    checks = [
+        # naive ATE: was 0.343 or 0.345; live is live["naive"]
+        ("0.343", lambda: f"{live['naive']:.3f}", None, "naive ATE (0.343)"),
+        ("0.345", lambda: f"{live['naive']:.3f}", None, "naive ATE (0.345)"),
+        # confounding gap: was 0.102 or 0.104; live is live["gap"]
+        ("0.102", lambda: f"{live['gap']:.3f}", None, "confounding gap (0.102)"),
+        ("0.104", lambda: f"{live['gap']:.3f}", None, "confounding gap (0.104)"),
+        # E-value: was 2.73; live is live["e_value"]
+        ("2.73", lambda: f"{live['e_value']:.2f}", None, "E-value (2.73)"),
+    ]
+
+    # Search all content strings
+    content_text = json.dumps(d["content"])
+
+    failures = []
+    for stale, getter, _, label in checks:
+        if stale in content_text:
+            failures.append(f"STALE: '{stale}' ({label}) still in content — should be '{getter()}'")
+
+    if failures:
+        pytest.fail("\n".join(failures))
