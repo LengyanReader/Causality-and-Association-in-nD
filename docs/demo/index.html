@@ -45,6 +45,14 @@ svg text{font-family:system-ui,sans-serif}
 .dagbar button:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
 .dagpop{display:none;position:fixed;background:var(--dark);color:#e2e8f0;padding:16px 20px;border-radius:var(--radius);max-width:400px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.84rem;line-height:1.55}
 .dagpop.on{display:block}.dagn{cursor:pointer}.dagn:hover{filter:brightness(1.2)}.dagpop b{color:#34d399}
+/* Pannable graph panel */
+.graph-panel{position:relative;overflow:hidden;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:grab;user-select:none}
+.graph-panel:active{cursor:grabbing}
+.graph-panel svg{display:block;transform-origin:0 0}
+.graph-bar{display:flex;gap:4px;padding:6px 8px;background:#f8fafc;border-bottom:1px solid var(--border);align-items:center}
+.graph-bar button{width:28px;height:28px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:1rem;line-height:1;color:var(--text);display:flex;align-items:center;justify-content:center}
+.graph-bar button:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.graph-bar .gb-hint{font-size:.7rem;color:var(--muted);margin-left:8px}
 .navbox{margin:14px 0;padding:10px;background:rgba(255,255,255,.08);border-radius:6px}
 .navbox .nht{font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:6px}
 .navbox a{display:block;padding:1px 0;font-size:.74rem;text-decoration:none}.navbox a.nm{color:#e2e8f0}.navbox a.nd{color:#fbbf24}
@@ -168,7 +176,7 @@ function buildLadderSVG(ladder){
   h+='<text x="475" y="282" font-size="9" fill="#64748b" font-style="italic">do()</text>';
   h+='<text x="475" y="422" font-size="9" fill="#64748b" font-style="italic">abduction-action-prediction</text>';
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildConfoundingBars(v){
@@ -187,7 +195,7 @@ function buildConfoundingBars(v){
   // Annotations
   h+='<text x="250" y="130" text-anchor="middle" font-size="9" fill="#64748b" font-style="italic">Red bar = rung-1 association. Green = rung-2 causal truth. Orange gap = confounding bias removed by adjustment.</text>';
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildEvalueGauge(v){
@@ -209,7 +217,7 @@ function buildEvalueGauge(v){
   h+='<text x="'+mx+'" y="'+(gy-8)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">'+v.our_value.toFixed(2)+'</text>';
   h+='<text x="260" y="110" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Higher E-value = more robust to unmeasured confounding</text>';
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildConceptSketch(v){
@@ -240,14 +248,18 @@ function buildConceptSketch(v){
     var n=v.nodes[i];
     h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+n.r+'" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
     h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="'+((n.r||22)>20?'9':'8')+'" font-weight="700" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
-    h+='<text x="'+n.x+'" y="'+(n.y-n.r-7)+'" text-anchor="middle" font-size="8" fill="#1a1a2e">'+n.label+'</text>';
+    // Handle multi-line labels (e.g., "rain\nweekend\npayday")
+    var lines=n.label.split("\n");
+    for(var li=0;li<lines.length;li++){
+      h+='<text x="'+n.x+'" y="'+(n.y-n.r-7-(lines.length-1-li)*9)+'" text-anchor="middle" font-size="8" fill="#1a1a2e">'+lines[li]+'</text>';
+    }
   }
   for(var i=0;i<v.annotations.length;i++){
     var a=v.annotations[i];
     h+='<text x="'+a.x+'" y="'+a.y+'" text-anchor="middle" font-size="'+(a.size||8)+'" fill="'+a.color+'" font-style="italic">'+a.text+'</text>';
   }
   h+='</svg>';
-  return '<div class="card"><div class="sketch-wrap">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function renderMiniDataTable(dp){
@@ -311,7 +323,7 @@ function buildDecompositionDiagram(v,rd){
   }
   h+='<text x="'+(W/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">'+v.annotation+'</text>';
   h+='</svg>';
-  return '<div class="card"><div class="decomp-wrap">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildRoadmap(rm){
@@ -343,7 +355,7 @@ function buildIDFlow(v){
     }
   }
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildCompareCard(v){
@@ -389,7 +401,7 @@ function buildBalanceChart(v){
   h+='<text x="'+(tx+4)+'" y="40" font-size="7" fill="#f39c12">|SMD|=0.1</text>';
   h+='<text x="220" y="'+(H-3)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Red = before IPW. Green = after IPW. Dashed = 0.1 threshold.</text>';
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildStabilityChart(v){
@@ -411,7 +423,7 @@ function buildStabilityChart(v){
   h+='<text x="'+(tx+4)+'" y="36" font-size="7" fill="#f39c12">alarm='+v.threshold.toFixed(2)+'</text>';
   h+='<text x="230" y="'+(H-3)+'" text-anchor="middle" font-size="8" fill="#64748b" font-style="italic">Green = invariant. Red = mechanism drift detected (log-loss degradation).</text>';
   h+='</svg>';
-  return '<div class="card"><div style="overflow-x:auto">'+h+'</div></div>';
+  return '<div class="card">'+wrapGraph(h)+'</div>';
 }
 
 function buildThinking(th){
@@ -646,6 +658,7 @@ function build(){
   if(c.references){h+='<h2>References</h2><div class="card" style="font-size:.84rem">';for(var i=0;i<c.references.length;i++){var ref=c.references[i];h+='<p>'+ref.short+' - '+ref.full+' <a href="'+ref.url+'" target="_blank">[link]</a></p>'}h+='</div>'}
   document.getElementById("content").innerHTML=h;
   var dags=document.querySelectorAll(".dagn");for(var i=0;i<dags.length;i++)dags[i].addEventListener("click",function(ev){dagPopup(ev,this.getAttribute("data-nid"))});
+  setupGraphPanels();
 }
 
 function buildStation(s,rd){
@@ -690,6 +703,36 @@ function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
 function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
 function dagReset(){dagZoom=1;updateDagZoom()}
 function updateDagZoom(){var s=document.getElementById("dagsvg");if(s)s.style.transform="scale("+dagZoom+")"}
+
+// Generic pan + zoom for any graph panel
+function setupGraphPanels(){
+  var panels=document.querySelectorAll(".graph-panel");
+  for(var i=0;i<panels.length;i++){(function(panel){
+    var svg=panel.querySelector("svg");if(!svg)return;
+    var tx=0,ty=0,scale=1,panning=false,px=0,py=0;
+    function apply(){svg.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")"}
+    panel.addEventListener("mousedown",function(e){panning=true;px=e.clientX;py=e.clientY;e.preventDefault()});
+    window.addEventListener("mousemove",function(e){if(!panning)return;tx+=e.clientX-px;ty+=e.clientY-py;px=e.clientX;py=e.clientY;apply()});
+    window.addEventListener("mouseup",function(){panning=false});
+    panel.addEventListener("wheel",function(e){e.preventDefault();var z=scale*(e.deltaY<0?1.15:1/1.15);scale=Math.max(0.3,Math.min(4,z));apply()});
+    // Touch support
+    panel.addEventListener("touchstart",function(e){if(e.touches.length===1){panning=true;px=e.touches[0].clientX;py=e.touches[0].clientY}});
+    window.addEventListener("touchmove",function(e){if(!panning)return;tx+=e.touches[0].clientX-px;ty+=e.touches[0].clientY-py;px=e.touches[0].clientX;py=e.touches[0].clientY;apply()});
+    window.addEventListener("touchend",function(){panning=false});
+    // Buttons in toolbar
+    var bar=panel.querySelector(".graph-bar");
+    if(bar){
+      bar.querySelector(".gb-zoomin").addEventListener("click",function(e){e.stopPropagation();scale=Math.min(4,scale*1.2);apply()});
+      bar.querySelector(".gb-zoomout").addEventListener("click",function(e){e.stopPropagation();scale=Math.max(0.3,scale/1.2);apply()});
+      bar.querySelector(".gb-reset").addEventListener("click",function(e){e.stopPropagation();tx=0;ty=0;scale=1;apply()});
+    }
+  })(panels[i])}
+}
+
+// Wrap SVG in a pannable graph panel with toolbar
+function wrapGraph(svgHtml){
+  return '<div class="graph-panel"><div class="graph-bar"><button class="gb-zoomin" title="Zoom in">+</button><button class="gb-zoomout" title="Zoom out">−</button><button class="gb-reset" title="Reset">↺</button><span class="gb-hint">Drag to pan · Scroll to zoom</span></div>'+svgHtml+'</div>';
+}
 function dagPopup(ev,nodeId){
   var p=document.getElementById("dagpopup");if(!p)return;var nd=null;
   if(D&&D.content&&D.content.dag)for(var i=0;i<D.content.dag.nodes.length;i++)if(D.content.dag.nodes[i].id===nodeId)nd=D.content.dag.nodes[i];

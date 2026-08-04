@@ -301,16 +301,16 @@ data["content"] = {
     },
     "concept_sketch": {
         "title": "The Core Problem — A Sketch Before the Formal DAG",
-        "width": 660, "height": 260,
-        "hidden_box": {"x": 20, "y": 30, "w": 140, "h": 210, "label": "What the platform CANNOT see", "color": "#fef2f2"},
-        "observed_box": {"x": 190, "y": 30, "w": 200, "h": 210, "label": "What the platform CAN see", "color": "#f0fdf4"},
-        "outcome_box": {"x": 430, "y": 70, "w": 200, "h": 130, "label": "What we want to affect", "color": "#eff6ff"},
+        "width": 720, "height": 300,
+        "hidden_box": {"x": 10, "y": 25, "w": 160, "h": 255, "label": "What the platform CANNOT see", "color": "#fef2f2"},
+        "observed_box": {"x": 195, "y": 25, "w": 205, "h": 255, "label": "What the platform CAN see", "color": "#f0fdf4"},
+        "outcome_box": {"x": 425, "y": 65, "w": 275, "h": 155, "label": "What we want to affect", "color": "#eff6ff"},
         "nodes": [
-            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 100, "color": "#e74c3c", "r": 22},
-            {"id": "W", "label": "W: App-use (proxy)", "x": 260, "y": 85, "color": "#f39c12", "r": 22},
-            {"id": "T", "label": "T: Notification", "x": 260, "y": 190, "color": "#2ecc71", "r": 22},
-            {"id": "Y", "label": "Y: Order placed", "x": 510, "y": 130, "color": "#2ecc71", "r": 22},
-            {"id": "C", "label": "Context:\nrain, weekend, payday", "x": 340, "y": 140, "color": "#95a5a6", "r": 20}
+            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 125, "color": "#e74c3c", "r": 22},
+            {"id": "W", "label": "W: App-use (proxy)", "x": 270, "y": 82, "color": "#f39c12", "r": 22},
+            {"id": "T", "label": "T: Notification sent", "x": 270, "y": 218, "color": "#2ecc71", "r": 22},
+            {"id": "Y", "label": "Y: Order placed", "x": 550, "y": 130, "color": "#2ecc71", "r": 22},
+            {"id": "C", "label": "rain\nweekend\npayday", "x": 400, "y": 172, "color": "#95a5a6", "r": 18}
         ],
         "edges": [
             {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger drives app use"},
@@ -321,9 +321,8 @@ data["content"] = {
             {"from": "C", "to": "Y", "color": "#95a5a6", "dash": "4,2", "label": ""}
         ],
         "annotations": [
-            {"x": 70, "y": 48, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
-            {"x": 440, "y": 55, "text": "Is this path causal?", "color": "#2ecc71", "size": 9},
-            {"x": 440, "y": 68, "text": "Or just confounding?", "color": "#e74c3c", "size": 9}
+            {"x": 70, "y": 52, "text": "The hidden confounder", "color": "#e74c3c", "size": 9},
+            {"x": 495, "y": 52, "text": "Is this causal or just confounding?", "color": "#e74c3c", "size": 9}
         ]
     },
     "decomposition_diagram": {

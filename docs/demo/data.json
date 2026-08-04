@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.228,
+    "ci_low": 0.2279,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019300651114831733, 'tolerance': 0.013343510437933782}"
+        "detail": "{'estimate': 0.0019112241537866958, 'tolerance': 0.013353006341690699}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 1.4432543299830458e-05, 'tolerance': 0.008025929370633636}"
+        "detail": "{'delta': 2.3581810290218552e-05, 'tolerance': 0.008025371855470661}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005168270412131443, 'tolerance': 0.018544880108807442}"
+        "detail": "{'delta': 0.005226705899213424, 'tolerance': 0.01855748739994534}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008248509762688933, 'tolerance': 0.014538997493528445}"
+        "detail": "{'estimate': -0.0008579409034355018, 'tolerance': 0.0145342152590779}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
+    "ci_low": 0.1769,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.00434000568620475, 'tolerance': 0.013360654777680281}"
+        "detail": "{'estimate': 0.004344150416679379, 'tolerance': 0.013361886157162517}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.001263284139299159, 'tolerance': 0.00793214982098192}"
+        "detail": "{'delta': 0.001256128849879412, 'tolerance': 0.00793222095513278}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.00507163495349483, 'tolerance': 0.018334477299036915}"
+        "detail": "{'delta': 0.005047457238797848, 'tolerance': 0.018334663481560567}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004388551551759421, 'tolerance': 0.014173921048174238}"
+        "detail": "{'estimate': -0.004347280900212248, 'tolerance': 0.014168188898973606}"
       }
     ],
     "naive": 0.297,
@@ -578,29 +578,29 @@
     },
     "concept_sketch": {
       "title": "The Core Problem — A Sketch Before the Formal DAG",
-      "width": 660,
-      "height": 260,
+      "width": 720,
+      "height": 300,
       "hidden_box": {
-        "x": 20,
-        "y": 30,
-        "w": 140,
-        "h": 210,
+        "x": 10,
+        "y": 25,
+        "w": 160,
+        "h": 255,
         "label": "What the platform CANNOT see",
         "color": "#fef2f2"
       },
       "observed_box": {
-        "x": 190,
-        "y": 30,
-        "w": 200,
-        "h": 210,
+        "x": 195,
+        "y": 25,
+        "w": 205,
+        "h": 255,
         "label": "What the platform CAN see",
         "color": "#f0fdf4"
       },
       "outcome_box": {
-        "x": 430,
-        "y": 70,
-        "w": 200,
-        "h": 130,
+        "x": 425,
+        "y": 65,
+        "w": 275,
+        "h": 155,
         "label": "What we want to affect",
         "color": "#eff6ff"
       },
@@ -609,41 +609,41 @@
           "id": "U",
           "label": "U: Hunger (latent)",
           "x": 70,
-          "y": 100,
+          "y": 125,
           "color": "#e74c3c",
           "r": 22
         },
         {
           "id": "W",
           "label": "W: App-use (proxy)",
-          "x": 260,
-          "y": 85,
+          "x": 270,
+          "y": 82,
           "color": "#f39c12",
           "r": 22
         },
         {
           "id": "T",
-          "label": "T: Notification",
-          "x": 260,
-          "y": 190,
+          "label": "T: Notification sent",
+          "x": 270,
+          "y": 218,
           "color": "#2ecc71",
           "r": 22
         },
         {
           "id": "Y",
           "label": "Y: Order placed",
-          "x": 510,
+          "x": 550,
           "y": 130,
           "color": "#2ecc71",
           "r": 22
         },
         {
           "id": "C",
-          "label": "Context:\nrain, weekend, payday",
-          "x": 340,
-          "y": 140,
+          "label": "rain\nweekend\npayday",
+          "x": 400,
+          "y": 172,
           "color": "#95a5a6",
-          "r": 20
+          "r": 18
         }
       ],
       "edges": [
@@ -693,22 +693,15 @@
       "annotations": [
         {
           "x": 70,
-          "y": 48,
+          "y": 52,
           "text": "The hidden confounder",
           "color": "#e74c3c",
           "size": 9
         },
         {
-          "x": 440,
-          "y": 55,
-          "text": "Is this path causal?",
-          "color": "#2ecc71",
-          "size": 9
-        },
-        {
-          "x": 440,
-          "y": 68,
-          "text": "Or just confounding?",
+          "x": 495,
+          "y": 52,
+          "text": "Is this causal or just confounding?",
           "color": "#e74c3c",
           "size": 9
         }
