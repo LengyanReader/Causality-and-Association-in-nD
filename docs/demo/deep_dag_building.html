@@ -161,14 +161,76 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout"><b>Core principle:</b> A causal graph is never "finished" — it is a living hypothesis about how the world works. It must be <b>testable</b> (via absent edges), <b>versioned</b> (so estimates are traceable), and <b>evolvable</b> (so new evidence can revise it). The NomNom DAG has 54 absent edges — each one is an invitation to falsify.</div>
 </div>
 
-<h2>6. Key References</h2>
+<h2>6. Method Comparison — When to Use What</h2>
+<div class="card">
+<table>
+<tr><th>Method</th><th>Best for</th><th>Data needed</th><th>Handles latents?</th><th>Orients edges?</th></tr>
+<tr><td>Expert elicitation</td><td>Well-understood domains with accessible experts</td><td>None required</td><td>Yes (experts name them)</td><td>Yes (experts know directions)</td></tr>
+<tr><td>Literature review</td><td>Domains with prior experimental evidence</td><td>Published studies</td><td>If documented</td><td>If prior RCTs exist</td></tr>
+<tr><td>PC algorithm</td><td>Exploratory analysis, moderate dimensions</td><td>Observational (i.i.d.)</td><td>No (assumes causal sufficiency)</td><td>Partially (equivalence class)</td></tr>
+<tr><td>FCI algorithm</td><td>Domains with likely latent confounders</td><td>Observational (i.i.d.)</td><td>Yes (allows arbitrary latents)</td><td>Partially (PAG output)</td></tr>
+<tr><td>GES</td><td>Model selection, large variable sets</td><td>Observational (i.i.d.)</td><td>No</td><td>Partially (equivalence class)</td></tr>
+<tr><td>LiNGAM</td><td>Linear systems with non-Gaussian noise</td><td>Observational (i.i.d.)</td><td>Limited</td><td><b>Yes (full DAG)</b></td></tr>
+<tr><td>LLM-assisted</td><td>Rapid prototyping, supplementing expert judgment</td><td>None (LLM pre-training)</td><td>If prompted</td><td>If prompted</td></tr>
+<tr><td>Agentic loop</td><td>Iterative refinement with empirical feedback</td><td>Observational + LLM</td><td>Via FCI integration</td><td>Via human review</td></tr>
+</table>
+<div class="callout-info"><b>Practical recommendation:</b> For most applied work, start with expert elicitation + literature review, then use PC/FCI to test the proposed graph against data. LLM methods are best used as <b>accelerators</b> for the elicitation step — they help experts consider edges they might have missed.</div>
+</div>
+
+<h2>7. Graph Evaluation — Is Your DAG Any Good?</h2>
+<div class="card">
+<p>Once built, a causal graph should be evaluated against several criteria beyond just "it feels right":</p>
+
+<h4>7.1 Testable Implications</h4>
+<p>Every absent edge implies a conditional independence: if there is no edge X→Y, then X ⊥ Y | pa(Y) in some conditioning set. These implications can be <b>empirically tested</b> against data. A graph whose absent-edge implications are consistently violated by the data is <b>falsified</b> — it must be revised.</p>
+
+<h4>7.2 Stability Across Environments</h4>
+<p>A correct causal graph should be <b>stable</b>: the conditional distribution P(effect | direct causes) should remain invariant across environments (Peters, Bühlmann & Meinshausen 2016). If P(Y | pa(Y)) changes dramatically when the data collection process changes, the parent set is likely wrong.</p>
+
+<h4>7.3 Simplicity (Occam's Razor)</h4>
+<p>Among graphs that are equally consistent with the data and domain knowledge, prefer the <b>simpler</b> one — fewer edges, fewer latent variables. But simplicity is a tiebreaker, not a primary criterion: a graph that is too simple to explain known mechanisms is <b>underfit</b>.</p>
+
+<h4>7.4 Predictive Accuracy</h4>
+<p>While the graph is a causal model (not a predictive one), a graph whose implied conditional distributions fit the data poorly is suspicious. Use held-out log-likelihood or BIC to compare candidate graphs.</p>
+
+<h4>7.5 Inter-rater Reliability</h4>
+<p>Have <b>multiple independent experts</b> draw the graph for the same domain. Where they agree, confidence is higher. Where they disagree, those edges need investigation — they are the highest-value targets for experiments or data-driven testing.</p>
+</div>
+
+<h2>8. Classic Examples Beyond NomNom</h2>
+<div class="card">
+<p>The graph-construction principles above apply universally. Here are three classic causal graphs from other domains that illustrate the same challenges:</p>
+
+<p><b>Smoking → Lung Cancer (Fisher vs. Doll & Hill, 1950s).</b> Fisher proposed a latent genetic confounder G causing both smoking desire and cancer susceptibility — the graph had edges G→Smoking and G→Cancer. Doll & Hill argued the evidence favored Smoking→Cancer directly, with no latent confounder. The debate hinged on an <b>absent edge</b>: was there a direct Smoking→Cancer link, or was it entirely confounded? Resolution required decades of evidence — illustrating that graph construction is a scientific process, not a one-shot statistical exercise.</p>
+
+<p><b>HRT → Heart Disease (Nurses' Health Study vs. WHI RCT, 1990s-2000s).</b> Observational studies found hormone replacement therapy protective against heart disease. The DAG omitted a key confounder: socioeconomic status (SES), which causes both HRT use (wealthier women access healthcare) and heart health (wealthier women have better outcomes). The WHI randomized trial later found HRT <i>increased</i> heart disease risk — the observational graph was wrong because it missed the SES confounder. This is why sensitivity analysis (E-value) is critical: it quantifies how strong an omitted confounder would need to be.</p>
+
+<p><b>Education → Earnings (Griliches, 1970s).</b> Does more schooling cause higher wages? The graph must contend with unobserved ability (A) causing both education and earnings (A→Ed, A→Wage), family background confounding, and measurement error in schooling. Griliches used <b>instrumental variables</b> (family background as instrument for education) — a graph-based identification strategy — to estimate the causal effect. The graph drove the choice of method.</p>
+</div>
+
+<h2>9. Software & Tools</h2>
+<div class="card">
+<table>
+<tr><th>Tool</th><th>Methods</th><th>Best for</th></tr>
+<tr><td><a href="https://dagitty.net/">dagitty</a></td><td>Manual DAG drawing, identification analysis</td><td>Expert elicitation, teaching, small graphs</td></tr>
+<tr><td><a href="https://github.com/cmu-phil/tetrad">Tetrad</a></td><td>PC, FCI, GFCI, LiNGAM, GES, FGES</td><td>Comprehensive discovery suite (CMU)</td></tr>
+<tr><td><a href="https://github.com/py-why/causal-learn">causal-learn</a></td><td>PC, FCI, GES, LiNGAM, GRaSP</td><td>Python-native causal discovery</td></tr>
+<tr><td><a href="https://github.com/py-why/dowhy">DoWhy</a></td><td>Graph-based identification + estimation + refutation</td><td>End-to-end causal inference workflow</td></tr>
+<tr><td><a href="https://github.com/quantumblacklabs/causalnex">CausalNex</a></td><td>Structure learning + do-calculus</td><td>Bayesian network + causal integration</td></tr>
+</table>
+</div>
+
+<h2>10. Key References</h2>
 <div class="card">
 <p>Spirtes, P., Glymour, C., & Scheines, R. (2000). <i>Causation, Prediction, and Search</i> (2nd ed.). MIT Press. — The foundational text on constraint-based causal discovery.</p>
 <p>Chickering, D. M. (2002). Optimal structure identification with greedy search. <i>JMLR</i>, 3, 507–554. — GES algorithm.</p>
 <p>Shimizu, S., Hoyer, P. O., Hyvärinen, A., & Kerminen, A. (2006). A linear non-Gaussian acyclic model for causal discovery. <i>JMLR</i>, 7, 2003–2030. — LiNGAM.</p>
+<p>Peters, J., Bühlmann, P., & Meinshausen, N. (2016). Causal inference by using invariant prediction. <i>JRSS-B</i>, 78(5), 947–1012. — Invariance principle for graph evaluation.</p>
 <p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. — Ch. 2: graph fundamentals; Ch. 3: d-separation and testable implications.</p>
 <p>Kıcıman, E. et al. (2024). Causal reasoning and large language models: Opening a new frontier for causality. <i>arXiv:2305.00050</i>.</p>
 <p>Darvariu, V.-A. et al. (2025). Leveraging large language models for causal graph construction. <i>arXiv</i>.</p>
+<p>Fisher, R. A. (1958). Cigarettes, cancer, and statistics. <i>The Centennial Review</i>, 2, 151–166. — The classic latent-confounder debate.</p>
+<p>Griliches, Z. (1977). Estimating the returns to schooling: Some econometric problems. <i>Econometrica</i>, 45(1), 1–22. — IV-based causal graph for education→earnings.</p>
 </div>
 
 <script>
