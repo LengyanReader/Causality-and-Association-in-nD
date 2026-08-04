@@ -137,7 +137,7 @@ details.think .think-body h4:first-child{margin-top:0}
 .tbl-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:.7rem;color:var(--muted)}
 .tbl-legend span{background:#f1f5f9;padding:2px 8px;border-radius:10px;white-space:nowrap}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
-var D=null,activeRegime="static",dagZoom=1;
+var D=null,activeRegime="static";
 fetch("data.json?v=8").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;build()}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
@@ -517,47 +517,68 @@ function build(){
   h+='<h2 id="s2"><span class="cn">2</span> The Causal Graph <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';
-    h+='<div class="dagwrap"><div class="dagbar"><button onclick="dagZoomIn()">+</button><button onclick="dagZoomOut()">-</button><button onclick="dagReset()">1:1</button><span style="font-size:.75rem;color:var(--muted);padding:4px 8px">Click nodes for details</span></div><div id="dagpopup" class="dagpop"></div>';
-    h+='<svg id="dagsvg" viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white">';
+    h+='<div id="dagpopup" class="dagpop"></div>';
+    h+='<div class="graph-panel"><div class="graph-bar">';
+    h+='<button class="gb-zoomin" title="Zoom in">+</button><button class="gb-zoomout" title="Zoom out">−</button><button class="gb-reset" title="Reset">↺</button>';
+    h+='<span class="gb-hint">Drag to pan · Scroll to zoom · Click nodes for details · Shift+drag labels to reposition</span></div>';
+    h+='<svg viewBox="0 0 720 240" style="max-width:100%;height:auto;background:white">';
     for(var j=0;j<c.dag.edges.length;j++){var e=c.dag.edges[j],fn=np(c.dag.nodes,e.from),tn=np(c.dag.nodes,e.to);
       if(fn&&tn){var dash=e.style==="dashed"?"8,3":(e.style==="dotted"?"3,3":"none");
       var w=(e.label==="causal target"?3:1.6);
       var dx=tn.x-fn.x,dy=tn.y-fn.y,len=Math.sqrt(dx*dx+dy*dy);
       if(len>0){dx/=len;dy/=len}
-      var ax=tn.x-dx*17,ay=tn.y-dy*17;  // start of arrowhead, at node boundary
-      var bx=tn.x-dx*24,by=tn.y-dy*24;  // line endpoint before arrowhead
+      var ax=tn.x-dx*17,ay=tn.y-dy*17;
+      var bx=tn.x-dx*24,by=tn.y-dy*24;
       h+='<line x1="'+fn.x+'" y1="'+fn.y+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="'+e.color+'" stroke-width="'+w+'" stroke-dasharray="'+dash+'" opacity="0.75"/>';
-      // Arrowhead triangle: tip at node boundary, base 7px back
       var tipx=ax,tipy=ay;
       var perpx=-dy,perpy=dx;
       var basex=ax-dx*7,basey=ay-dy*7;
-      h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(basex+perpx*3.5).toFixed(1)+','+(basey+perpy*3.5).toFixed(1)+' '+(basex-perpx*3.5).toFixed(1)+','+(basey-perpy*3.5).toFixed(1)+'" fill="'+e.color+'"/>';}}
+      h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(basex+perpx*3.5).toFixed(1)+','+(basey+perpy*3.5).toFixed(1)+' '+(basex-perpx*3.5).toFixed(1)+','+(basey-perpy*3.5).toFixed(1)+'" fill="'+e.color+'"/>';
+      if(e.label){var mx=(fn.x+tn.x)/2,my=(fn.y+tn.y)/2-6;h+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="7" fill="'+e.color+'" font-style="italic">'+e.label+'</text>';}}
     for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
-      h+='<g class="dagn" data-nid="'+n.id+'"><circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
-      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"?"#555":"#fff")+'">'+n.id+'</text>';
+      h+='<g class="dagn" data-nid="'+n.id+'" style="cursor:pointer"><circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
+      h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
       h+='<text x="'+n.x+'" y="'+(n.y-20)+'" text-anchor="middle" font-size="7" fill="#1a1a2e">'+n.label+'</text></g>';}
     h+='<g transform="translate(10,210)">';
     for(var j=0;j<c.dag.legend.length;j++){var l=c.dag.legend[j],dx=j*150;
       h+='<line x1="'+dx+'" y1="8" x2="'+(dx+30)+'" y2="8" stroke="'+l.color+'" stroke-width="2" stroke-dasharray="'+(l.style==="dashed"?"6,2":(l.style==="dotted"?"3,3":"none"))+'"/>';
       h+='<text x="'+(dx+34)+'" y="12" font-size="7" fill="#1a1a2e">'+l.label+'</text>';}
     h+='</g></svg></div></div>';}
-    h+='<div class="card"><h3>A Gentle Introduction</h3>';
-    h+='<p>Imagine you are an analyst at NomNom Eats, staring at a spreadsheet with 20,000 rows and 13 columns. Each row is a user-day: whether they received a notification (T), whether they ordered (Y), their app usage history (W), the weather, the day of the week, and a dozen other variables. You are asked: <i>"Do notifications cause orders?"</i></p>';
-    h+='<p>The spreadsheet alone cannot answer this. Correlation is not causation. You need a <b>theory</b> — a story about how these variables relate to each other. The causal graph is that theory, made visible.</p>';
-    h+='<p>Drawing a causal graph means making every assumption <b>explicit and debatable</b>. Each arrow is a statement: "I believe X directly causes Y." Each <i>absent</i> arrow is equally important: "I believe there is NO direct causal relationship between X and Y." Both can be wrong — and being wrong is testable.</p></div>';
-
-    h+='<div class="card"><h3>Reading the Graph Below</h3>';
-    h+='<p>The graph has <b>11 nodes</b> connected by <b>17 directed edges</b>. It reads from left to right: causes on the left, effects on the right. Here is how to read each part:</p>';
-    h+='<table><tr><th>Color</th><th>Meaning</th><th>Nodes</th></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#2ecc40;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Green</b></td><td>The causal path we want to measure</td><td>T (notification) and Y (order)</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e8e8e8;border-radius:50%;vertical-align:middle;margin-right:6px;border:1px solid #ccc"></span><b>Gray</b></td><td>Latent (unobserved) confounder</td><td>U (true hunger) — the platform cannot see this</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#f39c12;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Orange</b></td><td>Measured proxy for the latent confounder</td><td>W (app-use history) — the single most important variable</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#3498db;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Blue</b></td><td>Instrument (randomized, affects only T)</td><td>Z (send-time jitter)</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#8e44ad;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Purple</b></td><td>Mediator (on the causal path from T to Y)</td><td>M (app opened) — NEVER adjust for this</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e67e22;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Deep orange</b></td><td>Collider (common effect of T and Y)</td><td>S (engagement score) — NEVER adjust for this</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e74c3c;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Red</b></td><td>Negative control (smoke alarm)</td><td>NC (battery drain) — shares U, no T effect</td></tr>';
-    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#95a5a6;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Gray</b></td><td>Observed confounders (must adjust)</td><td>rain, weekend, payday</td></tr></table>';
-    h+='<p><b>Red dashed edges</b> are confounding paths — they create the spurious association we must remove. <b>Green solid edge</b> (T→Y) is the causal effect we estimate. <b>Purple dashed edges</b> (T→M→Y) are the mediation path — part of the total effect but not to be adjusted. <b>Orange dotted edges</b> (T→S, Y→S) form a collider — conditioning here opens a back door.</p></div>';
+    // "Reading the Graph" -- right next to the DAG for proximity
+    h+='<div class="card"><h3>Reading the Graph</h3>';
+    h+='<p>The graph has <b>11 nodes</b> connected by <b>17 directed edges</b>. It reads left to right: causes on the left, effects on the right. Each node has a role — click any node above to see its full explanation.</p>';
+    h+='<table><tr><th>Color</th><th>Role</th><th>Adjustment Rule</th></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#2ecc40;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Green</b></td><td>T & Y — treatment and outcome (the causal target)</td><td>—</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e8e8e8;border-radius:50%;vertical-align:middle;margin-right:6px;border:1px solid #ccc"></span><b>Gray</b></td><td>U — latent confounder (hunger). Cannot be measured.</td><td>Cannot adjust — rely on proxy W</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#f39c12;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Orange</b></td><td>W — proxy for U (app-use history). The most critical variable.</td><td><b>MUST adjust</b> — blocks back-door path</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#3498db;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Blue</b></td><td>Z — instrument (randomized send-time jitter)</td><td>Do NOT adjust — amplifies bias</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#8e44ad;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Purple</b></td><td>M — mediator (app opened). On the causal path T→M→Y.</td><td><b>NEVER adjust</b> — blocks causal path</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e67e22;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Deep orange</b></td><td>S — collider (engagement score). Common effect of T and Y.</td><td><b>NEVER adjust</b> — opens spurious path</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#e74c3c;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Red</b></td><td>NC — negative control (battery drain). Shares U, no T effect.</td><td>Use for testing, not adjustment</td></tr>';
+    h+='<tr><td><span style="display:inline-block;width:14px;height:14px;background:#95a5a6;border-radius:50%;vertical-align:middle;margin-right:6px"></span><b>Gray (solid)</b></td><td>rain, weekend, payday — observed confounders</td><td><b>MUST adjust</b></td></tr></table>';
+    h+='<p style="font-size:.84rem;color:var(--muted)">Edge styles: <span style="color:#2ecc40"><b>solid green</b></span> = causal target (T→Y). <span style="color:#e74c3c"><b>dashed red</b></span> = confounding paths (must block). <span style="color:#8e44ad"><b>dashed purple</b></span> = mediation (T→M→Y). <span style="color:#e67e22"><b>dotted orange</b></span> = collider structure (T→S←Y).</p></div>';
+    // "The Story This Graph Tells" -- narrative flow
+    h+='<div class="card"><h3>The Story This Graph Tells</h3>';
+    h+='<p>A user\'s true hunger (U) is invisible to the platform. Hungry users use the app more (U→W), so the targeting algorithm — which only sees W — sends them more notifications (W→T). Hungry users also order more regardless of notifications (U→Y). This creates a <b>back-door path</b> T←W←U→Y: association flows backwards from T to U through W, then forwards from U to Y — producing a spurious correlation between notifications and orders that has nothing to do with causation.</p>';
+    h+='<p><b>To close this back door, we condition on W.</b> Because W is the only channel through which U affects T, conditioning on W blocks the entire confounding path. This is why W is the single most important variable — without it, the ATE is not identified.</p>';
+    h+='<p>The other variables each play a specific role in the causal structure:</p>';
+    h+='<ul style="margin-left:20px;font-size:.9rem"><li><b>M (app open):</b> The mediator — part of <i>how</i> notifications work (T→M→Y). We want the total effect, so we <b>must not</b> adjust for M — doing so would block the mediated path and bias the estimate downward.</li>';
+    h+='<li><b>S (engagement):</b> A collider — computed from both T and Y (T→S←Y). Conditioning on "high engagement" selects users who either got notified OR ordered, creating a spurious negative association (Berkson\'s bias). <b>Never condition on a collider.</b></li>';
+    h+='<li><b>Z (jitter):</b> Randomized by the experiment platform — affects T but has no direct path to Y and is independent of confounders. A valid instrument for IV estimation.</li>';
+    h+='<li><b>NC (battery):</b> Correlated with U (more app use → more battery drain) but NOT caused by T. If our adjustment is correct, the estimated T→NC effect should be zero — a non-zero result is a smoke alarm for residual confounding.</li></ul></div>';
+    // "How Did We Build This Graph?" -- new section
+    h+='<div class="card"><h3>How Did We Build This Graph?</h3>';
+    h+='<p>Building a causal graph is the hardest step in causal inference — it requires <b>domain knowledge</b>, not just data. There are multiple approaches, and in practice they are often combined:</p>';
+    h+='<h4>Classical Methods</h4>';
+    h+='<p><b>1. Expert elicitation.</b> Domain experts (product managers, data scientists, engineers) draw arrows based on their understanding of how the system works. A PM knows the targeting algorithm uses app-use history (W→T). An engineer knows send-time jitter is randomized (Z→T). This is the foundation — no algorithm replaces human domain knowledge.</p>';
+    h+='<p><b>2. Literature review.</b> Published studies, prior experiments, and established theory constrain the graph. If prior RCTs show that notifications increase app-opens, the edge T→M is supported by evidence. If no plausible mechanism exists for notifications to drain batteries, the absent edge T↛NC is a falsifiable claim.</p>';
+    h+='<p><b>3. Constraint-based discovery (PC/FCI algorithms).</b> Starting from the data, test conditional independence relations implied by the graph. If X ⊥ Y | Z in the data, and the algorithm\'s pattern matches a fork X←Z→Y, then Z is a candidate confounder. FCI extends this to allow for latent variables — it correctly leaves U as latent rather than forcing an edge. <i>Limitation: Markov equivalence classes — PC cannot distinguish X→Y from X←Y without additional assumptions.</i></p>';
+    h+='<p><b>4. Score-based discovery (GES).</b> Search over graph structures, scoring each by how well it fits the data (BIC, BDeu). Greedily add and remove edges to maximize the score. <i>Limitation: scores measure fit, not causation — a well-fitting graph may still get causal directions wrong.</i></p>';
+    h+='<h4>Agentic AI / LLM-Powered Methods</h4>';
+    h+='<p><b>5. LLM-assisted causal elicitation.</b> Large language models, prompted with domain context (e.g., "a food-delivery platform\'s notification system"), can propose candidate DAGs by drawing on patterns from their training data. The LLM suggests: "Hunger likely confounds both app-use and orders," "Engagement scores are typically computed from user actions (a collider)." These suggestions are <b>hypotheses to be validated</b>, not final answers — but they dramatically accelerate the elicitation process.</p>';
+    h+='<p><b>6. Agentic causal discovery loops.</b> An LLM-powered agent iteratively: (a) proposes candidate edges based on variable names and domain context, (b) tests each proposed edge against the data using conditional independence tests, (c) revises the graph based on test results, and (d) explains its reasoning in natural language. This combines the scalability of automated discovery with the interpretability of expert judgment. <i>Active research area (2024-2026): Kıcıman et al. (2024), Long et al. (2024), Darvariu et al. (2025).</i></p>';
+    h+='<p><b>7. LLM + graph databases / KGs.</b> When the domain has an existing knowledge graph (e.g., a company ontology linking "notification" → "user engagement" → "order"), the LLM can ground its causal hypotheses in structured, versioned knowledge. The KG provides the vocabulary and known relationships; the LLM fills gaps and proposes causal directions. The resulting DAG is version-controlled alongside the KG.</p>';
+    h+='<div class="callout cw"><b>Key principle:</b> All methods — classical and AI-powered — converge on the same requirement: the graph must be <b>testable</b>. Every absent edge implies a conditional independence that can be checked against data. A graph that makes no testable predictions (every node connected to every other) is unfalsifiable and useless. The NomNom DAG above has <b>54 absent edges</b> — each one is a statement that can be empirically challenged.</div></div>';
 
     h+='<div class="card"><h3>The Story This Graph Tells</h3>';
     h+='<p>A user\'s true hunger level (U) is something no platform can measure — but it drives everything. Hungry users use the app more (U→W), so the platform\'s targeting algorithm — which only sees W — sends them more notifications (W→T). Hungry users also order more food regardless of notifications (U→Y). This creates a <b>back-door path</b>: T ← W ← U → Y. Association flows backwards from T to U through W, then forwards from U to Y — producing a spurious correlation between notifications and orders that has nothing to do with causation.</p>';
@@ -700,11 +721,6 @@ function buildSidebar(){
   document.getElementById("sidebar").innerHTML=h;
 }
 function switchRegime(v){activeRegime=v;build()}
-
-function dagZoomIn(){dagZoom=Math.min(2.5,dagZoom+0.25);updateDagZoom()}
-function dagZoomOut(){dagZoom=Math.max(0.5,dagZoom-0.25);updateDagZoom()}
-function dagReset(){dagZoom=1;updateDagZoom()}
-function updateDagZoom(){var s=document.getElementById("dagsvg");if(s)s.style.transform="scale("+dagZoom+")"}
 
 // Generic pan + zoom for any graph panel
 // Shift+drag on any text label moves just that label
