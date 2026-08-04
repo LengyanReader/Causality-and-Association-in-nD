@@ -539,7 +539,7 @@ function build(){
       var perpx=-dy,perpy=dx;
       var basex=ax-dx*7,basey=ay-dy*7;
       h+='<polygon points="'+tipx.toFixed(1)+','+tipy.toFixed(1)+' '+(basex+perpx*3.5).toFixed(1)+','+(basey+perpy*3.5).toFixed(1)+' '+(basex-perpx*3.5).toFixed(1)+','+(basey-perpy*3.5).toFixed(1)+'" fill="'+e.color+'"/>';
-      if(e.label){var mx=(fn.x+tn.x)/2,my=(fn.y+tn.y)/2-6;h+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="7" fill="'+e.color+'" font-style="italic">'+e.label+'</text>';}}
+      if(e.label){var mx=(fn.x+tn.x)/2,my=(fn.y+tn.y)/2-6;h+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="7" fill="'+e.color+'" font-style="italic">'+e.label+'</text>';}}}
     for(var j=0;j<c.dag.nodes.length;j++){var n=c.dag.nodes[j];
       h+='<g class="dagn" data-nid="'+n.id+'" style="cursor:pointer"><circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
       h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="8" font-weight="bold" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
