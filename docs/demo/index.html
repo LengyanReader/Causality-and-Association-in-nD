@@ -246,9 +246,11 @@ function buildConceptSketch(v){
   }
   for(var i=0;i<v.nodes.length;i++){
     var n=v.nodes[i];
+    h+='<g class="dagn" style="cursor:pointer">';
     h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+n.r+'" fill="'+n.color+'" stroke="#1a1a2e" stroke-width="1.5"/>';
-    h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="'+((n.r||22)>20?'9':'8')+'" font-weight="700" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
-    // Handle multi-line labels (e.g., "rain\nweekend\npayday")
+    h+='<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="'+((n.r||22)>20?'9':'8')+'" font-weight="700" fill="'+(n.color==="#e8e8e8"||n.color==="#f39c12"||n.color==="#95a5a6"?"#1a1a2e":"#fff")+'">'+n.id+'</text>';
+    if(n.detail)h+='<title>'+n.detail+'</title>';
+    h+='</g>';
     var lines=n.label.split("\n");
     for(var li=0;li<lines.length;li++){
       h+='<text x="'+n.x+'" y="'+(n.y-n.r-7-(lines.length-1-li)*9)+'" text-anchor="middle" font-size="8" fill="#1a1a2e">'+lines[li]+'</text>';

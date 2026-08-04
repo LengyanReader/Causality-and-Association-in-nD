@@ -306,11 +306,16 @@ data["content"] = {
         "observed_box": {"x": 195, "y": 30, "w": 205, "h": 268, "label": "What the platform CAN see", "color": "#f0fdf4"},
         "outcome_box": {"x": 425, "y": 75, "w": 275, "h": 160, "label": "What we want to affect", "color": "#eff6ff"},
         "nodes": [
-            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 135, "color": "#e74c3c", "r": 22},
-            {"id": "W", "label": "W: App-use history", "x": 270, "y": 90, "color": "#f39c12", "r": 22},
-            {"id": "T", "label": "T: Notification sent", "x": 270, "y": 228, "color": "#2ecc71", "r": 22},
-            {"id": "Y", "label": "Y: Order placed", "x": 550, "y": 140, "color": "#2ecc71", "r": 22},
-            {"id": "C", "label": "Context:\nrain\nweekend\npayday", "x": 405, "y": 180, "color": "#95a5a6", "r": 18}
+            {"id": "U", "label": "U: Hunger (latent)", "x": 70, "y": 135, "color": "#e74c3c", "r": 22,
+             "detail": "U = True hunger level. This is a LATENT variable — the platform cannot see or measure it. U drives both app-use (U→W) and orders (U→Y), making it the root of all confounding in this problem."},
+            {"id": "W", "label": "W: App-use history", "x": 270, "y": 90, "color": "#f39c12", "r": 22,
+             "detail": "W = App-use history. A measured proxy for hunger — correlates with U (r≈0.89) but is NOT the same thing. The platform targets notifications based on W. Conditioning on W blocks the back-door path T←W←U→Y."},
+            {"id": "T", "label": "T: Notification sent", "x": 270, "y": 228, "color": "#2ecc71", "r": 22,
+             "detail": "T = Treatment: was a push notification sent? The intervention we study. T is caused by W (targeting), Z (jitter), rain, weekend, and payday. We want to know: does T CAUSE Y, or just correlate with it?"},
+            {"id": "Y", "label": "Y: Order placed", "x": 550, "y": 140, "color": "#2ecc71", "r": 22,
+             "detail": "Y = Outcome: did the user place an order? Y is caused by T (causal target), U (hunger), rain, weekend, payday, and coupons. The ATE measures E[Y|do(T=1)] − E[Y|do(T=0)]."},
+            {"id": "C", "label": "Context:\nrain\nweekend\npayday", "x": 405, "y": 180, "color": "#95a5a6", "r": 18,
+             "detail": "Context variables (observed confounders):\n• rain — raining? Affects both T (more notifications on rainy days) and Y (more orders in bad weather)\n• weekend — weekend? Different notification strategy and order behavior\n• payday — payday? More orders on payday, different targeting\nAll three must be included in the adjustment set."}
         ],
         "edges": [
             {"from": "U", "to": "W", "color": "#e74c3c", "dash": "6,2", "label": "hunger → app use"},

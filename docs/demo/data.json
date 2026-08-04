@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.2279,
+    "ci_low": 0.228,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0020966299957834687, 'tolerance': 0.013346936815818809}"
+        "detail": "{'estimate': 0.0019114725520951391, 'tolerance': 0.013352638641302414}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 8.336876407535887e-05, 'tolerance': 0.008025204492209578}"
+        "detail": "{'delta': 1.8854549550223476e-05, 'tolerance': 0.008024927743439133}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005206479666331115, 'tolerance': 0.018554276331053502}"
+        "detail": "{'delta': 0.005160703817483875, 'tolerance': 0.018544147352741926}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008139862561684073, 'tolerance': 0.014537205064807168}"
+        "detail": "{'estimate': -0.0008865901080776313, 'tolerance': 0.014536233762460533}"
       }
     ],
     "naive": 0.3467,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0043461245604423755, 'tolerance': 0.013360725406307668}"
+        "detail": "{'estimate': 0.004344593009825045, 'tolerance': 0.013360572159164558}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0011898074923623048, 'tolerance': 0.007932395048231882}"
+        "detail": "{'delta': 0.001160738176340964, 'tolerance': 0.007932832692182534}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005095967298477666, 'tolerance': 0.018334940221944613}"
+        "detail": "{'delta': 0.0050958429666655425, 'tolerance': 0.018334447448924093}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004337973048831679, 'tolerance': 0.014167358474261703}"
+        "detail": "{'estimate': -0.004435187385780713, 'tolerance': 0.014167682509249498}"
       }
     ],
     "naive": 0.297,
@@ -611,7 +611,8 @@
           "x": 70,
           "y": 135,
           "color": "#e74c3c",
-          "r": 22
+          "r": 22,
+          "detail": "U = True hunger level. This is a LATENT variable — the platform cannot see or measure it. U drives both app-use (U→W) and orders (U→Y), making it the root of all confounding in this problem."
         },
         {
           "id": "W",
@@ -619,7 +620,8 @@
           "x": 270,
           "y": 90,
           "color": "#f39c12",
-          "r": 22
+          "r": 22,
+          "detail": "W = App-use history. A measured proxy for hunger — correlates with U (r≈0.89) but is NOT the same thing. The platform targets notifications based on W. Conditioning on W blocks the back-door path T←W←U→Y."
         },
         {
           "id": "T",
@@ -627,7 +629,8 @@
           "x": 270,
           "y": 228,
           "color": "#2ecc71",
-          "r": 22
+          "r": 22,
+          "detail": "T = Treatment: was a push notification sent? The intervention we study. T is caused by W (targeting), Z (jitter), rain, weekend, and payday. We want to know: does T CAUSE Y, or just correlate with it?"
         },
         {
           "id": "Y",
@@ -635,7 +638,8 @@
           "x": 550,
           "y": 140,
           "color": "#2ecc71",
-          "r": 22
+          "r": 22,
+          "detail": "Y = Outcome: did the user place an order? Y is caused by T (causal target), U (hunger), rain, weekend, payday, and coupons. The ATE measures E[Y|do(T=1)] − E[Y|do(T=0)]."
         },
         {
           "id": "C",
@@ -643,7 +647,8 @@
           "x": 405,
           "y": 180,
           "color": "#95a5a6",
-          "r": 18
+          "r": 18,
+          "detail": "Context variables (observed confounders):\n• rain — raining? Affects both T (more notifications on rainy days) and Y (more orders in bad weather)\n• weekend — weekend? Different notification strategy and order behavior\n• payday — payday? More orders on payday, different targeting\nAll three must be included in the adjustment set."
         }
       ],
       "edges": [
