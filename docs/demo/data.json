@@ -1,7 +1,7 @@
 {
   "static": {
     "ate": 0.2437,
-    "ci_low": 0.228,
+    "ci_low": 0.2279,
     "ci_high": 0.2594,
     "se": 0.008,
     "truth": 0.2413,
@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019114725520951391, 'tolerance': 0.013352638641302414}"
+        "detail": "{'estimate': 0.0019287505618934585, 'tolerance': 0.013344195610175047}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 1.8854549550223476e-05, 'tolerance': 0.008024927743439133}"
+        "detail": "{'delta': 2.839638793300514e-05, 'tolerance': 0.008025898541434895}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005160703817483875, 'tolerance': 0.018544147352741926}"
+        "detail": "{'delta': 0.0051510171478490185, 'tolerance': 0.018544999806794776}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008865901080776313, 'tolerance': 0.014536233762460533}"
+        "detail": "{'estimate': -0.0008044504055178527, 'tolerance': 0.014537936693097737}"
       }
     ],
     "naive": 0.3467,
@@ -51,8 +51,8 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
-    "ci_high": 0.2081,
+    "ci_low": 0.1769,
+    "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
     "mu1": 0.5755,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004344593009825045, 'tolerance': 0.013360572159164558}"
+        "detail": "{'estimate': 0.004333244324749711, 'tolerance': 0.013361301626771085}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.001160738176340964, 'tolerance': 0.007932832692182534}"
+        "detail": "{'delta': 0.001147124074053596, 'tolerance': 0.00793218284429298}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.0050958429666655425, 'tolerance': 0.018334447448924093}"
+        "detail": "{'delta': 0.0050958870611106655, 'tolerance': 0.018334976963095696}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004435187385780713, 'tolerance': 0.014167682509249498}"
+        "detail": "{'estimate': -0.004340324696619264, 'tolerance': 0.014167389003424373}"
       }
     ],
     "naive": 0.297,
@@ -107,7 +107,7 @@
   },
   "evolve": {
     "control": {
-      "M": 0.0083,
+      "M": 0.0082,
       "NC": -0.0039,
       "S": 0.002,
       "T": 0.0067,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.008
+      "Y": 0.0081
     },
     "worst": "M",
     "alarm": 0.02

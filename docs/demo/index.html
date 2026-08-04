@@ -138,7 +138,7 @@ details.think .think-body h4:first-child{margin-top:0}
 .tbl-legend span{background:#f1f5f9;padding:2px 8px;border-radius:10px;white-space:nowrap}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"></aside><main class="main" id="content"><p style="color:var(--muted);padding:40px">Loading...</p></main></div><script>
 var D=null,activeRegime="static";
-fetch("data.json?v=9").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;try{build()}catch(e){document.getElementById("content").innerHTML='<div class="card"><h3>JS Error</h3><p>'+e.message+'</p><pre>'+e.stack+'</pre></div>'}}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data.json</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
+fetch("data.json?v=10").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){D=j;try{build()}catch(e){document.getElementById("content").innerHTML='<div class="card"><h3>JS Error</h3><p>'+e.message+'</p><pre>'+e.stack+'</pre></div>'}}).catch(function(e){document.getElementById("content").innerHTML='<div class="card"><h3>Cannot load data.json</h3><p>Run <code>python docs/demo/generate.py</code></p><p>'+e.message+'</p></div>'});
 function fmt(v,d){d=d||4;return(v>=0?"+":"")+v.toFixed(d)}
 function r(){return D[activeRegime]}
 function cov(dd){return dd.ci_low<=dd.truth&&dd.truth<=dd.ci_high}
@@ -486,7 +486,7 @@ function buildThinking(th){
 }
 
 function build(){
-  if(!D)return;var rd=r(),c=D.content,cs=c.stations,h="";buildSidebar();
+  if(!D)return;var rd=r(),c=D.content,cs=c.stations,h="",_step="";buildSidebar();
   h+='<h1>Causal Science - A Guided Walkthrough</h1>';
   h+='<p style="font-size:1.05rem;color:var(--muted)">NomNom Eats: Does sending push notifications <i>cause</i> users to order?</p>';
   h+='<h2 id="s1"><span class="cn">1</span> The Question</h2>';
