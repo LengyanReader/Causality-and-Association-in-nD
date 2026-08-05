@@ -87,9 +87,41 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>4. The E-value — Minimum Confounding Strength (VanderWeele & Ding 2017)</h2>
+<h2>4. The Quantities Themselves — What RR, R², and Γ Actually Measure</h2>
 <div class="card">
-<h3>3.1 Semantic Interpretation</h3>
+<p>Before deriving each method, we need to understand what the underlying quantities <i>are</i> — not just their formulas, but what kind of "thing" each one measures.</p>
+
+<h3>4.1 Risk Ratio (RR) — "How many times more likely?"</h3>
+<p><b>What it is.</b> RR = P(Y=1 | T=1) / P(Y=1 | T=0). It's a <b>multiplicative comparison</b> of two probabilities. RR=2 means "treated units are twice as likely to experience the outcome." RR=1 means "no difference." RR=0.5 means "treated units are half as likely."</p>
+<p><b>What kind of measure.</b> RR is a <b>ratio scale</b> — it lives on (0, ∞), with 1 as the natural "no effect" reference point. It is NOT a distance (RR=4 is not "twice as far from 1" as RR=2 — the scale is multiplicative, not additive). Moving from RR=2 to RR=3 is a 50% increase in risk; moving from RR=10 to RR=11 is a 10% increase. Equal differences in RR do NOT represent equal differences in confounding strength.</p>
+<p><b>What it captures.</b> RR measures the <b>strength of association</b> between a binary variable and a binary outcome. When used in the E-value, RR_TU means "how much does U shift the probability of T?" and RR_UY means "how much does U shift the probability of Y?" Both are conditional on measured covariates — they are the residual association after accounting for X.</p>
+<p><b>What RR=2.73 actually means in the world.</b> If U has RR=2.73 with treatment T, then among people with the same measured covariates, those with U=1 are 2.73× as likely to receive treatment as those with U=0. If the baseline probability of treatment is 30%, the confounder shifts it to 30% × 2.73 ≈ 82% — a massive shift. This is why E-values above 2 are considered "robust": they require confounders that would dominate the treatment assignment process.</p>
+
+<h3>4.2 Partial R² — "What fraction of unexplained variance does it explain?"</h3>
+<p><b>What it is.</b> R²_{T∼U|X} is the fraction of variance in T that U explains, AFTER X has already explained everything it can. If R² = 0.05, U explains 5% of what X left unexplained. This is fundamentally different from RR: it's on a <b>[0,1] scale</b> (a proportion), and it measures <b>variance explained</b> rather than <b>probability ratio</b>.</p>
+<p><b>What kind of measure.</b> Partial R² is a <b>bounded proportion</b> — it lives on [0,1], with 0 meaning "U explains nothing beyond X" and 1 meaning "U explains everything X didn't." It is <b>additive across uncorrelated variables</b>: if U₁ explains 3% and U₂ explains 4% and they're uncorrelated, together they explain ~7%. This makes it natural for thinking about multiple confounders.</p>
+<p><b>What it captures.</b> Partial R² measures the <b>incremental predictive power</b> of U — how much U improves our ability to predict T (or Y) beyond what X already achieves. It's a measure of <b>residual dependence</b>: after conditioning on X, how much "pattern" remains that U can capture?</p>
+<p><b>What R²=0.05 actually means in the world.</b> If X (income, age, education) already explains 40% of variance in treatment, and U explains 5% of the remaining 60%, then U captures 5% × 60% = 3% of the total variance. This is a small but real effect — comparable to adding one moderately predictive covariate to a regression. In social science contexts, R²=0.05 for a single variable is fairly typical; R²=0.20 would be considered very strong.</p>
+
+<h3>4.3 Rosenbaum's Γ — "How much can hidden bias tilt the playing field?"</h3>
+<p><b>What it is.</b> Γ ≥ 1 bounds the odds ratio of treatment assignment between two matched units with identical observed covariates: 1/Γ ≤ (π_i/(1−π_i)) / (π_j/(1−π_j)) ≤ Γ. Γ=1 means perfectly random assignment within matched pairs. Γ=2 means one unit can be up to twice as likely (in odds) to receive treatment as its matched twin.</p>
+<p><b>What kind of measure.</b> Γ is a <b>multiplicative bound</b> — like RR, it lives on [1,∞) with 1 as the "no bias" reference. But unlike RR, Γ does NOT measure association with an outcome — it measures the <b>maximum allowable distortion</b> in the treatment assignment process. It's a measure of <b>departure from random assignment</b>, not a measure of confounding strength per se.</p>
+<p><b>What it captures.</b> Γ captures the <b>design quality</b> — how close your matched study is to a randomized experiment. A study that survives Γ=5 has a much stronger design than one that fails at Γ=1.2. In this sense, Γ is a <b>design robustness metric</b>: it tells you how much hidden bias your design can tolerate before the conclusion changes.</p>
+<p><b>What Γ=2 actually means in the world.</b> In a matched study of notification→order, two users with identical W, rain, weekend, payday should have the same notification probability. Γ=2 means: an unmeasured confounder could make one user up to 2× more likely (in odds) to receive a notification than the other — doubling the odds. If the baseline notification probability is 50% (odds=1), doubling the odds to 2 means probability rises to 67%. A confounder that can shift probability by 17 percentage points within matched pairs is substantial but not implausible — which is why Γ=2 is often considered a moderate sensitivity threshold.</p>
+
+<h3>4.4 How These Measures Relate</h3>
+<table>
+<tr><th>Quantity</th><th>Scale</th><th>Measures</th><th>Natural reference</th><th>Used by</th></tr>
+<tr><td>RR</td><td>(0,∞) multiplicative</td><td>Probability ratio: how many times more likely?</td><td>1 = no association</td><td>E-value</td></tr>
+<tr><td>Partial R²</td><td>[0,1] additive</td><td>Variance explained: what fraction of residual pattern?</td><td>0 = no explanatory power</td><td>Cinelli-Hazlett, Breakdown frontier</td></tr>
+<tr><td>Γ</td><td>[1,∞) multiplicative</td><td>Odds ratio bound: how much can hidden bias tilt assignment?</td><td>1 = random assignment</td><td>Rosenbaum</td></tr>
+</table>
+<p>None of these is "better" — they measure different things on different scales for different study designs. The E-value uses RR because binary outcomes are common in epidemiology. Partial R² uses variance-explained because continuous outcomes are common in economics and social science. Γ uses odds ratios because matched designs are common in statistics. <b>Choosing the right sensitivity method means choosing the right scale for your problem.</b></p>
+</div>
+
+<h2>5. The E-value — Minimum Confounding Strength (VanderWeele & Ding 2017)</h2>
+<div class="card">
+<h3>5.1 Semantic Interpretation</h3>
 <p>The E-value answers: <b>"What is the minimum risk ratio an unmeasured confounder must have with BOTH treatment and outcome, conditional on measured covariates, to fully explain away the observed association?"</b></p>
 <p>Think of it as a <b>"worst-case" benchmark</b>. An E-value of 2.73 means: even in the most pessimistic scenario, a confounder would need RR ≥ 2.73 with both T and Y to reduce the true effect to zero. If domain experts believe no unmeasured confounder could be that strong, the result is robust.</p>
 <div class="callout-green"><b>Everyday analogy — the two-skill safe-cracker:</b> A confounder must be strong in <b>two dimensions simultaneously</b> — associated with BOTH treatment AND outcome. Think of a safe that requires <b>two hands turning two dials at once</b>. The E-value says: "To crack this safe, a thief would need to apply at least 273 lbs of pressure with EACH hand simultaneously." Your strongest friend can do 180 lbs with one hand — and almost no one can sustain that with both. The safe isn't provably uncrackable, but the thief would need to be <b>bilaterally implausible</b>. This captures the E-value's key structure: RR with T AND RR with Y, both ≥ E-value.</div>
@@ -122,7 +154,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Conservative variant:</b> Use the CI bound closest to the null instead of the point estimate. If the CI-bound E-value still exceeds 2, the conclusion is robust even under parameter uncertainty.</p>
 </div>
 
-<h2>5. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
+<h2>6. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
 <div class="card">
 <h3>4.1 Semantic Interpretation</h3>
 <p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
@@ -143,7 +175,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>What the math guarantees — and what it doesn't.</b> The partial R² framework guarantees: IF a confounder U exists with partial R² values (R²_T, R²_Y), THEN the bias is exactly δ×γ/(1−R²_{T∼X}), which can be expressed in terms of (R²_T, R²_Y). It does NOT guarantee: that the linear model is correctly specified (if the true relationships are nonlinear, the partial R² may misstate the confounder's importance), that the confounder's effect is additive (interactions with T would change the bias formula), or that the observed covariates are sufficient to identify the other coefficients (they may be colliders). <b>Extent:</b> The framework holds exactly for linear models with additive confounding. For nonlinear models, it provides a useful approximation whose accuracy depends on how close to linear the true relationships are. For binary outcomes, the E-value is generally preferred; for continuous outcomes, partial R² is the natural choice.</p>
 </div>
 
-<h2>6. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
+<h2>7. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
 <div class="card">
 <h3>5.1 Semantic Interpretation</h3>
 <p>Rosenbaum bounds ask: <b>"How large would the departure from random assignment need to be (in terms of odds ratios) to render my significant result non-significant?"</b> This is the classic sensitivity analysis for matched observational studies.</p>
@@ -159,7 +191,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>What the math guarantees — and what it doesn't.</b> Rosenbaum bounds guarantee: IF the odds ratio distortion from U is at most Γ, THEN the p-value is in the computed range. They do NOT guarantee: that Γ = 1 (random assignment) is true, that the matched design successfully balanced unobserved covariates (only observed ones), or that the test statistic is the most powerful one available. <b>Extent:</b> The bounds are <b>sharp</b> for the given Γ — there exists a distribution of U that achieves the bound. But they are <b>conservative</b> in the sense that the actual U may be far less adversarial than the worst case. If your result survives Γ = 3, it would also survive any real confounder weaker than that.</p>
 </div>
 
-<h2>7. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
+<h2>8. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
 <div class="card">
 <h3>6.1 Semantic Interpretation</h3>
 <p>Rather than a single number (E-value, RV), the breakdown frontier maps the <b>entire boundary</b> of (R²_{T∼U}, R²_{Y∼U}) combinations that would nullify the result. It answers: "What are ALL the confounder profiles that could explain away my effect?"</p>
@@ -170,7 +202,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>The frontier is a <b>hyperbola-like curve</b> in (R²_T, R²_Y) space. Points above the curve correspond to confounders that would overturn the result. The E-value is one point on this curve (where R²_T = R²_Y). The robustness value is a perpendicular projection. The frontier is the <b>complete characterization</b>.</p>
 </div>
 
-<h2>8. How Each Method Handles Unmeasured vs. Unknown — Worked Examples</h2>
+<h2>9. How Each Method Handles Unmeasured vs. Unknown — Worked Examples</h2>
 <div class="card">
 <h3>8.1 The E-value — Handles BOTH Without Distinction</h3>
 <p><b>How it deals with unmeasured:</b> You suspect stress confounds your notification→order estimate but didn't measure it. The E-value says: "ANY confounder, whether it's stress or something else, needs RR≥2.73 with both T and Y." Since you know from the literature that stress→smoking RR≈1.5 (weaker than 2.73), even stress couldn't explain away your result. <b>The E-value doesn't need you to name the confounder — it works exactly the same for unmeasured and unknown.</b></p>
@@ -211,7 +243,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>9. Method Comparison — Which Sensitivity Tool When?</h2>
+<h2>10. Method Comparison — Which Sensitivity Tool When?</h2>
 <div class="card">
 <table>
 <tr><th>Method</th><th>Best for</th><th>Unmeasured or Unknown?</th><th>Scale</th><th>Calibration</th><th>Software</th></tr>
@@ -224,13 +256,13 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>10. The Cornfield Conditions — Where It All Began (1959)</h2>
+<h2>11. The Cornfield Conditions — Where It All Began (1959)</h2>
 <div class="card">
 <p>Cornfield et al. (1959) addressed Fisher's claim that a genetic confounder could explain the smoking-lung cancer association. They showed: <b>for a confounder to fully explain the observed RR, its association with the outcome must be at least as strong as the observed association itself.</b> Specifically, if smoking has RR=9 for lung cancer, any confounder must have RR ≥ 9 with lung cancer — stronger than almost any known risk factor. This was the <b>first sensitivity analysis in history</b>, and it convinced the scientific community that smoking causes cancer.</p>
 <div class="callout-green"><b>Historical significance:</b> Cornfield's inequality is the intellectual ancestor of the E-value. The E-value generalizes it to arbitrary RR values and proves it as a mathematical bound (the Ding-VanderWeele inequality), not just a heuristic.</div>
 </div>
 
-<h2>11. Key References</h2>
+<h2>12. Key References</h2>
 <div class="card">
 <p><a href="https://doi.org/10.1093/jnci/22.1.173" target="_blank">Cornfield, J. et al. (1959).</a> Smoking and lung cancer: recent evidence and a discussion of some questions. <i>JNCI</i>, 22(1), 173-203. — The first sensitivity analysis in history.</p>
 <p><a href="https://doi.org/10.1007/978-1-4757-3692-2" target="_blank">Rosenbaum, P. R. (2002).</a> <i>Observational Studies</i>. Springer. — Rosenbaum bounds (Γ).</p>
