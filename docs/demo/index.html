@@ -5,6 +5,7 @@
 <title>Causal Science - UCL Walkthrough</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <style>
 :root{--bg:#fafbfc;--card:#fff;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--teal:#0d9488;--dark:#0f172a;--border:#e2e8f0;--radius:10px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -453,8 +454,13 @@ function buildThinking(th){
   // LAYER 3: Concrete Operations
   var hasHow = (th.derivation&&th.derivation.body);
   if(hasHow){
+    var derBody=th.derivation.body;
+    // If body has no HTML tags, render as display LaTeX
+    if(!/<[a-z][\s\S]*>/i.test(derBody)){
+      derBody=DM(derBody);
+    }
     h+='<details class="think"><summary>Layer 3: Concrete Operations</summary><div class="think-body">';
-    h+='<details class="think-derivation" open><summary>'+(th.derivation.title||"Derivation")+'</summary><div class="der-body">'+th.derivation.body+'</div></details>';
+    h+='<details class="think-derivation" open><summary>'+(th.derivation.title||"Derivation")+'</summary><div class="der-body">'+derBody+'</div></details>';
     h+='</div></details>';
   }
   // LAYER 4: Logic Verification
@@ -762,6 +768,7 @@ function build(){
   document.getElementById("content").innerHTML=h;
   var dags=document.querySelectorAll(".dagn");for(var i=0;i<dags.length;i++)dags[i].addEventListener("click",function(ev){dagPopup(ev,this.getAttribute("data-nid"))});
   setupGraphPanels();
+  if(typeof renderMathInElement!=='undefined'){renderMathInElement(document.getElementById("content"),{delimiters:[{left:\"$$\",right:\"$$\",display:true},{left:\"$\",right:\"$\",display:false}]});}
 }
 
 function buildStation(s,rd){

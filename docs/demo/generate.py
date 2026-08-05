@@ -851,6 +851,13 @@ _REPLS = [
 
 data["content"] = _replace_in_strings(data["content"], _REPLS)
 
+# ── Escape & in LaTeX symbolic fields (KaTeX treats & as alignment tab) ──
+for _st in data["content"]["stations"]:
+    _th = _st.get("thinking", {})
+    if "symbolic" in _th:
+        # Escape bare & that are not already \& and not HTML entities
+        _th["symbolic"] = _re.sub(r'(?<!\\)&(?!\w+;)', r'\\&', _th["symbolic"])
+
 # ── Verify no stale hardcoded numbers remain ──
 _STALE_CHECKS = [
     ("0.343", "naive ATE"), ("0.345", "naive ATE"),

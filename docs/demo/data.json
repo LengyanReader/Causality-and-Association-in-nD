@@ -28,22 +28,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.0019461046344937515, 'tolerance': 0.013343236795898427}"
+        "detail": "{'estimate': 0.0019197132863109881, 'tolerance': 0.013343966119535628}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 8.192335904683157e-06, 'tolerance': 0.008025726339858772}"
+        "detail": "{'delta': 3.2669302573506975e-05, 'tolerance': 0.008026157991666243}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005279590281089097, 'tolerance': 0.018570874115676317}"
+        "detail": "{'delta': 0.00520672559461291, 'tolerance': 0.018553942346354144}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.0008086165068809523, 'tolerance': 0.01453881150189683}"
+        "detail": "{'estimate': -0.0008631965608044366, 'tolerance': 0.014534277965727609}"
       }
     ],
     "naive": 0.3467,
@@ -51,7 +51,7 @@
   },
   "holiday": {
     "ate": 0.1925,
-    "ci_low": 0.177,
+    "ci_low": 0.1769,
     "ci_high": 0.208,
     "se": 0.0079,
     "truth": 0.191,
@@ -78,22 +78,22 @@
       {
         "name": "placebo_treatment",
         "passed": true,
-        "detail": "{'estimate': 0.004350221104431643, 'tolerance': 0.013360604332596152}"
+        "detail": "{'estimate': 0.004350651500251298, 'tolerance': 0.013360424321324301}"
       },
       {
         "name": "random_common_cause",
         "passed": true,
-        "detail": "{'delta': 0.0012094597224427128, 'tolerance': 0.007932701329985775}"
+        "detail": "{'delta': 0.0012685973391504402, 'tolerance': 0.007932780053808012}"
       },
       {
         "name": "subset_refuter",
         "passed": true,
-        "detail": "{'delta': 0.005045241979193399, 'tolerance': 0.01833458746881523}"
+        "detail": "{'delta': 0.005043933527781319, 'tolerance': 0.018334720986220077}"
       },
       {
         "name": "negative_control:NC",
         "passed": true,
-        "detail": "{'estimate': -0.004444109305195325, 'tolerance': 0.014168114132530451}"
+        "detail": "{'estimate': -0.004356922606912842, 'tolerance': 0.01416787628229789}"
       }
     ],
     "naive": 0.297,
@@ -118,7 +118,7 @@
       "NC": -0.0062,
       "S": 0.0056,
       "T": -0.0003,
-      "Y": 0.0081
+      "Y": 0.008
     },
     "worst": "M",
     "alarm": 0.02,
@@ -217,7 +217,7 @@
       },
       {
         "name": "Y",
-        "degradation": 0.008,
+        "degradation": 0.0081,
         "alarm": false
       },
       {
@@ -1635,7 +1635,7 @@
         "explanation": "Refutation is continuous, not episodic (Design Principle P4). The refutation battery applies stress tests: (1) Placebo treatment — permute T randomly, estimate should be ~0. (2) Random common cause — add a random covariate, estimate should be stable. (3) Subset refuter — estimate on 80% of data, should agree with full sample. (4) Negative-control test — estimate T→NC effect, should be ~null (NC shares confounders, no T effect).",
         "thinking": {
           "takeaway": "Refutation is continuous — placebo, random cause, subset, and negative control tests stress-test the pipeline",
-          "symbolic": "\\text{Refutation battery:} \\\\\n\\text{1. Placebo: } \\tilde{T} \\sim \\text{Bernoulli}(0.5) \\Rightarrow H_0: \\hat{\\tau}(\\tilde{T}, Y) = 0 \\\\\n\\text{2. Random common cause: } \\tilde{X} \\sim N(0,1) \\Rightarrow H_0: |\\hat{\\tau}(X) - \\hat{\\tau}(X, \\tilde{X})| < \\varepsilon \\\\\n\\text{3. Subset: } \\hat{\\tau}_{80\\%} \\approx \\hat{\\tau}_{100\\%} \\\\\n\\text{4. Negative control: } H_0: \\hat{\\tau}(T, NC) = 0 \\quad \\text{(Lipsitch, Tchetgen Tchetgen & Cohen 2010)} \\\\\n\\text{Loop invariants: } I_1 \\land I_2 \\land I_3 \\land I_4 \\text{ must hold in every run}",
+          "symbolic": "\\text{Refutation battery:} \\\\\n\\text{1. Placebo: } \\tilde{T} \\sim \\text{Bernoulli}(0.5) \\Rightarrow H_0: \\hat{\\tau}(\\tilde{T}, Y) = 0 \\\\\n\\text{2. Random common cause: } \\tilde{X} \\sim N(0,1) \\Rightarrow H_0: |\\hat{\\tau}(X) - \\hat{\\tau}(X, \\tilde{X})| < \\varepsilon \\\\\n\\text{3. Subset: } \\hat{\\tau}_{80\\%} \\approx \\hat{\\tau}_{100\\%} \\\\\n\\text{4. Negative control: } H_0: \\hat{\\tau}(T, NC) = 0 \\quad \\text{(Lipsitch, Tchetgen Tchetgen \\& Cohen 2010)} \\\\\n\\text{Loop invariants: } I_1 \\land I_2 \\land I_3 \\land I_4 \\text{ must hold in every run}",
           "steps": [
             {
               "label": "Mental operation 1: Run the placebo test",
