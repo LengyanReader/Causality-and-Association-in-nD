@@ -37,6 +37,23 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <h1>Deep Dive: Causal Identification — Σ (Summing Out) as the Universal Engine</h1>
 <p style="color:var(--muted)">Why every causal identification method — back-door, front-door, IV, do-calculus — is fundamentally the same operation: conditioning + marginalization over non-targeted variables.</p>
 
+<div class="card" style="border-left:4px solid var(--purple);background:linear-gradient(135deg,#f5f0ff,#fafbfc)">
+<h2 style="border-bottom:none;margin-top:0">What Identification Is — And Why It Matters</h2>
+
+<p><b>What.</b> Identification is the problem of expressing a <b>causal quantity</b> (something involving <code>do(T)</code> or potential outcomes <code>Y(t)</code>) purely in terms of <b>observable probabilities</b> — things you can actually compute from data. Mathematically:</p>
+<p class="formula"><span id="eq-ident"></span></p>
+<p>The Σ (sum / integral / marginalization) is the operator that makes this translation possible. Every identification method — back-door, front-door, IV, DiD, RDD, do-calculus — is a specific recipe for <b>what to condition on</b> and <b>what to sum over</b>.</p>
+
+<p><b>Why.</b> Without identification, you are doing statistics, not causal inference. You can have the best estimator in the world — if the quantity you're estimating is not the causal effect, you're precisely estimating the wrong thing. Identification is <b>prior to and separate from estimation</b> (Pearl 2009, §3; Hernán & Robins 2020, Part II). Three reasons this matters:</p>
+<ol style="margin-left:20px;line-height:1.9">
+<li><b>No statistical sophistication rescues a non-identified estimand.</b> You cannot "deep learn" your way out of confounding. If P(Y|do(T)) is not expressible in terms of P(Y|T,X), no estimator — no matter how flexible or well-regularized — will recover the truth.</li>
+<li><b>Identification determines the adjustment set — not the data.</b> The DAG tells you which variables to condition on. The data cannot tell you this. "Just control for everything" guarantees mediator bias, collider bias, or both (Cinelli, Forney & Pearl 2022).</li>
+<li><b>Every identification formula is a Σ.</b> Once you see this, the entire landscape of causal methods unifies: back-door adjustment = Σ over confounders; front-door = nested Σ over mediator + treatment; IV = implicit Σ over compliance types; DiD = Σ over time×group cells. The methods differ in <i>what</i> you sum over, never in <i>whether</i> you sum.</li>
+</ol>
+
+<p><b>Key insight.</b> Identification is the <b>bridge</b> between Rung 1 (association, P(Y|T)) and Rung 2 (intervention, P(Y|do(T))). The bridge is built from assumptions (the DAG) and crossed by Σ (marginalization). Without the assumptions, you cannot build the bridge. Without Σ, you cannot cross it. Both are necessary; neither is sufficient alone. This is why the project's Design Principle P1 insists that <b>assumptions are first-class artifacts</b> — they are the foundation the bridge stands on.</p>
+</div>
+
 <h2>1. The Core Observation</h2>
 <div class="card">
 <p>Write down the back-door adjustment formula:</p>
@@ -285,17 +302,22 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h2>12. Key References</h2>
 <div class="card">
-<p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a> — Introduces the back-door criterion and the do-calculus (R1-R3).</p>
-<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a> — §3.3: back-door; §3.4: do-calculus R1-R3; §3.5: front-door; §4: identification.</p>
-<p>Shpitser, I. & Pearl, J. (2008). Complete identification methods for the causal hierarchy. <i>Journal of Machine Learning Research</i>, 9, 1941–1979. — The ID algorithm: completeness proof that every identified causal effect is a Σ expression. (Tech report: 2006, UCLA R-352.)</p>
-<p>Greenland, S., Pearl, J., & Robins, J. M. (1999). Causal diagrams for epidemiologic research. <i>Epidemiology</i>, 10(1), 37-48. — Unified the graphical and epidemiological approaches to adjustment.</p>
-<p>Hernán, M. A. & Robins, J. M. (2020). <i>Causal Inference: What If</i>. Chapman & Hall/CRC. <a href="https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/" target="_blank">Free online</a> — Ch.7: confounding; Ch.15: instrumental variables; Ch.16: IV estimation.</p>
-<p>Cinelli, C., Forney, A., & Pearl, J. (2022). A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>. <a href="https://doi.org/10.1177/00491241221099552" target="_blank">DOI</a> — Why "control for everything" fails; the DAG tells you which Σ to use.</p>
-<p>Angrist, J. D., Imbens, G. W., & Rubin, D. B. (1996). Identification of causal effects using instrumental variables. <i>JASA</i>, 91(434), 444–455. <a href="https://doi.org/10.1080/01621459.1996.10476902" target="_blank">DOI</a> — LATE and compliance-based identification via IV.</p>
-<p>Cartwright, N. (1999). <i>The Dappled World: A Study of the Boundaries of Science</i>. Cambridge University Press. — Philosophical foundation: "no causes in, no causes out."</p>
-<p>Mlodozeniec, B., Krueger, D., & Turner, R. E. (2025). Position: Probabilistic modelling is sufficient for causal inference. <i>ICML 2025 (Oral)</i>, PMLR 267:81810-81840. <a href="https://arxiv.org/abs/2512.23408" target="_blank">arXiv</a> — Challenges the necessity of specialized causal notation; argues Σ within a full joint probabilistic model suffices.</p>
-<p>Pearl, J. (2011). On the bias amplification of conditioning on instruments. UCLA Cognitive Systems Laboratory, Technical Report R-421. — Why Σ over instruments amplifies bias.</p>
-</div>
+<p><a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">Pearl, J. (1995).</a> Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669-688. — Back-door criterion + do-calculus R1-R3.</p>
+<p><a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">Pearl, J. (2009).</a> <i>Causality</i> (2nd ed.). Cambridge. — §3.3-3.5 back-door/front-door/do-calculus; §4 identification.</p>
+<p><a href="https://www.jmlr.org/papers/v9/shpitser08a.html" target="_blank">Shpitser, I. & Pearl, J. (2008).</a> Complete identification methods for the causal hierarchy. <i>JMLR</i>, 9, 1941-1979. — ID algorithm completeness.</p>
+<p><a href="https://doi.org/10.1097/00001648-199901000-00008" target="_blank">Greenland, S., Pearl, J., & Robins, J. M. (1999).</a> Causal diagrams for epidemiologic research. <i>Epidemiology</i>, 10(1), 37-48.</p>
+<p><a href="https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/" target="_blank">Hernan, M. A. & Robins, J. M. (2020).</a> <i>Causal Inference: What If</i>. Chapman & Hall/CRC.</p>
+<p><a href="https://doi.org/10.1177/00491241221099552" target="_blank">Cinelli, C., Forney, A., & Pearl, J. (2022).</a> A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>.</p>
+<p><a href="https://doi.org/10.1080/01621459.1996.10476902" target="_blank">Angrist, J. D., Imbens, G. W., & Rubin, D. B. (1996).</a> Identification of causal effects using instrumental variables. <i>JASA</i>, 91(434), 444-455.</p>
+<p><a href="https://doi.org/10.1017/CBO9781139167093" target="_blank">Cartwright, N. (1999).</a> <i>The Dappled World</i>. Cambridge University Press.</p>
+<p><a href="https://ftp.cs.ucla.edu/pub/stat_ser/r421.pdf" target="_blank">Pearl, J. (2011).</a> Bias amplification of conditioning on instruments. UCLA CSL, TR R-421.</p>
+<p><a href="https://arxiv.org/abs/2512.23408" target="_blank">Mlodozeniec, B., Krueger, D., & Turner, R. E. (2025).</a> Probabilistic modelling is sufficient for causal inference. <i>ICML 2025 (Oral)</i>.</p>
+<p><a href="https://doi.org/10.1016/j.jeconom.2020.09.006" target="_blank">Goodman-Bacon, A. (2021).</a> DiD with variation in treatment timing. <i>J. Econometrics</i>, 225(2), 254-277.</p>
+<p><a href="https://doi.org/10.1016/j.jeconom.2020.12.001" target="_blank">Callaway, B. & SantAnna, P. H. C. (2021).</a> DiD with multiple time periods. <i>J. Econometrics</i>, 225(2), 200-230.</p>
+<p><a href="https://doi.org/10.1093/restud/rdab016" target="_blank">Blandhol, C. et al. (2022).</a> When is TSLS actually LATE? <i>Review of Economic Studies</i>.</p>
+<p><a href="https://arxiv.org/abs/2403.09580" target="_blank">Cakiqi, A. & Little, J. (2024).</a> Algorithmic syntactic causal identification. <i>arXiv:2403.09580</i>.</p>
+<p><a href="https://doi.org/10.1111/ectj.12097" target="_blank">Chernozhukov, V. et al. (2018).</a> Double/debiased machine learning. <i>The Econometrics Journal</i>, 21(1), C1-C68.</p>
+<p><a href="https://doi.org/10.1257/aer.20210816" target="_blank">Arkhangelsky, D. et al. (2021).</a> Synthetic difference in differences. <i>AER</i>, 111(12), 4088-4118.</p></div>
 
 <script>
 function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
@@ -316,6 +338,7 @@ document.getElementById("eq-do2").innerHTML=M("P(y \\mid do(x), do(z), w) = P(y 
 document.getElementById("eq-do3").innerHTML=M("P(y \\mid do(x), do(z), w) = P(y \\mid do(x), w) \\quad \\text{if } Y \\perp\\!\\!\\!\\perp Z \\mid X, W \\text{ in } G_{\\overline{X},\\overline{Z(W)}}");
 document.getElementById("eq-did").innerHTML=M("\\text{ATT}_{\\text{DiD}} = (E[Y_{\\text{post}} \\mid T=1] - E[Y_{\\text{pre}} \\mid T=1]) - (E[Y_{\\text{post}} \\mid T=0] - E[Y_{\\text{pre}} \\mid T=0])");
 document.getElementById("eq-rdd").innerHTML=M("\\tau_{\\text{RDD}} = \\lim_{r \\downarrow c} E[Y \\mid R=r] - \\lim_{r \\uparrow c} E[Y \\mid R=r]");
+document.getElementById("eq-ident").innerHTML=DM("\\underbrace{P(Y \\mid do(T=t))}_{\\text{causal (unobservable)}} = \\sum_z \\underbrace{P(Y \\mid T=t, Z=z)}_{\\text{statistical (observable)}} \\cdot \\underbrace{P(Z=z)}_{\\text{population weights}}");
 </script>
 </body>
 </html>
