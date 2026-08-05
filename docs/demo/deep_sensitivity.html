@@ -142,6 +142,41 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <h3>5.1 Semantic Interpretation</h3>
 <p>The E-value answers: <b>"What is the minimum risk ratio an unmeasured confounder must have with BOTH treatment and outcome, conditional on measured covariates, to fully explain away the observed association?"</b></p>
 <p>Think of it as a <b>"worst-case" benchmark</b>. An E-value of 2.73 means: even in the most pessimistic scenario, a confounder would need RR ≥ 2.73 with both T and Y to reduce the true effect to zero. If domain experts believe no unmeasured confounder could be that strong, the result is robust.</p>
+<div style="text-align:center;margin:16px 0">
+<svg viewBox="0 0 520 180" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
+  <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker></defs>
+  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">How the E-value Works</text>
+  <!-- U (confounder) -->
+  <circle cx="70" cy="90" r="30" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="70" y="86" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">U</text>
+  <text x="70" y="100" text-anchor="middle" font-size="8" fill="#991b1b">Confounder</text>
+  <!-- T -->
+  <circle cx="260" cy="45" r="30" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="260" y="41" text-anchor="middle" font-size="10" font-weight="700" fill="#2563eb">T</text>
+  <text x="260" y="55" text-anchor="middle" font-size="8" fill="#1e40af">Treatment</text>
+  <!-- Y -->
+  <circle cx="260" cy="135" r="30" fill="#f0fdf4" stroke="#059669" stroke-width="2"/>
+  <text x="260" y="131" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Y</text>
+  <text x="260" y="145" text-anchor="middle" font-size="8" fill="#065f46">Outcome</text>
+  <!-- U->T arrow -->
+  <line x1="97" y1="78" x2="233" y2="52" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="150" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_TU ≥ E</text>
+  <!-- U->Y arrow -->
+  <line x1="97" y1="102" x2="233" y2="128" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="150" y="135" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_UY ≥ E</text>
+  <!-- T->Y observed -->
+  <line x1="260" y1="75" x2="260" y2="105" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="295" y="93" text-anchor="start" font-size="8" fill="#64748b">Observed</text>
+  <text x="295" y="103" text-anchor="start" font-size="8" fill="#64748b">association</text>
+  <!-- Annotation -->
+  <text x="420" y="70" text-anchor="middle" font-size="9" fill="#dc2626">BOTH arrows</text>
+  <text x="420" y="84" text-anchor="middle" font-size="9" fill="#dc2626">must be ≥ E-value</text>
+  <text x="420" y="98" text-anchor="middle" font-size="8" fill="#64748b">If either is weaker,</text>
+  <text x="420" y="110" text-anchor="middle" font-size="8" fill="#64748b">confounding cannot</text>
+  <text x="420" y="122" text-anchor="middle" font-size="8" fill="#64748b">explain the effect</text>
+</svg>
+</div>
+
 <div class="callout-green"><b>Everyday analogy — the two-skill safe-cracker:</b> A confounder must be strong in <b>two dimensions simultaneously</b> — associated with BOTH treatment AND outcome. Think of a safe that requires <b>two hands turning two dials at once</b>. The E-value says: "To crack this safe, a thief would need to apply at least 273 lbs of pressure with EACH hand simultaneously." Your strongest friend can do 180 lbs with one hand — and almost no one can sustain that with both. The safe isn't provably uncrackable, but the thief would need to be <b>bilaterally implausible</b>. This captures the E-value's key structure: RR with T AND RR with Y, both ≥ E-value.</div>
 <div class="callout-warn"><b>Where this analogy breaks — and what the E-value CANNOT do:</b> (1) <b>Multiple thieves.</b> The E-value assumes a SINGLE confounder. Two weak confounders acting together could theoretically crack the safe even when neither alone meets the threshold — the safe's two-hand test doesn't rule out a team. (2) <b>Different methods of entry.</b> The E-value measures force (RR scale). If the confounder operates through a different mechanism — e.g., an instrument-like variable that affects T through a channel the E-value's derivation doesn't cover — the analogy fails. (3) <b>You might not know the strongest person alive.</b> "Benchmarks" (strongest known confounder, strongest person you know) calibrate against your current knowledge, not against reality. Before 1950, "smoking→lung cancer: RR≈10-20" would have sounded absurd — but it was real. The E-value tells you a confounder would need to be smoking-strength; it does NOT tell you smoking-strength confounders don't exist. That judgment requires domain expertise, not math.</div>
 
@@ -185,6 +220,39 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="card">
 <h3>6.1 Semantic Interpretation</h3>
 <p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
+<div style="text-align:center;margin:16px 0">
+<svg viewBox="0 0 600 200" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
+  <defs><marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker></defs>
+  <text x="300" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">Partial R² — Variance Explained by Confounder U</text>
+  <!-- T variance bar -->
+  <text x="30" y="52" font-size="9" fill="#64748b">Treatment T:</text>
+  <rect x="130" y="40" width="280" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="130" y="40" width="168" height="18" rx="3" fill="#93c5fd"/>  <!-- 60% explained by X -->
+  <text x="218" y="53" text-anchor="middle" font-size="8" fill="#1e40af">Explained by X (60%)</text>
+  <rect x="298" y="40" width="56" height="18" rx="3" fill="#c4b5fd"/>  <!-- U explains 20% of residual = 8% total -->
+  <text x="326" y="53" text-anchor="middle" font-size="8" fill="#6d28d9">U: R²_T=0.05</text>
+  <rect x="354" y="40" width="56" height="18" rx="3" fill="#fecaca"/>  <!-- unexplained -->
+  <text x="382" y="53" text-anchor="middle" font-size="8" fill="#991b1b">Unexpl.</text>
+  <!-- Y variance bar -->
+  <text x="30" y="92" font-size="9" fill="#64748b">Outcome Y:</text>
+  <rect x="130" y="80" width="280" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="130" y="80" width="140" height="18" rx="3" fill="#86efac"/>  <!-- 50% explained by X+T -->
+  <text x="200" y="93" text-anchor="middle" font-size="8" fill="#065f46">Explained by X+T (50%)</text>
+  <rect x="270" y="80" width="56" height="18" rx="3" fill="#c4b5fd"/>
+  <text x="298" y="93" text-anchor="middle" font-size="8" fill="#6d28d9">U: R²_Y=0.05</text>
+  <rect x="326" y="80" width="84" height="18" rx="3" fill="#fecaca"/>
+  <text x="368" y="93" text-anchor="middle" font-size="8" fill="#991b1b">Unexplained</text>
+  <!-- Benchmark comparison -->
+  <line x1="130" y1="130" x2="410" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="30" y="148" font-size="9" fill="#64748b">Benchmark:</text>
+  <rect x="130" y="136" width="84" height="18" rx="3" fill="#fbbf24" opacity="0.6"/>
+  <text x="172" y="149" text-anchor="middle" font-size="8" fill="#92400e">Income R²=0.03</text>
+  <text x="230" y="149" font-size="9" fill="#7c3aed">→ U must be 1.7× stronger than income</text>
+  <!-- Key text -->
+  <text x="300" y="185" text-anchor="middle" font-size="9" fill="#7c3aed">U explains residual variance in both T and Y.</text>
+  <text x="300" y="197" text-anchor="middle" font-size="8" fill="#64748b">If either R² is too small, U cannot explain away the effect.</text>
+</svg>
+</div>
 <div class="callout-green"><b>Everyday analogy — the "how much stronger than income?" test:</b> Imagine you're debating whether a raise actually improves productivity, or whether "motivation" (which you didn't measure) confounds both. A colleague says: "Motivation is probably a confounder." You reply: "OK — <i>how much</i> stronger than income would motivation need to be to overturn my result?" Income explains 8% of the variance in getting a raise. The partial R² framework tells you: motivation would need to explain <b>24%</b> — <b>three times as much as income</b>. Now your colleague has to defend whether an unmeasured variable could really be 3× as predictive as income. The burden of proof shifts — from you having to prove there's NO confounder, to your critic having to argue that a confounder that strong could exist. This is the power of benchmarking: it makes the debate <b>concrete and calibratable</b>.</div>
 
 <h3>6.2 Mathematical Derivation</h3>
@@ -222,6 +290,42 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="card">
 <h3>8.1 Semantic Interpretation</h3>
 <p>Rather than a single number (E-value, RV), the breakdown frontier maps the <b>entire boundary</b> of (R²_{T∼U}, R²_{Y∼U}) combinations that would nullify the result. It answers: "What are ALL the confounder profiles that could explain away my effect?"</p>
+<div style="text-align:center;margin:16px 0">
+<svg viewBox="0 0 480 280" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
+  <text x="240" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">Breakdown Frontier — The Danger Curve</text>
+  <!-- Axes -->
+  <line x1="60" y1="240" x2="420" y2="240" stroke="#1a1a2e" stroke-width="1.5"/>
+  <line x1="60" y1="240" x2="60" y2="30" stroke="#1a1a2e" stroke-width="1.5"/>
+  <text x="240" y="268" text-anchor="middle" font-size="10">R²_T∼U|X  (variance in treatment explained by U)</text>
+  <text x="15" y="140" text-anchor="middle" font-size="10" transform="rotate(-90,15,140)">R²_Y∼U|X,T  (variance in outcome)</text>
+  <!-- Danger curve (hyperbola-like) -->
+  <path d="M 60 240 Q 120 180, 240 120 Q 360 80, 420 60" fill="none" stroke="#dc2626" stroke-width="3"/>
+  <!-- Safe zone -->
+  <text x="140" y="215" font-size="9" fill="#059669">SAFE ZONE</text>
+  <!-- Danger zone -->
+  <text x="300" y="100" font-size="9" fill="#dc2626">DANGER</text>
+  <text x="300" y="112" font-size="8" fill="#dc2626">(would overturn result)</text>
+  <!-- E-value point -->
+  <circle cx="180" cy="160" r="6" fill="#2563eb"/>
+  <text x="188" y="156" font-size="8" fill="#2563eb">E-value</text>
+  <text x="188" y="166" font-size="7" fill="#64748b">(R²_T = R²_Y)</text>
+  <!-- Asymmetric point -->
+  <circle cx="310" cy="95" r="6" fill="#d97706"/>
+  <text x="318" y="91" font-size="8" fill="#d97706">Asymmetric</text>
+  <text x="318" y="101" font-size="7" fill="#64748b">(R²_Y >> R²_T)</text>
+  <!-- Arrow from asymmetric to curve -->
+  <line x1="310" y1="95" x2="340" y2="87" stroke="#d97706" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="350" y="82" font-size="7" fill="#d97706">above curve = danger</text>
+  <!-- Grid lines -->
+  <line x1="60" y1="200" x2="420" y2="200" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="60" y1="160" x2="420" y2="160" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="60" y1="120" x2="420" y2="120" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="60" y1="80" x2="420" y2="80" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="150" y1="240" x2="150" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="240" y1="240" x2="240" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="330" y1="240" x2="330" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+</svg>
+</div>
 <div class="callout-green"><b>Everyday analogy — the "shape of danger":</b> The E-value tells you the confounder needs RR ≥ 2.73 with BOTH T and Y. But what if the confounder is <i>extremely</i> predictive of the outcome (R² = 0.50) but only <i>weakly</i> predictive of treatment (R² = 0.01)? The E-value treats these symmetrically and might say "safe." But the breakdown frontier shows that this asymmetric confounder ALSO overturns your result — it just does so from a different direction. Think of the frontier as the <b>"danger curve"</b> on a map: everything above the curve is dangerous (would overturn your result), everything below is safe. The E-value and RV are single points on this curve — useful summaries, but they don't show you the full shape of the risk. A result might survive a symmetric confounder (E-value says "safe") but be vulnerable to an asymmetric one (frontier says "danger above this curve"). The frontier gives you the <b>complete picture</b>.</div>
 
 <h3>8.2 Why a Single Number Is Not Enough</h3>
