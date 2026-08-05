@@ -158,7 +158,48 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>The frontier is a <b>hyperbola-like curve</b> in (R²_T, R²_Y) space. Points above the curve correspond to confounders that would overturn the result. The E-value is one point on this curve (where R²_T = R²_Y). The robustness value is a perpendicular projection. The frontier is the <b>complete characterization</b>.</p>
 </div>
 
-<h2>8. Method Comparison — Which Sensitivity Tool When?</h2>
+<h2>8. How Each Method Handles Unmeasured vs. Unknown — Worked Examples</h2>
+<div class="card">
+<h3>8.1 The E-value — Handles BOTH Without Distinction</h3>
+<p><b>How it deals with unmeasured:</b> You suspect stress confounds your notification→order estimate but didn't measure it. The E-value says: "ANY confounder, whether it's stress or something else, needs RR≥2.73 with both T and Y." Since you know from the literature that stress→smoking RR≈1.5 (weaker than 2.73), even stress couldn't explain away your result. <b>The E-value doesn't need you to name the confounder — it works exactly the same for unmeasured and unknown.</b></p>
+<p><b>How it deals with unknown:</b> A critic says "maybe there's a variable you've never thought of." The E-value responds: "That variable would need RR≥2.73 with both T and Y. The strongest risk factor in this entire domain (smoking→lung cancer) has RR≈10-20. Most behavioral variables have RR<2.0. So your unknown confounder would need to be unprecedentedly strong." <b>The E-value is the only method that treats unmeasured and unknown identically — it needs no calibration in either case.</b></p>
+<p><b>How it deals with multiple confounders:</b> The E-value assumes a SINGLE unmeasured confounder. If multiple confounders exist, their joint effect could be stronger than any single one. VanderWeele & Ding note this limitation: the E-value is conservative for a single U, but multiple weak confounders acting together could theoretically explain an effect even when no single one exceeds the E-value. <b>Rule of thumb:</b> if the E-value is large (>3) and domain experts cannot name even ONE plausible confounder that strong, multiple confounders are unlikely to jointly explain the effect — but this is a judgment call, not a mathematical guarantee.</p>
+</div>
+
+<div class="card">
+<h3>8.2 Partial R² / Robustness Value — Excels at Unmeasured, Struggles with Unknown</h3>
+<p><b>How it deals with unmeasured:</b> This is where Partial R² shines. You didn't measure "motivation" but you DID measure "income." Income explains 8% of residual variance in treatment. The RV says you need a confounder explaining 24%. You can definitively state: "Motivation would need to be 3× as strong as income." <b>This calibrates the debate — your critic must now argue that motivation is 3× more predictive than income, which is a concrete, disputable claim.</b></p>
+<p><b>How it deals with unknown:</b> Without a named variable, you can't calibrate against observed covariates — you don't know what to compare to. You can only benchmark against the maximum observed partial R² among ALL measured covariates: "The strongest measured variable explains 12%; an unknown confounder would need to explain 24% — twice the maximum." This is weaker than a named-variable calibration but still informative. <b>Bottom line: Partial R² is strongest when you can name the confounder; for unknown confounders, prefer the E-value.</b></p>
+<p><b>How it deals with multiple confounders:</b> The framework naturally extends to multiple confounders via the partial R² of the set {U₁, U₂, ..., U_k} jointly. The RV asks about the minimum variance a confounder SET must explain. <b>This is an advantage over the E-value:</b> you can bound the joint explanatory power of multiple unmeasured variables, not just a single one.</p>
+</div>
+
+<div class="card">
+<h3>8.3 Rosenbaum Γ — Design-Based, Handles Both Through Odds Ratios</h3>
+<p><b>How it deals with unmeasured:</b> In a matched study of notification→order, two users with identical W, rain, weekend, payday should have equal notification probability. Γ = 2 means: even if an unmeasured confounder (stress) made one user up to 2× more likely to receive a notification, the result still holds. <b>You're saying: "I can tolerate a confounder that doubles the odds of treatment, which is stronger than any measured covariate's effect on treatment."</b></p>
+<p><b>How it deals with unknown:</b> Γ doesn't require naming the confounder — it only bounds the odds ratio of assignment. An unknown confounder with effect up to Γ on the odds ratio cannot overturn your result. <b>Like the E-value, Rosenbaum bounds are calibration-free for unknown confounders.</b></p>
+<p><b>How it deals with multiple confounders:</b> Γ bounds the COMBINED effect of all unmeasured confounders on treatment assignment odds. This is an advantage: it handles multiple confounders naturally — you don't need to assume a single U.</p>
+</div>
+
+<div class="card">
+<h3>8.4 Breakdown Frontier — Maps the Full Risk Landscape for Unknown Confounders</h3>
+<p><b>How it deals with unknown:</b> This is the frontier's strongest use case. You cannot name the confounder, so you cannot calibrate. The frontier shows you the COMPLETE set of (R²_T, R²_Y) pairs that would overturn your result. You can then check: does any KNOWN variable in any related field fall in the danger zone? If not, an unknown confounder would need to be stronger than anything ever documented. <b>The frontier turns "unknown" into "unprecedentedly strong" — which is as close to a refutation as you can get for an unknown unknown.</b></p>
+<p><b>How it deals with multiple confounders:</b> Like Partial R², the frontier naturally handles confounder sets. The R² values are for the JOINT effect of all unmeasured variables. The frontier shows the minimum joint explanatory power needed.</p>
+</div>
+
+<div class="card">
+<h3>8.5 Decision Heuristic — Which Method for Which Situation</h3>
+<table>
+<tr><th>Situation</th><th>Recommended method</th><th>Why</th></tr>
+<tr><td>"I know X is a confounder but didn't measure it"</td><td><b>Partial R² + benchmarking</b></td><td>Calibrate against observed X-like covariates; make the critic defend a specific strength claim</td></tr>
+<tr><td>"There might be confounders I haven't thought of"</td><td><b>E-value</b></td><td>Calibration-free absolute lower bound; works for ANY confounder</td></tr>
+<tr><td>"I used matching; how sensitive is my design?"</td><td><b>Rosenbaum Γ</b></td><td>Design-based; naturally handles multiple confounders</td></tr>
+<tr><td>"I want the complete picture, not one number"</td><td><b>Breakdown frontier</b></td><td>Shows FULL danger zone; identifies asymmetric vulnerabilities</td></tr>
+<tr><td>"My treatment/outcome are continuous"</td><td><b>Partial R² / RV</b></td><td>E-value requires binary/ratio scale; Partial R² works for any outcome</td></tr>
+<tr><td>"I used instrumental variables"</td><td><b>IV sensitivity (Cinelli & Hazlett 2025)</b></td><td>Purpose-built for IV; handles exclusion restriction AND ignorability violations</td></tr>
+</table>
+</div>
+
+<h2>9. Method Comparison — Which Sensitivity Tool When?</h2>
 <div class="card">
 <table>
 <tr><th>Method</th><th>Best for</th><th>Unmeasured or Unknown?</th><th>Scale</th><th>Calibration</th><th>Software</th></tr>
@@ -171,13 +212,13 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>9. The Cornfield Conditions — Where It All Began (1959)</h2>
+<h2>10. The Cornfield Conditions — Where It All Began (1959)</h2>
 <div class="card">
 <p>Cornfield et al. (1959) addressed Fisher's claim that a genetic confounder could explain the smoking-lung cancer association. They showed: <b>for a confounder to fully explain the observed RR, its association with the outcome must be at least as strong as the observed association itself.</b> Specifically, if smoking has RR=9 for lung cancer, any confounder must have RR ≥ 9 with lung cancer — stronger than almost any known risk factor. This was the <b>first sensitivity analysis in history</b>, and it convinced the scientific community that smoking causes cancer.</p>
 <div class="callout-green"><b>Historical significance:</b> Cornfield's inequality is the intellectual ancestor of the E-value. The E-value generalizes it to arbitrary RR values and proves it as a mathematical bound (the Ding-VanderWeele inequality), not just a heuristic.</div>
 </div>
 
-<h2>10. Key References</h2>
+<h2>11. Key References</h2>
 <div class="card">
 <p><a href="https://doi.org/10.1093/jnci/22.1.173" target="_blank">Cornfield, J. et al. (1959).</a> Smoking and lung cancer: recent evidence and a discussion of some questions. <i>JNCI</i>, 22(1), 173-203. — The first sensitivity analysis in history.</p>
 <p><a href="https://doi.org/10.1007/978-1-4757-3692-2" target="_blank">Rosenbaum, P. R. (2002).</a> <i>Observational Studies</i>. Springer. — Rosenbaum bounds (Γ).</p>
