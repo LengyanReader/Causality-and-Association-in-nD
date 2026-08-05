@@ -59,7 +59,23 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-purple"><b>Key insight:</b> Sensitivity analysis transforms the binary "identified or not?" question into a continuous "how fragile?" question. This is epistemologically more honest — it acknowledges that identification is always a matter of degree, not a binary property.</div>
 </div>
 
-<h2>2. Historical Evolution — Four Generations of Sensitivity Analysis</h2>
+<h2>2. Unmeasured vs. Unknown — A Critical Distinction</h2>
+<div class="card">
+<p>In sensitivity analysis, we must distinguish two qualitatively different situations:</p>
+<table>
+<tr><th></th><th>Unmeasured confounder</th><th>Unknown confounder</th></tr>
+<tr><td><b>Definition</b></td><td>A variable you <i>know about</i> but didn't collect</td><td>A variable you are <i>not even aware exists</i></td></tr>
+<tr><td><b>Example</b></td><td>"We know stress affects both smoking and heart disease, but our dataset has no stress measure"</td><td>"A specific gene variant (discovered in 2030) affects both smoking behavior and cancer risk — we had no idea in 2025"</td></tr>
+<tr><td><b>Can you name it?</b></td><td>Yes — you can reason about its likely strength</td><td>No — by definition, you cannot</td></tr>
+<tr><td><b>Calibration possible?</b></td><td>Yes — "stress probably has RR≈1.5 with smoking; the E-value says I need RR≥2.7, so even a confounder 1.8× stronger than stress wouldn't suffice"</td><td>No — you can only benchmark against the <i>strongest known risk factor in the entire literature</i></td></tr>
+<tr><td><b>Sensitivity method</b></td><td>Partial R² with benchmarking (compare to observed covariates); Rosenbaum Γ with domain-informed bounds</td><td>E-value (no calibration needed); Breakdown frontier (shows the full "danger zone" without assuming anything about U)</td></tr>
+<tr><td><b>Epistemological status</b></td><td>A <b>known unknown</b> — you can quantify your uncertainty about it</td><td>An <b>unknown unknown</b> — the fundamental limit of causal knowledge from observational data</td></tr>
+</table>
+<div class="callout-purple"><b>Why this distinction matters in practice:</b> When defending a causal claim, you will face two kinds of criticism. (1) "You didn't measure X — and X is obviously a confounder." This is an <i>unmeasured</i> confounder critique. You can respond with a calibrated sensitivity analysis: "Even if X were as strong as the strongest measured covariate, it wouldn't overturn my result." (2) "There might be something you haven't even thought of." This is the <i>unknown</i> confounder challenge. You respond with the E-value: "ANY confounder, no matter what it is, would need RR≥2.7 with both T and Y. The strongest confounders in this entire field have RR<2.0. So even an unknown confounder would need to be unprecedentedly strong." The E-value is especially valuable for unknown confounders precisely because it requires <b>no calibration</b> — it gives an absolute, assumption-free lower bound.</div>
+<div class="callout-red"><b>Definitive usage rule — use these terms precisely:</b> In your own writing, say <b>"unmeasured confounder"</b> when you can name the variable and reason about its likely strength (e.g., "we didn't measure stress, but we know stress→smoking RR≈1.5 from the literature"). Say <b>"unknown confounder"</b> or <b>"unmeasured confounding of unknown form"</b> when referring to the fundamental epistemological limit — the possibility that something you haven't conceived of could be confounding your result. The E-value addresses BOTH simultaneously. The partial R² framework primarily addresses unmeasured confounders (through benchmarking). Never say "unmeasured confounding" when you mean a specific variable you could have measured but didn't. Never say "unknown" when you actually know what it is but just don't have the data. Precision in this distinction is precision in your uncertainty.</div>
+</div>
+
+<h2>3. Historical Evolution — Four Generations of Sensitivity Analysis</h2>
 <div class="card">
 <table>
 <tr><th>Generation</th><th>Method</th><th>Key Reference</th><th>What it asks</th></tr>
@@ -71,7 +87,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </table>
 </div>
 
-<h2>3. The E-value — Minimum Confounding Strength (VanderWeele & Ding 2017)</h2>
+<h2>4. The E-value — Minimum Confounding Strength (VanderWeele & Ding 2017)</h2>
 <div class="card">
 <h3>3.1 Semantic Interpretation</h3>
 <p>The E-value answers: <b>"What is the minimum risk ratio an unmeasured confounder must have with BOTH treatment and outcome, conditional on measured covariates, to fully explain away the observed association?"</b></p>
@@ -100,7 +116,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Conservative variant:</b> Use the CI bound closest to the null instead of the point estimate. If the CI-bound E-value still exceeds 2, the conclusion is robust even under parameter uncertainty.</p>
 </div>
 
-<h2>4. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
+<h2>5. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
 <div class="card">
 <h3>4.1 Semantic Interpretation</h3>
 <p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
@@ -118,7 +134,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Why it's effective.</b> The partial R² framework is <b>scale-free and benchmarkable</b>. You can say: "an unmeasured confounder would need to explain 5% of the residual variance in treatment AND 5% in outcome. For comparison, the strongest observed covariate (income) explains 3% of treatment variance. So the needed confounder would need to be 1.7× as strong as income." This makes sensitivity <b>calibratable against known quantities</b>.</p>
 </div>
 
-<h2>5. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
+<h2>6. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
 <div class="card">
 <h3>5.1 Semantic Interpretation</h3>
 <p>Rosenbaum bounds ask: <b>"How large would the departure from random assignment need to be (in terms of odds ratios) to render my significant result non-significant?"</b> This is the classic sensitivity analysis for matched observational studies.</p>
@@ -131,7 +147,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p><b>Why it's effective.</b> Rosenbaum bounds directly address the design-based question: "How much hidden bias would it take to overturn my finding?" They are the gold standard for matched studies and the foundation that later methods (E-value, partial R²) generalize.</p>
 </div>
 
-<h2>6. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
+<h2>7. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
 <div class="card">
 <h3>6.1 Semantic Interpretation</h3>
 <p>Rather than a single number (E-value, RV), the breakdown frontier maps the <b>entire boundary</b> of (R²_{T∼U}, R²_{Y∼U}) combinations that would nullify the result. It answers: "What are ALL the confounder profiles that could explain away my effect?"</p>
@@ -142,26 +158,26 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>The frontier is a <b>hyperbola-like curve</b> in (R²_T, R²_Y) space. Points above the curve correspond to confounders that would overturn the result. The E-value is one point on this curve (where R²_T = R²_Y). The robustness value is a perpendicular projection. The frontier is the <b>complete characterization</b>.</p>
 </div>
 
-<h2>7. Method Comparison — Which Sensitivity Tool When?</h2>
+<h2>8. Method Comparison — Which Sensitivity Tool When?</h2>
 <div class="card">
 <table>
-<tr><th>Method</th><th>Best for</th><th>Scale</th><th>Calibration</th><th>Software</th></tr>
-<tr><td><b>E-value</b></td><td>Binary/ratio outcomes, quick assessment</td><td>Risk ratio</td><td>Substantive knowledge (smoking→cancer RR≈10)</td><td>EValue R package</td></tr>
-<tr><td><b>Partial R² / RV</b></td><td>Continuous outcomes, benchmarking</td><td>Variance explained</td><td>Observed covariates as reference</td><td>sensemakr (R, Stata)</td></tr>
-<tr><td><b>Rosenbaum Γ</b></td><td>Matched designs, permutation tests</td><td>Odds ratio of assignment</td><td>Γ = 2 considered moderate</td><td>rbounds R package</td></tr>
-<tr><td><b>Breakdown frontier</b></td><td>Full sensitivity surface, research</td><td>(R²_T, R²_Y) space</td><td>Same as partial R²</td><td>MetricGate, custom</td></tr>
-<tr><td><b>L² sensitivity</b></td><td>ML-estimated causal effects</td><td>Variance of h(X,U)</td><td>Observed covariate benchmarks</td><td>Zhao (2024), implementation TBD</td></tr>
-<tr><td><b>IV sensitivity</b></td><td>Instrumental variable designs</td><td>Partial R² (IV)</td><td>First-stage R², reduced form</td><td>iv.sensemakr (R)</td></tr>
+<tr><th>Method</th><th>Best for</th><th>Unmeasured or Unknown?</th><th>Scale</th><th>Calibration</th><th>Software</th></tr>
+<tr><td><b>E-value</b></td><td>Binary/ratio outcomes, quick assessment</td><td><b>Both</b> — no calibration needed</td><td>Risk ratio</td><td>Substantive knowledge (smoking→cancer RR≈10)</td><td>EValue R package</td></tr>
+<tr><td><b>Partial R² / RV</b></td><td>Continuous outcomes, benchmarking</td><td><b>Unmeasured</b> — calibrate to observed covariates</td><td>Variance explained</td><td>Observed covariates as reference</td><td>sensemakr (R, Stata)</td></tr>
+<tr><td><b>Rosenbaum Γ</b></td><td>Matched designs, permutation tests</td><td><b>Both</b> — no distribution assumed</td><td>Odds ratio of assignment</td><td>Γ = 2 considered moderate</td><td>rbounds R package</td></tr>
+<tr><td><b>Breakdown frontier</b></td><td>Full sensitivity surface, research</td><td><b>Unknown</b> — shows complete danger zone</td><td>(R²_T, R²_Y) space</td><td>Same as partial R²</td><td>MetricGate, custom</td></tr>
+<tr><td><b>L² sensitivity</b></td><td>ML-estimated causal effects</td><td><b>Unmeasured</b> — calibrate via observed covariate benchmarks</td><td>Variance of h(X,U)</td><td>Observed covariate benchmarks</td><td>Zhao (2024)</td></tr>
+<tr><td><b>IV sensitivity</b></td><td>Instrumental variable designs</td><td><b>Unmeasured</b> — calibrate to first-stage strength</td><td>Partial R² (IV)</td><td>First-stage R², reduced form</td><td>iv.sensemakr (R)</td></tr>
 </table>
 </div>
 
-<h2>8. The Cornfield Conditions — Where It All Began (1959)</h2>
+<h2>9. The Cornfield Conditions — Where It All Began (1959)</h2>
 <div class="card">
 <p>Cornfield et al. (1959) addressed Fisher's claim that a genetic confounder could explain the smoking-lung cancer association. They showed: <b>for a confounder to fully explain the observed RR, its association with the outcome must be at least as strong as the observed association itself.</b> Specifically, if smoking has RR=9 for lung cancer, any confounder must have RR ≥ 9 with lung cancer — stronger than almost any known risk factor. This was the <b>first sensitivity analysis in history</b>, and it convinced the scientific community that smoking causes cancer.</p>
 <div class="callout-green"><b>Historical significance:</b> Cornfield's inequality is the intellectual ancestor of the E-value. The E-value generalizes it to arbitrary RR values and proves it as a mathematical bound (the Ding-VanderWeele inequality), not just a heuristic.</div>
 </div>
 
-<h2>9. Key References</h2>
+<h2>10. Key References</h2>
 <div class="card">
 <p><a href="https://doi.org/10.1093/jnci/22.1.173" target="_blank">Cornfield, J. et al. (1959).</a> Smoking and lung cancer: recent evidence and a discussion of some questions. <i>JNCI</i>, 22(1), 173-203. — The first sensitivity analysis in history.</p>
 <p><a href="https://doi.org/10.1007/978-1-4757-3692-2" target="_blank">Rosenbaum, P. R. (2002).</a> <i>Observational Studies</i>. Springer. — Rosenbaum bounds (Γ).</p>
