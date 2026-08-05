@@ -142,40 +142,71 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <h3>5.1 Semantic Interpretation</h3>
 <p>The E-value answers: <b>"What is the minimum risk ratio an unmeasured confounder must have with BOTH treatment and outcome, conditional on measured covariates, to fully explain away the observed association?"</b></p>
 <p>Think of it as a <b>"worst-case" benchmark</b>. An E-value of 2.73 means: even in the most pessimistic scenario, a confounder would need RR ≥ 2.73 with both T and Y to reduce the true effect to zero. If domain experts believe no unmeasured confounder could be that strong, the result is robust.</p>
+
+<div class="card" style="font-size:.84rem;padding:14px 18px;background:#f8fafc">
+<b>Notation key</b> (all are risk ratios, conditional on measured covariates X):
+&nbsp; <code>RR<sub>obs</sub></code> = observed T→Y association (what the data shows)
+&nbsp; <code>RR<sub>true</sub></code> = true causal effect (what do(T) would give)
+&nbsp; <code>RR<sub>TU</sub></code> = confounder U → treatment T association
+&nbsp; <code>RR<sub>UY</sub></code> = confounder U → outcome Y association
+&nbsp; <b>e</b> = the common value when RR<sub>TU</sub> = RR<sub>UY</sub> (worst case)
+</div>
+
 <div style="text-align:center;margin:16px 0">
-<svg viewBox="0 0 520 180" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
-  <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker></defs>
-  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">How the E-value Works</text>
-  <!-- U (confounder) -->
-  <circle cx="70" cy="90" r="30" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="70" y="86" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">U</text>
-  <text x="70" y="100" text-anchor="middle" font-size="8" fill="#991b1b">Confounder</text>
-  <!-- T -->
-  <circle cx="260" cy="45" r="30" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="260" y="41" text-anchor="middle" font-size="10" font-weight="700" fill="#2563eb">T</text>
-  <text x="260" y="55" text-anchor="middle" font-size="8" fill="#1e40af">Treatment</text>
-  <!-- Y -->
-  <circle cx="260" cy="135" r="30" fill="#f0fdf4" stroke="#059669" stroke-width="2"/>
-  <text x="260" y="131" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Y</text>
-  <text x="260" y="145" text-anchor="middle" font-size="8" fill="#065f46">Outcome</text>
+<svg viewBox="0 0 600 220" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
+  <defs>
+    <marker id="arR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
+    <marker id="arG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#64748b"/></marker>
+  </defs>
+  <text x="300" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">How the E-value Works</text>
+
+  <!-- X box (measured covariates) -->
+  <rect x="10" y="40" width="90" height="155" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="55" y="62" text-anchor="middle" font-size="8" fill="#64748b">Measured</text>
+  <text x="55" y="74" text-anchor="middle" font-size="8" fill="#64748b">covariates X</text>
+  <text x="55" y="86" text-anchor="middle" font-size="7" fill="#94a3b8">(already adj.)</text>
+
+  <!-- U (confounder) — dashed border to show it's UNMEASURED -->
+  <circle cx="190" cy="115" r="32" fill="#fef2f2" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <text x="190" y="110" text-anchor="middle" font-size="13" font-weight="800" fill="#dc2626">U</text>
+  <text x="190" y="126" text-anchor="middle" font-size="8" fill="#991b1b">Unmeasured</text>
+  <text x="190" y="138" text-anchor="middle" font-size="7" fill="#991b1b">confounder</text>
+
+  <!-- T (treatment) -->
+  <circle cx="360" cy="55" r="32" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="360" y="50" text-anchor="middle" font-size="12" font-weight="800" fill="#2563eb">T</text>
+  <text x="360" y="64" text-anchor="middle" font-size="8" fill="#1e40af">Treatment</text>
+
+  <!-- Y (outcome) -->
+  <circle cx="360" cy="170" r="32" fill="#f0fdf4" stroke="#059669" stroke-width="2"/>
+  <text x="360" y="165" text-anchor="middle" font-size="12" font-weight="800" fill="#059669">Y</text>
+  <text x="360" y="179" text-anchor="middle" font-size="8" fill="#065f46">Outcome</text>
+
   <!-- U->T arrow -->
-  <line x1="97" y1="78" x2="233" y2="52" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
-  <text x="150" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>TU</sub></code> ≥ 2.73</text>
+  <line x1="218" y1="98" x2="332" y2="68" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arR)"/>
+  <text x="275" y="75" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>TU</sub></code> ≥ 2.73</text>
+
   <!-- U->Y arrow -->
-  <line x1="97" y1="102" x2="233" y2="128" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
-  <text x="150" y="135" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>UY</sub></code> ≥ 2.73</text>
-  <!-- T->Y observed -->
-  <line x1="260" y1="75" x2="260" y2="105" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <text x="295" y="93" text-anchor="start" font-size="8" fill="#64748b">Observed</text>
-  <text x="295" y="103" text-anchor="start" font-size="8" fill="#64748b">association</text>
-  <!-- Annotation -->
-  <text x="420" y="60" text-anchor="middle" font-size="9" fill="#dc2626">If U existed with</text>
-  <text x="420" y="74" text-anchor="middle" font-size="9" fill="#dc2626">RR≥2.73 on BOTH arrows</text>
-  <text x="420" y="90" text-anchor="middle" font-size="8" fill="#64748b">it could reduce the</text>
-  <text x="420" y="102" text-anchor="middle" font-size="8" fill="#64748b">true effect to zero</text>
-  <text x="420" y="118" text-anchor="middle" font-size="8" fill="#64748b">If EITHER is weaker,</text>
-  <text x="420" y="130" text-anchor="middle" font-size="8" fill="#64748b">confounding cannot</text>
-  <text x="420" y="142" text-anchor="middle" font-size="8" fill="#64748b">explain away the effect</text>
+  <line x1="218" y1="132" x2="332" y2="157" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arR)"/>
+  <text x="275" y="155" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>UY</sub></code> ≥ 2.73</text>
+
+  <!-- T->Y observed association -->
+  <line x1="360" y1="87" x2="360" y2="138" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arG)"/>
+  <text x="400" y="108" text-anchor="start" font-size="9" fill="#64748b"><code>RR<sub>obs</sub></code> = 1.67</text>
+  <text x="400" y="120" text-anchor="start" font-size="7" fill="#94a3b8">(observed)</text>
+
+  <!-- Annotation box -->
+  <rect x="445" y="42" width="145" height="112" rx="6" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+  <text x="517" y="58" text-anchor="middle" font-size="8" font-weight="700" fill="#dc2626">IF U existed with</text>
+  <text x="517" y="72" text-anchor="middle" font-size="8" fill="#dc2626">RR≥2.73 on BOTH</text>
+  <text x="517" y="86" text-anchor="middle" font-size="8" fill="#dc2626">red arrows:</text>
+  <text x="517" y="104" text-anchor="middle" font-size="8" fill="#991b1b">→ could explain</text>
+  <text x="517" y="118" text-anchor="middle" font-size="8" fill="#991b1b">away RR=1.67</text>
+  <text x="517" y="136" text-anchor="middle" font-size="7" fill="#64748b">If EITHER arrow</text>
+  <text x="517" y="148" text-anchor="middle" font-size="7" fill="#64748b">weaker → cannot</text>
+
+  <!-- Bottom caption -->
+  <text x="300" y="212" text-anchor="middle" font-size="8" fill="#64748b">X (measured covariates, already adjusted for) shown as dashed box. U is UNMEASURED (dashed border).</text>
 </svg>
 </div>
 
