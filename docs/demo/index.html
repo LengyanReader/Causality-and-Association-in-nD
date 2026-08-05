@@ -436,28 +436,28 @@ function buildStabilityChart(v){
 function buildThinking(th){
   if(!th)return"";
   var h='';
-  // LAYER 1: Key Points — always visible summary
+  // LAYER 1: Key Points
   h+='<details class="think" open><summary>Layer 1: Key Points</summary><div class="think-body">';
   if(th.takeaway)h+='<div class="callout cg" style="margin-bottom:10px"><b>Takeaway:</b> '+th.takeaway+'</div>';
-  if(th.symbolic)h+='<div class="formula" style="display:block;padding:10px 14px;font-size:.9em;line-height:1.8">'+M(th.symbolic)+'</div>';
+  if(th.symbolic)h+='<div class="formula" style="display:block;padding:10px 14px;font-size:.88em;line-height:1.9">'+DM(th.symbolic)+'</div>';
   h+='</div></details>';
-  // LAYER 2: Reasoning Chain — the "why"
+  // LAYER 2: Reasoning Chain
   if(th.steps&&th.steps.length>0){
     h+='<details class="think"><summary>Layer 2: Reasoning Chain</summary><div class="think-body">';
     for(var i=0;i<th.steps.length;i++){
       var s=th.steps[i];
-      h+='<div class="reason-step"><div class="rs-num">'+(i+1)+'</div><div><span class="rs-label">'+s.label+'</span>'+s.detail+'</div></div>';
+      h+='<div class="reason-step"><div class="rs-num">'+(i+1)+'</div><div><span class="rs-label">'+s.label+'</span><br>'+s.detail+'</div></div>';
     }
     h+='</div></details>';
   }
-  // LAYER 3: Concrete Operations — the "how"
+  // LAYER 3: Concrete Operations
   var hasHow = (th.derivation&&th.derivation.body);
   if(hasHow){
     h+='<details class="think"><summary>Layer 3: Concrete Operations</summary><div class="think-body">';
     h+='<details class="think-derivation" open><summary>'+(th.derivation.title||"Derivation")+'</summary><div class="der-body">'+th.derivation.body+'</div></details>';
     h+='</div></details>';
   }
-  // LAYER 4: Verification — logic checks
+  // LAYER 4: Logic Verification
   if(th.logic&&th.logic.length>0){
     h+='<details class="think"><summary>Layer 4: Logic Verification</summary><div class="think-body">';
     for(var i=0;i<th.logic.length;i++){
