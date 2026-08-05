@@ -768,7 +768,7 @@ function build(){
   document.getElementById("content").innerHTML=h;
   var dags=document.querySelectorAll(".dagn");for(var i=0;i<dags.length;i++)dags[i].addEventListener("click",function(ev){dagPopup(ev,this.getAttribute("data-nid"))});
   setupGraphPanels();
-  if(typeof renderMathInElement!=='undefined'){renderMathInElement(document.getElementById("content"),{delimiters:[{left:\"$$\",right:\"$$\",display:true},{left:\"$\",right:\"$\",display:false}]});}
+  if(typeof renderMathInElement!=='undefined'){renderMathInElement(document.getElementById("content"),{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});}
 }
 
 function buildStation(s,rd){
