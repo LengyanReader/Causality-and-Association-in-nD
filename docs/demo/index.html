@@ -680,7 +680,7 @@ function build(){
   }
   if(D.visuals&&D.visuals.confounding_gap)h+=buildConfoundingBars(D.visuals.confounding_gap);
   if(D.comparisons&&D.comparisons.collider_bias)h+=buildCompareCard(D.comparisons.collider_bias);
-  h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a> <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">KG→</a></h2>';
+  h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_sensitivity.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a> <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">KG→</a></h2>';
   h+='<div class="section-indicator">📍 Stations 6-7 — EVALUATE & TEST: sensitivity + refutation</div>';
   // E-value gauge
   if(D.visuals&&D.visuals.evalue_gauge)h+=buildEvalueGauge(D.visuals.evalue_gauge);
@@ -706,7 +706,7 @@ function build(){
       h+="<tr"+trStyle+"><td><b>"+t[0]+"</b></td><td>"+t[1]+"</td><td>"+marker+"</td></tr>";
     }
     h+='</table><div class="callout cw">'+ev.example+'</div>';
-    h+='<p style="font-size:.8rem;color:var(--muted);margin-top:8px">Related KG concepts: <a href="kg_browser.html" target="_blank">sensitivity-analysis</a>, <a href="kg_browser.html" target="_blank">confounding</a>, <a href="kg_browser.html" target="_blank">ignorability</a>. See <a href="deep_evalue.html">the full deep dive</a> for the quadratic derivation step-by-step.</p>';
+    h+='<p style="font-size:.8rem;color:var(--muted);margin-top:8px">Related KG concepts: <a href="kg_browser.html" target="_blank">sensitivity-analysis</a>, <a href="kg_browser.html" target="_blank">confounding</a>, <a href="kg_browser.html" target="_blank">ignorability</a>. See <a href="deep_sensitivity.html">the full deep dive</a> for the quadratic derivation step-by-step.</p>';
     h+='</div></details></div>';}
   // Balance chart
   if(D.balance_chart)h+=buildBalanceChart(D.balance_chart);
@@ -794,7 +794,7 @@ function buildSidebar(){
   h+='<a href="kg_browser.html" class="nd" style="color:#fbbf24">🧠 Knowledge Graph Browser</a>';
   h+='<a href="deep_dgp.html" class="nd">🔬 How the Data Is Generated</a>';
   h+='<a href="deep_identification.html" class="nd">🔍 Causal Identification (Σ)</a>';
-  h+='<a href="deep_evalue.html" class="nd">⚠️ The E-value Sensitivity</a>';
+  h+='<a href="deep_sensitivity.html" class="nd">⚠️ Sensitivity Analysis</a>';
   h+='<a href="deep_dag_building.html" class="nd">📐 How Causal Graphs Are Built</a></div>';
   // On This Page navigation
   h+='<div class="navbox"><div class="nht">📍 ON THIS PAGE</div>';

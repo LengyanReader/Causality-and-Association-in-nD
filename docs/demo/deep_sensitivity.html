@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dive: Sensitivity Analysis — How Wrong Could We Be?</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--dark:#0f172a;--border:#e2e8f0;--radius:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout{background:#eff6ff;border-left:4px solid var(--blue);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.callout-red{background:#fef2f2;border-left-color:var(--red)}
+.callout-green{background:#f0fdf4;border-left-color:var(--green)}
+.callout-warn{background:#fffbeb;border-left-color:var(--orange)}
+.callout-purple{background:#f5f0ff;border-left-color:var(--purple)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:6px 0;font-size:.92em}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+nav{display:flex;gap:12px;margin-bottom:20px;font-size:.88rem;flex-wrap:wrap}
+nav a{padding:4px 12px;border:1px solid var(--border);border-radius:20px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .15s}
+nav a:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+</style></head><body>
+
+<nav>
+<a href="index.html">← Main Walkthrough</a>
+<a href="deep_dgp.html">DGP</a>
+<a href="deep_identification.html">Identification</a>
+<a href="deep_sensitivity.html" class="current">Sensitivity</a>
+<a href="deep_dag_building.html">DAG Building</a>
+</nav>
+
+<h1>Deep Dive: Sensitivity Analysis — How Wrong Could We Be?</h1>
+<p style="color:var(--muted)">From Cornfield (1959) to the E-value to partial R² frontiers — the evolving toolkit for quantifying the fragility of causal claims to unmeasured confounding.</p>
+
+<div class="card" style="border-left:4px solid var(--red);background:linear-gradient(135deg,#fef2f2,#fafbfc)">
+<h2 style="border-bottom:none;margin-top:0">What Sensitivity Analysis Is — And Why Every Causal Claim Needs One</h2>
+<p><b>What.</b> Sensitivity analysis answers: <i>"How strong would an unmeasured confounder need to be to change my conclusion?"</i> It quantifies the <b>fragility</b> of a causal estimate — not whether unmeasured confounding exists (that's untestable), but how much confounding would be required to nullify, reverse, or render statistically insignificant the observed effect.</p>
+<p><b>Why.</b> The assumption of "no unmeasured confounding" (ignorability) is <b>fundamentally untestable</b> from observational data. You can never prove you measured everything. Without sensitivity analysis, every observational causal claim is an open-loop assertion — precise but potentially precisely wrong. Sensitivity analysis <b>closes the loop</b>: it puts error bars on your assumptions, not just your sampling uncertainty.</p>
+<p><b>Three reasons this matters:</b></p>
+<ol style="margin-left:20px;line-height:1.9">
+<li><b>Untestable doesn't mean unquantifiable.</b> You can't test whether unmeasured confounding is zero, but you CAN quantify how strong it would need to be. This transforms an untestable binary assumption into a calibratable continuous quantity.</li>
+<li><b>Not all "significant" results are robust.</b> An estimate with p < 0.001 may be overturned by a confounder with RR = 1.5 with both treatment and outcome. An estimate with p = 0.04 may survive RR = 5.0 confounding. The p-value measures sampling uncertainty; sensitivity analysis measures <b>structural uncertainty</b>.</li>
+<li><b>Sensitivity analysis guides resource allocation.</b> If your result is fragile (low E-value, low robustness value), you need to collect more covariates or design an experiment. If it's robust (high E-value), further sensitivity analysis may be unnecessary — the conclusion is structurally sound.</li>
+</ol>
+</div>
+
+<h2>1. The Untestable Assumption — Why Sensitivity Analysis Exists</h2>
+<div class="card">
+<p>Every observational causal estimate rests on <b>ignorability</b> (no unmeasured confounding):</p>
+<p class="formula"><span id="eq-ign"></span></p>
+<p>This assumption cannot be verified from the data. You can check balance on observed covariates (SMD < 0.1), you can run placebo tests and negative controls — but you can never prove that no <i>unmeasured</i> confounder exists. The most you can do is quantify: <b>if one does exist, how strong would it need to be to matter?</b></p>
+<div class="callout-purple"><b>Key insight:</b> Sensitivity analysis transforms the binary "identified or not?" question into a continuous "how fragile?" question. This is epistemologically more honest — it acknowledges that identification is always a matter of degree, not a binary property.</div>
+</div>
+
+<h2>2. Historical Evolution — Four Generations of Sensitivity Analysis</h2>
+<div class="card">
+<table>
+<tr><th>Generation</th><th>Method</th><th>Key Reference</th><th>What it asks</th></tr>
+<tr><td><b>1st (1959)</b></td><td>Cornfield conditions</td><td>Cornfield et al. (1959)</td><td>"How strong must a confounder's association with the outcome be to explain away the smoking-lung cancer association?"</td></tr>
+<tr><td><b>2nd (1980s-2000s)</b></td><td>Rosenbaum bounds</td><td>Rosenbaum (2002)</td><td>"What is the range of possible p-values given a bound Γ on the odds ratio of treatment assignment due to an unmeasured confounder?"</td></tr>
+<tr><td><b>3rd (2017-2020)</b></td><td>E-value</td><td>VanderWeele & Ding (2017)</td><td>"What is the minimum association (RR scale) a confounder needs with BOTH treatment and outcome to explain away the effect?"</td></tr>
+<tr><td><b>3rd (2020)</b></td><td>Partial R² / Robustness Value</td><td>Cinelli & Hazlett (2020)</td><td>"What fraction of residual variance must a confounder explain in treatment AND outcome to change the conclusion?"</td></tr>
+<tr><td><b>4th (2021-2025)</b></td><td>Breakdown frontier / L² sensitivity</td><td>Masten & Poirier (2021); Zhao (2024)</td><td>"What is the entire boundary of confounding strengths that would nullify my result?"</td></tr>
+</table>
+</div>
+
+<h2>3. The E-value — Minimum Confounding Strength (VanderWeele & Ding 2017)</h2>
+<div class="card">
+<h3>3.1 Semantic Interpretation</h3>
+<p>The E-value answers: <b>"What is the minimum risk ratio an unmeasured confounder must have with BOTH treatment and outcome, conditional on measured covariates, to fully explain away the observed association?"</b></p>
+<p>Think of it as a <b>"worst-case" benchmark</b>. An E-value of 2.73 means: even in the most pessimistic scenario, a confounder would need RR ≥ 2.73 with both T and Y to reduce the true effect to zero. If domain experts believe no unmeasured confounder could be that strong, the result is robust.</p>
+
+<h3>3.2 Mathematical Derivation — Step by Step</h3>
+<p><b>Step 1 — The Ding-VanderWeele bound.</b> For any unmeasured confounder U, the maximum bias it can induce is bounded by:</p>
+<p class="formula"><span id="eq-dv1"></span></p>
+<p>where RR_TU = risk ratio of U on T, RR_UY = risk ratio of U on Y, both conditional on measured covariates.</p>
+<p><b>Step 2 — Worst-case scenario.</b> To find the <i>minimum</i> confounder strength that could explain away the entire effect, set RR_true = 1 (no true causal effect — the confounder explains everything) and assume the worst case where RR_TU = RR_UY = e:</p>
+<p class="formula"><span id="eq-dv2"></span></p>
+<p><b>Step 3 — Solve the quadratic.</b> Cross-multiply: RR_obs × (2e − 1) = e². Rearranged: e² − 2·RR_obs·e + RR_obs = 0. The larger root gives:</p>
+<p class="formula"><span id="eq-evalue"></span></p>
+<p><b>Step 4 — Why it works.</b> The E-value is <b>conservative</b> — it assumes the worst-case confounder (equal strength with T and Y). Any real confounder with RR_TU ≠ RR_UY would need even stronger associations. The E-value provides a <b>lower bound</b> on the required confounder strength: if the E-value is large, even the weakest possible confounder that could explain the effect must be strong.</p>
+
+<h3>3.3 Calibration — What E-values Mean in Practice</h3>
+<table>
+<tr><th>E-value</th><th>Interpretation</th><th>Calibration example</th></tr>
+<tr><td>1.0</td><td>Trivial — any weak confounder could explain the effect</td><td>RR=1.0 → E-value=1.0</td></tr>
+<tr><td>1.0–1.5</td><td>Fragile — modest confounding could explain it away</td><td>RR=1.1 → E-value≈1.5</td></tr>
+<tr><td>1.5–2.0</td><td>Moderate — somewhat robust</td><td>RR=1.3 → E-value≈1.9</td></tr>
+<tr><td>2.0–5.0</td><td>Robust — strong confounding needed</td><td>RR=1.8 → E-value≈3.0 (exercise→CVD: RR≈2-3)</td></tr>
+<tr><td>>5.0</td><td>Highly robust — very strong confounding needed</td><td>RR=3.0 → E-value≈5.4 (smoking→lung cancer: RR≈10-20)</td></tr>
+</table>
+<p><b>Conservative variant:</b> Use the CI bound closest to the null instead of the point estimate. If the CI-bound E-value still exceeds 2, the conclusion is robust even under parameter uncertainty.</p>
+</div>
+
+<h2>4. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
+<div class="card">
+<h3>4.1 Semantic Interpretation</h3>
+<p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
+
+<h3>4.2 Mathematical Derivation</h3>
+<p><b>Omitted variable bias formula.</b> In a linear model Y = τT + Xβ + Uγ + ε, omitting U biases τ̂ by:</p>
+<p class="formula"><span id="eq-ovb"></span></p>
+<p>where δ is the coefficient of U on T (after partialling X), γ is the coefficient of U on Y (after partialling X and T), and R²_{T∼X} is the R² from regressing T on X.</p>
+<p><b>Partial R².</b> Define R²_{T∼U|X} = the fraction of residual variance in T (after X) explained by U. Similarly, R²_{Y∼U|X,T} for Y. Then the bias can be expressed purely in terms of these partial R² values:</p>
+<p class="formula"><span id="eq-pr2"></span></p>
+<p><b>Robustness Value (RV).</b> The minimum partial R² that U must have with BOTH T and Y to reduce τ̂ to zero:</p>
+<p class="formula"><span id="eq-rv"></span></p>
+<p>where f_{Y∼T|X} = (t²_{α/2})/(t²_{α/2} + n − p − 1) is the partial Cohen's f². This unifies the E-value intuition (minimum strength needed for BOTH associations) with the variance-explained metric.</p>
+<p><b>Why it's effective.</b> The partial R² framework is <b>scale-free and benchmarkable</b>. You can say: "an unmeasured confounder would need to explain 5% of the residual variance in treatment AND 5% in outcome. For comparison, the strongest observed covariate (income) explains 3% of treatment variance. So the needed confounder would need to be 1.7× as strong as income." This makes sensitivity <b>calibratable against known quantities</b>.</p>
+</div>
+
+<h2>5. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
+<div class="card">
+<h3>5.1 Semantic Interpretation</h3>
+<p>Rosenbaum bounds ask: <b>"How large would the departure from random assignment need to be (in terms of odds ratios) to render my significant result non-significant?"</b> This is the classic sensitivity analysis for matched observational studies.</p>
+
+<h3>5.2 Mathematical Derivation</h3>
+<p>In a matched pair design, two units i and j with the same observed covariates X have treatment assignment probabilities π_i and π_j. If assignment were random (no unmeasured confounding), π_i = π_j. Rosenbaum introduces Γ ≥ 1 bounding the odds ratio:</p>
+<p class="formula"><span id="eq-rosenbaum"></span></p>
+<p>Γ = 1 ⇒ random assignment (no confounding). Γ = 2 ⇒ matched individuals could differ in treatment odds by up to 2× due to an unmeasured U. For each Γ, compute the range of possible p-values. The <b>sensitivity limit Γ*</b> is the largest Γ for which the result remains significant at α = 0.05.</p>
+<p><b>Why it's effective.</b> Rosenbaum bounds directly address the design-based question: "How much hidden bias would it take to overturn my finding?" They are the gold standard for matched studies and the foundation that later methods (E-value, partial R²) generalize.</p>
+</div>
+
+<h2>6. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
+<div class="card">
+<h3>6.1 Semantic Interpretation</h3>
+<p>Rather than a single number (E-value, RV), the breakdown frontier maps the <b>entire boundary</b> of (R²_{T∼U}, R²_{Y∼U}) combinations that would nullify the result. It answers: "What are ALL the confounder profiles that could explain away my effect?"</p>
+
+<h3>6.2 Why a Single Number Is Not Enough</h3>
+<p>Consider two confounders: U₁ has R²_{T∼U}=0.01 but R²_{Y∼U}=0.50 (very weak with T, very strong with Y). U₂ has R²_{T∼U}=0.50 but R²_{Y∼U}=0.01 (strong with T, weak with Y). The E-value treats them symmetrically (worst case). The frontier shows that BOTH can be damaging — and which regions of the (R²_T, R²_Y) space are "dangerous" depends on the study design.</p>
+<p>The frontier is a <b>hyperbola-like curve</b> in (R²_T, R²_Y) space. Points above the curve correspond to confounders that would overturn the result. The E-value is one point on this curve (where R²_T = R²_Y). The robustness value is a perpendicular projection. The frontier is the <b>complete characterization</b>.</p>
+</div>
+
+<h2>7. Method Comparison — Which Sensitivity Tool When?</h2>
+<div class="card">
+<table>
+<tr><th>Method</th><th>Best for</th><th>Scale</th><th>Calibration</th><th>Software</th></tr>
+<tr><td><b>E-value</b></td><td>Binary/ratio outcomes, quick assessment</td><td>Risk ratio</td><td>Substantive knowledge (smoking→cancer RR≈10)</td><td>EValue R package</td></tr>
+<tr><td><b>Partial R² / RV</b></td><td>Continuous outcomes, benchmarking</td><td>Variance explained</td><td>Observed covariates as reference</td><td>sensemakr (R, Stata)</td></tr>
+<tr><td><b>Rosenbaum Γ</b></td><td>Matched designs, permutation tests</td><td>Odds ratio of assignment</td><td>Γ = 2 considered moderate</td><td>rbounds R package</td></tr>
+<tr><td><b>Breakdown frontier</b></td><td>Full sensitivity surface, research</td><td>(R²_T, R²_Y) space</td><td>Same as partial R²</td><td>MetricGate, custom</td></tr>
+<tr><td><b>L² sensitivity</b></td><td>ML-estimated causal effects</td><td>Variance of h(X,U)</td><td>Observed covariate benchmarks</td><td>Zhao (2024), implementation TBD</td></tr>
+<tr><td><b>IV sensitivity</b></td><td>Instrumental variable designs</td><td>Partial R² (IV)</td><td>First-stage R², reduced form</td><td>iv.sensemakr (R)</td></tr>
+</table>
+</div>
+
+<h2>8. The Cornfield Conditions — Where It All Began (1959)</h2>
+<div class="card">
+<p>Cornfield et al. (1959) addressed Fisher's claim that a genetic confounder could explain the smoking-lung cancer association. They showed: <b>for a confounder to fully explain the observed RR, its association with the outcome must be at least as strong as the observed association itself.</b> Specifically, if smoking has RR=9 for lung cancer, any confounder must have RR ≥ 9 with lung cancer — stronger than almost any known risk factor. This was the <b>first sensitivity analysis in history</b>, and it convinced the scientific community that smoking causes cancer.</p>
+<div class="callout-green"><b>Historical significance:</b> Cornfield's inequality is the intellectual ancestor of the E-value. The E-value generalizes it to arbitrary RR values and proves it as a mathematical bound (the Ding-VanderWeele inequality), not just a heuristic.</div>
+</div>
+
+<h2>9. Key References</h2>
+<div class="card">
+<p><a href="https://doi.org/10.1093/jnci/22.1.173" target="_blank">Cornfield, J. et al. (1959).</a> Smoking and lung cancer: recent evidence and a discussion of some questions. <i>JNCI</i>, 22(1), 173-203. — The first sensitivity analysis in history.</p>
+<p><a href="https://doi.org/10.1007/978-1-4757-3692-2" target="_blank">Rosenbaum, P. R. (2002).</a> <i>Observational Studies</i>. Springer. — Rosenbaum bounds (Γ).</p>
+<p><a href="https://doi.org/10.7326/M16-2607" target="_blank">VanderWeele, T. J. & Ding, P. (2017).</a> Sensitivity analysis in observational research: Introducing the E-value. <i>Annals IM</i>, 167(4), 268-274.</p>
+<p><a href="https://doi.org/10.1111/rssb.12348" target="_blank">Cinelli, C. & Hazlett, C. (2020).</a> Making sense of sensitivity: extending omitted variable bias. <i>JRSS-B</i>, 82(1), 39-67. — Partial R² framework + sensemakr.</p>
+<p><a href="https://doi.org/10.1093/biomet/asae001" target="_blank">Cinelli, C. & Hazlett, C. (2025).</a> An OVB framework for sensitivity analysis of instrumental variables. <i>Biometrika</i>, 112(2).</p>
+<p><a href="https://arxiv.org/abs/2104.06562" target="_blank">Masten, M. A. & Poirier, A. (2021).</a> The breakdown frontier. <i>arXiv:2104.06562</i>.</p>
+<p><a href="https://doi.org/10.1093/biomet/asz048" target="_blank">Zhao, Q., Small, D. S., & Bhattacharya, B. B. (2019).</a> Sensitivity analysis for inverse probability weighting estimators via the percentile bootstrap. <i>Biometrika</i>, 106(4), 927-942.</p>
+<p><a href="https://arxiv.org/abs/2403.12607" target="_blank">Zhao, Q. (2024).</a> L² sensitivity analysis for causal inference with machine learning.</p>
+<p><a href="https://doi.org/10.1017/9781139025751" target="_blank">Imbens, G. W. & Rubin, D. B. (2015).</a> <i>Causal Inference</i>. Cambridge. — Ch.21-22: sensitivity analysis.</p>
+</div>
+
+<script>
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+function DM(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:true})}catch(e){return'<code>'+s+'</code>'}}
+document.getElementById("eq-ign").innerHTML=M("\\{Y(0),Y(1)\\} \\perp T \\mid X \\quad \\text{(untestable)}");
+document.getElementById("eq-dv1").innerHTML=M("RR_{\\text{obs}} \\leq RR_{\\text{true}} \\times \\frac{RR_{TU} \\times RR_{UY}}{RR_{TU} + RR_{UY} - 1}");
+document.getElementById("eq-dv2").innerHTML=M("RR_{\\text{obs}} \\leq \\frac{e^2}{2e - 1}");
+document.getElementById("eq-evalue").innerHTML=DM("E\\text{-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}} \\cdot (RR_{\\text{obs}} - 1)}");
+document.getElementById("eq-ovb").innerHTML=M("\\text{Bias}(\\hat{\\tau}) = \\delta \\cdot \\gamma \\cdot \\frac{1}{1 - R^2_{T\\sim X}}");
+document.getElementById("eq-pr2").innerHTML=M("\\text{Bias} \\propto \\sqrt{R^2_{T\\sim U|X} \\cdot R^2_{Y\\sim U|X,T}}");
+document.getElementById("eq-rv").innerHTML=DM("RV = \\frac{1}{2}\\left(\\sqrt{f^2 + 4f^2} - f^2\\right) \\text{ where } f^2 = f_{Y\\sim T|X}");
+document.getElementById("eq-rosenbaum").innerHTML=M("\\frac{1}{\\Gamma} \\leq \\frac{\\pi_i/(1-\\pi_i)}{\\pi_j/(1-\\pi_j)} \\leq \\Gamma");
+</script>
+</body>
+</html>
