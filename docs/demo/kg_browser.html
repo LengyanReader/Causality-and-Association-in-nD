@@ -65,9 +65,13 @@ fetch("causal_kg.json?v=1").then(r=>r.json()).then(function(d){
       rung:n.rung,role:n.role,year:n.year,question:n.question,
       formal_def:n.formal_def,glossary:n.glossary,doi:n.doi,output:n.output}
   });
-  G.edges=d.edges;
+  // Map from_id/to_id to source/target for D3 forceLink
+  G.edges=d.edges.map(function(e){
+    return {source:e.from_id,target:e.to_id,relationship:e.relationship,
+            from_type:e.from_type,to_type:e.to_type}
+  });
   build();
-});
+}).catch(function(e){document.getElementById("info").innerHTML='<p style=\"color:var(--red)\">Failed to load: '+e.message+'</p>';});
 
 function typeColor(t){return{'Concept':'var(--blue)','Reference':'var(--green)','Method':'var(--orange)','Station':'var(--purple)','Variable':'var(--red)','GalleryCase':'var(--teal)','Principle':'var(--pink)','BridgeLevel':'#fbbf24'}[t]||'#94a3b8'}
 
@@ -134,8 +138,10 @@ function showInfo(d){
   // Find connected nodes
   var neighbors=[];
   G.edges.forEach(function(e){
-    if(e.from_id===d.id){neighbors.push({dir:'out',rel:e.relationship,target:e.to_id})}
-    if(e.to_id===d.id){neighbors.push({dir:'in',rel:e.relationship,target:e.from_id})}
+    var src=typeof e.source==='object'?e.source.id:e.source;
+    var tgt=typeof e.target==='object'?e.target.id:e.target;
+    if(src===d.id){neighbors.push({dir:'out',rel:e.relationship,target:tgt})}
+    if(tgt===d.id){neighbors.push({dir:'in',rel:e.relationship,target:src})}
   });
   if(neighbors.length>0){
     h+='<div class="rel"><b>'+neighbors.length+' connections:</b> ';
