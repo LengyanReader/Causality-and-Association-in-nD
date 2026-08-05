@@ -176,7 +176,19 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 </ul>
 
 <h3>6.3 The Epistemological Status of the Σ</h3>
-<p>Cartwright (1999) argued that "no causes in, no causes out" — the DAG encodes causal assumptions that no amount of data or Σ can replace. The Σ is a <b>truth-preserving transformation</b>: if the DAG is correct, Σ gives the right answer; if the DAG is wrong, Σ gives a wrong answer with the appearance of mathematical rigor. The Σ does not <i>validate</i> causal claims — it merely <i>transforms</i> them from interventional to observational language, conditional on the graph being correct.</p>
+<p>Cartwright (1999) argued that "no causes in, no causes out" — the DAG encodes causal assumptions that no amount of data or Σ can replace. The Σ is a <b>truth-preserving transformation</b>: if the DAG is correct, Σ gives the right answer; if the DAG is wrong, Σ gives a wrong answer with the appearance of mathematical rigor.</p>
+
+<h3>6.4 A Serious Counter-Position — "Probabilistic Modelling Is Sufficient"</h3>
+<p>Mlodozeniec, Krueger & Turner (2025, ICML Oral) advance a provocative thesis that directly challenges the Pearlian framework: <b>probabilistic modelling alone is sufficient for causal inference</b> — no specialized do-operator, SCMs, or do-calculus required. Their argument, grounded in MacKay's principle ("always write down the probability of everything"), proceeds as follows:</p>
+<ol style="margin-left:20px">
+<li><b>Joint model of all worlds.</b> Construct a single probabilistic model (Bayesian network) spanning both the factual world (what happened) and hypothetical intervened worlds (what would happen under do(T=t)). The "twin network" approach (Balke & Pearl 1994) embeds counterfactuals in a standard graphical model.</li>
+<li><b>Causal queries reduce to probabilistic inference.</b> With the full joint specified, interventional questions P(Y|do(T=t)) and counterfactual questions P(Y(0)|T=1,Y=1) become standard conditional/marginal queries — just Σ over the latent variables connecting the factual and counterfactual worlds.</li>
+<li><b>The do-operator is syntactic sugar.</b> They reinterpret Pearl's do-calculus and SCMs not as fundamentally distinct mathematical operations, but as convenient notation for particular patterns of conditioning + marginalization within a larger probabilistic model. SCMs are recast as a restricted class of Bayesian networks with explicitly shared noise variables.</li>
+</ol>
+<div class="callout-warn"><b>What this means for our Σ thesis:</b> Mlodozeniec et al. actually <b>support</b> the core mathematical claim of this deep dive — that Σ (marginalization) is the universal engine. But they go further: they argue that the <i>entire causal inference apparatus</i> (DAGs, do-operator, identification criteria, do-calculus) is a notational layer on top of what is, fundamentally, just probabilistic modeling with Σ. The disagreement is not about the math (Σ is Σ) but about whether the specialized causal notation <i>adds essential structure</i> (Pearl's position: the DAG encodes untestable assumptions that probabilistic models alone cannot derive) or is <i>merely convenient</i> (Mlodozeniec et al.'s position: a sufficiently expressive probabilistic model already contains all the necessary structure).</div>
+<p><b>Our assessment:</b> Both positions agree that Σ is the engine. The disagreement is epistemological: <i>where do the assumptions that determine what to Σ over come from?</i> Pearl says they come from the DAG — an external causal theory. Mlodozeniec et al. say they come from the joint probabilistic model itself — you specify P(everything) and Σ does the rest. In practice, specifying P(everything) for a real problem requires encoding exactly the same domain knowledge that a DAG encodes, just in a different formalism. The DAG makes assumptions <b>visible and falsifiable</b> (every absent edge is a testable claim); a monolithic joint model may bury the same assumptions in prior and structure choices that are harder to audit. The value of the causal framework, then, is not that it enables something probabilistically impossible — it's that it makes assumptions <b>explicit, versioned, and testable</b> — which is exactly Design Principle P1 of this project.</p>
+
+<h3>6.5 The Epistemological Status of the Σ — Synthesis</h3>
 
 <h3>6.4 Comparison with Potential Outcomes</h3>
 <p>In the potential outcomes framework, identification is expressed as:</p>
@@ -230,7 +242,48 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-warn"><b>Practical note:</b> The ID algorithm is implemented in <a href="https://github.com/ananke-developers/ananke" target="_blank">Ananke</a> (Bhattacharya et al., UCLA) and <a href="https://dagitty.net/" target="_blank">dagitty</a>. For most applied problems, the back-door or front-door criterion suffices. The ID algorithm is essential for complex longitudinal settings with time-varying confounding and treatment-confounder feedback.</div>
 </div>
 
-<h2>11. Key References</h2>
+<h2>11. Further Reading — The Frontier of Identification Research</h2>
+<div class="card">
+<h3>11.1 Foundational Completeness Results</h3>
+<p><b>Shpitser & Pearl (2008)</b> — The ID algorithm: a sound and complete polynomial-time procedure for identifying any causal effect from observational data + a known DAG. <b>Huang & Valtorta (2006)</b> independently proved do-calculus completeness.</p>
+
+<h3>11.2 Beyond Observational Data — General Identifiability (gID)</h3>
+<p><b>Lee, Correa & Bareinboim (2019)</b> extended identification to settings with arbitrary combinations of observational AND interventional distributions (surrogate experiments). Their hedgelet/thicket structures characterize when effects are g-identifiable. Do-calculus is complete for gID (with positivity).</p>
+<p><b>Kivva et al. (2022, 2024)</b> revisited gID and showed a critical caveat: <b>without positivity, do-calculus is NOT sound</b> — you can derive identification formulas that are mathematically impossible to compute from the available data. This has profound implications for practical causal inference with finite samples.</p>
+
+<h3>11.3 Counterfactual Identification — Climbing to Rung 3</h3>
+<p><b>Correa, Lee & Bareinboim (2021)</b> developed a sound and complete algorithm for identifying nested counterfactuals (e.g., natural direct effects) from arbitrary surrogate experiments. Their key theorem reduces nested counterfactual identification to non-nested identification. The <b>M-ID algorithm</b> (Maiti, Plecko & Bareinboim 2025) extends this to arbitrary counterfactual queries under monotonicity constraints.</p>
+
+<h3>11.4 IV & LATE — Modern Challenges</h3>
+<p><b>Blandhol, Bonney, Mogstad & Torgovitsky (2022)</b> showed that 2SLS with covariates generally does NOT recover a convex-weighted LATE unless covariates are interacted with the instrument. <b>Słoczyński (2022)</b> demonstrated negative weights when first stages have opposite signs. <b>Mogstad, Torgovitsky & Walters (2021)</b> characterized what IV actually estimates with multiple instruments.</p>
+<p><b>Ma (2025)</b> proposed an orthogonalized Anderson-Rubin test for LATE with high-dimensional controls, uniformly valid regardless of identification strength.</p>
+
+<h3>11.5 DiD — The Heterogeneous Timing Revolution</h3>
+<p><b>Goodman-Bacon (2021)</b> and <b>de Chaisemartin & D'Haultfoeuille (2020)</b> independently showed that two-way fixed effects (TWFE) with staggered adoption produces contaminated estimates. <b>Callaway & Sant'Anna (2021)</b> proposed doubly robust group-time ATTs. <b>Roth (2022)</b> showed pre-trends tests have low power — passing them is necessary but not sufficient.</p>
+
+<h3>11.6 Synthetic Control & SDID</h3>
+<p><b>Arkhangelsky, Athey, Hirshberg, Imbens & Wager (2021)</b> proposed Synthetic Difference-in-Differences (SDID), combining SC's unit weighting with DiD's double-differencing. The method nests both DiD and SC as special cases.</p>
+
+<h3>11.7 Beyond Classical Probability — Categorical Identification</h3>
+<p><b>Cakiqi & Little (2024)</b> reformulated causal identification in symmetric monoidal categories, enabling identification in settings where classical probability doesn't apply: relational databases, hardware description languages, distributed systems. They derive purely syntactic analogues of back-door and front-door adjustment.</p>
+
+<h3>11.8 Machine Learning for Identification</h3>
+<p><b>Chernozhukov et al. (2018)</b> — Double/Debiased ML: Neyman-orthogonal scores + cross-fitting provides √N-consistent estimates with high-dimensional nuisances. Extends to LATE, DiD, and partially linear models.</p>
+<p><b>Belloni et al. (2017)</b> — DML for LATE with high-dimensional instruments.</p>
+
+<h3>11.9 Key Tools & Projects</h3>
+<table>
+<tr><th>Tool</th><th>What it does</th><th>Link</th></tr>
+<tr><td><b>dagitty</b></td><td>DAG drawing + identification analysis; computes adjustment sets, tests d-separation</td><td><a href="https://dagitty.net/" target="_blank">dagitty.net</a></td></tr>
+<tr><td><b>Ananke</b></td><td>Python implementation of the ID algorithm (Shpitser & Pearl); computes identifying functionals</td><td><a href="https://github.com/ananke-developers/ananke" target="_blank">GitHub</a></td></tr>
+<tr><td><b>DoWhy</b></td><td>End-to-end causal inference: graph-based identification → estimation → refutation</td><td><a href="https://github.com/py-why/dowhy" target="_blank">GitHub</a></td></tr>
+<tr><td><b>dosearch</b></td><td>R package for causal identification from arbitrary data sources (general ID problem)</td><td><a href="https://cran.r-project.org/package=dosearch" target="_blank">CRAN</a></td></tr>
+<tr><td><b>causal-learn</b></td><td>Python causal discovery: PC, FCI, GES, LiNGAM, GRaSP</td><td><a href="https://github.com/py-why/causal-learn" target="_blank">GitHub</a></td></tr>
+<tr><td><b>EconML</b></td><td>Microsoft's library for heterogeneous treatment effects; DML, CATE, policy learning</td><td><a href="https://github.com/py-why/EconML" target="_blank">GitHub</a></td></tr>
+</table>
+</div>
+
+<h2>12. Key References</h2>
 <div class="card">
 <p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a> — Introduces the back-door criterion and the do-calculus (R1-R3).</p>
 <p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a> — §3.3: back-door; §3.4: do-calculus R1-R3; §3.5: front-door; §4: identification.</p>
@@ -240,6 +293,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>Cinelli, C., Forney, A., & Pearl, J. (2022). A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>. <a href="https://doi.org/10.1177/00491241221099552" target="_blank">DOI</a> — Why "control for everything" fails; the DAG tells you which Σ to use.</p>
 <p>Angrist, J. D., Imbens, G. W., & Rubin, D. B. (1996). Identification of causal effects using instrumental variables. <i>JASA</i>, 91(434), 444–455. <a href="https://doi.org/10.1080/01621459.1996.10476902" target="_blank">DOI</a> — LATE and compliance-based identification via IV.</p>
 <p>Cartwright, N. (1999). <i>The Dappled World: A Study of the Boundaries of Science</i>. Cambridge University Press. — Philosophical foundation: "no causes in, no causes out."</p>
+<p>Mlodozeniec, B., Krueger, D., & Turner, R. E. (2025). Position: Probabilistic modelling is sufficient for causal inference. <i>ICML 2025 (Oral)</i>, PMLR 267:81810-81840. <a href="https://arxiv.org/abs/2512.23408" target="_blank">arXiv</a> — Challenges the necessity of specialized causal notation; argues Σ within a full joint probabilistic model suffices.</p>
 <p>Pearl, J. (2011). On the bias amplification of conditioning on instruments. UCLA Cognitive Systems Laboratory, Technical Report R-421. — Why Σ over instruments amplifies bias.</p>
 </div>
 
