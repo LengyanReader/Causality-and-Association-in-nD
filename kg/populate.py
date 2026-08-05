@@ -345,8 +345,8 @@ def populate_references(kg):
         {"id":"rosenbaum-rubin-1983","short":"Rosenbaum & Rubin (1983)","year":1983,
          "full":"Rosenbaum, P. R. & Rubin, D. B. (1983). The central role of the propensity score in observational studies for causal effects. Biometrika, 70(1), 41-55.",
          "doi":"10.1093/biomet/70.1.41","type":"paper","proves":["propensity-score","ignorability"]},
-        {"id":"shpitser-pearl-2006","short":"Shpitser & Pearl (2006)","year":2006,
-         "full":"Shpitser, I. & Pearl, J. (2006). Complete identification methods for the causal hierarchy. Journal of Machine Learning Research, 9, 1941-1979.",
+        {"id":"shpitser-pearl-2008","short":"Shpitser & Pearl (2008)","year":2008,
+         "full":"Shpitser, I. & Pearl, J. (2008). Complete identification methods for the causal hierarchy. Journal of Machine Learning Research, 9, 1941-1979.",
          "type":"paper","proves":["id-algorithm","do-calculus"]},
         {"id":"robins-1986","short":"Robins (1986)","year":1986,
          "full":"Robins, J. M. (1986). A new approach to causal inference in mortality studies with sustained exposure periods. Mathematical Modelling, 7(9), 1393-1512.",
@@ -444,6 +444,12 @@ def populate_methods(kg):
         {"id":"ges","name":"Greedy Equivalence Search","class":"discovery","rung":1,
          "description":"Score-based causal discovery: greedily adds/removes edges to maximize BIC. Returns the highest-scoring Markov equivalence class.",
          "requires":[],"inputs":"observational_data","outputs":"equivalence_class"},
+        {"id":"did","name":"Difference-in-Differences","class":"estimator","rung":2,
+         "description":"Identifies ATT by differencing pre-post changes between treated and control groups. Requires parallel trends assumption (untestable).",
+         "requires":[],"inputs":"panel_data","outputs":"att_estimate"},
+        {"id":"rdd","name":"Regression Discontinuity Design","class":"estimator","rung":2,
+         "description":"Identifies a local causal effect at a cutoff by exploiting a discontinuous jump in treatment probability. Requires continuity of potential outcomes at the threshold.",
+         "requires":[],"inputs":"running_variable","outputs":"late_estimate"},
     ]
     for m in methods:
         reqs = m.pop("requires", [])
@@ -634,7 +640,7 @@ def populate_relationships(kg):
         # Reference links
         ("Reference","pearl-2009","PROVES","Concept","truncated-factorization"),
         ("Reference","pearl-2009","PROVES","Concept","front-door-criterion"),
-        ("Reference","shpitser-pearl-2006","PROVES","Concept","id-algorithm"),
+        ("Reference","shpitser-pearl-2008","PROVES","Concept","id-algorithm"),
     ]
     for src_type, src_id, rel, tgt_type, tgt_id in edges:
         kg.run(f"""

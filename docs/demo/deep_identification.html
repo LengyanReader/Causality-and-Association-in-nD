@@ -79,7 +79,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <tr><td><b>Front-door</b></td><td>M (mediator) and T</td><td>M and T' (mediator + treatment)</td><td>T→M→Y with no direct T→Y, and no confounders for M→Y except through T</td></tr>
 <tr><td><b>IV (LATE)</b></td><td>Z (instrument), implicitly via compliance strata</td><td>Compliance type C (always-taker, never-taker, complier, defier)</td><td>Z→T (relevance), Z⊥U (independence), Z→Y only through T (exclusion)</td></tr>
 <tr><td><b>do-calculus R2</b></td><td>pa(Y) after graph surgery</td><td>Variables d-separated from Y after intervention</td><td>Graphical conditions on d-separation in mutilated graphs</td></tr>
-<tr><td><b>General ID</b></td><td>C-components derived from the graph</td><td>All variables not in the target C-component</td><td>Any identifiable causal effect (Shpitser & Pearl 2006)</td></tr>
+<tr><td><b>General ID</b></td><td>C-components derived from the graph</td><td>All variables not in the target C-component</td><td>Any identifiable causal effect (Shpitser & Pearl 2008)</td></tr>
 <tr><td><b>G-computation</b></td><td>pa(Y) — all parents of Y after removing T→Y</td><td>All post-treatment variables L and their histories</td><td>Sequential ignorability (time-varying confounding)</td></tr>
 </table>
 <div class="callout-green"><b>Unifying principle:</b> All methods reduce to <b>condition on the right set → sum over that set</b>. The difference between methods is entirely about <i>which set is right</i> — and that depends on the graph structure and the assumptions you are willing to make.</div>
@@ -87,7 +87,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h2>4. The Back-Door Criterion — Detailed Derivation</h2>
 <div class="card">
-<h3>4.1 The Criterion (Pearl 1995, Def. 3.3.1)</h3>
+<h3>4.1 The Criterion (Pearl 1995, 2009 §3.3.1)</h3>
 <p>A set of variables <b>Z</b> satisfies the <b>back-door criterion</b> relative to (T, Y) if:</p>
 <ol style="margin-left:20px">
 <li><b>No descendant of T is in Z.</b> This ensures we don't block causal paths or open collider paths via mediators.</li>
@@ -124,10 +124,45 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>Here the Σ is <b>implicit</b> — the numerator and denominator are both differences of conditional expectations, which are themselves sums over the data. The marginalization is over the <b>unobserved compliance type</b> (always-taker, never-taker, complier, defier), which is identified only for the complier subpopulation under the monotonicity assumption.</p>
 
 <h3>5.3 do-Calculus — The Complete Marginalization Calculus</h3>
-<p>Shpitser & Pearl (2006) proved that the ID algorithm is <b>complete</b>: any identifiable causal effect can be expressed as a sequence of Σ operations. Rules R1-R3 of the do-calculus are essentially rules about when you can add or remove a Σ (marginalization) or a conditioning operation. Every step of the algorithm either introduces a new Σ or eliminates a do() by replacing it with a condition + Σ.</p>
+<p>Shpitser & Pearl (2008) proved that the ID algorithm is <b>complete</b>: any identifiable causal effect can be expressed as a sequence of Σ operations. The three rules of do-calculus (Pearl 1995, 2009 §3.4) are:</p>
+<p class="formula"><span id="eq-do1"></span></p>
+<p class="formula"><span id="eq-do2"></span></p>
+<p class="formula"><span id="eq-do3"></span></p>
+<p><b>Rule 1 (Insertion/deletion of observations):</b> If Y and Z are d-separated by X and W in G<sub>X̅</sub> (the graph with arrows INTO X removed), then you can add/remove Z from the conditioning set.</p>
+<p><b>Rule 2 (Action/observation exchange):</b> If Y and Z are d-separated by X and W in G<sub>X̅Z̲</sub> (the graph with arrows INTO X removed AND arrows OUT OF Z removed), then P(Y|do(X),do(Z),W) = P(Y|do(X),Z,W) — you can replace do(Z) with see(Z).</p>
+<p><b>Rule 3 (Insertion/deletion of actions):</b> If Y and Z are d-separated by X and W in G<sub>X̅,Z(W)̅</sub>, then you can add/remove do(Z).</p>
+<p>Each rule licenses a Σ operation: Rule 1 allows introducing a variable to sum over; Rule 2 allows replacing a do() with a condition (which makes Σ possible); Rule 3 allows removing irrelevant interventions. Every step of the ID algorithm is an application of one of these three rules, and every application either introduces a Σ or eliminates a do().</p>
 </div>
 
-<h2>6. Critical Analysis — What Σ Can and Cannot Do</h2>
+<h2>6. Beyond the Canonical Trio — Other Identification Strategies</h2>
+<div class="card">
+<h3>6.1 Difference-in-Differences (DiD)</h3>
+<p>DiD identifies the ATT under the <b>parallel trends</b> assumption: in the absence of treatment, the treated and control groups would have followed parallel trajectories. The Σ here is <i>implicit</i> — it operates over time periods and groups:</p>
+<p class="formula"><span id="eq-did"></span></p>
+<p>The identification is not through conditioning on confounders but through <b>differencing out</b> time-invariant unobserved heterogeneity. The Σ sums over units within each group×time cell.</p>
+
+<h3>6.2 Regression Discontinuity Design (RDD)</h3>
+<p>RDD identifies a local causal effect at a cutoff by exploiting a discontinuous jump in treatment probability:</p>
+<p class="formula"><span id="eq-rdd"></span></p>
+<p>The Σ here sums over units within a bandwidth of the cutoff. Identification relies on <b>continuity</b> of potential outcomes at the threshold — not on conditioning on confounders. This is a fundamentally different Σ: it marginalizes over a <i>local</i> region rather than over a global adjustment set.</p>
+
+<h3>6.3 Synthetic Control</h3>
+<p>Synthetic control identifies the ATT by constructing a weighted combination of untreated units (the "synthetic control") that matches the treated unit's pre-treatment trajectory. The Σ is a <b>constrained weighted sum</b> — the weights are chosen to minimize pre-treatment outcome differences, not to satisfy a back-door criterion. This is Σ as <i>optimization</i> rather than Σ as <i>marginalization</i>.</p>
+
+<h3>6.4 Comparison Table — All Methods Are Σ</h3>
+<table>
+<tr><th>Method</th><th>Identification assumption</th><th>What is summed over</th><th>Σ type</th></tr>
+<tr><td>Back-door</td><td>Z blocks all back-door paths</td><td>Z (adjustment set)</td><td>Population-weighted average</td></tr>
+<tr><td>Front-door</td><td>M intercepts all causal paths; M⊥Y|T in G<sub>T̅</sub></td><td>M and T' (mediator + treatment)</td><td>Nested double Σ</td></tr>
+<tr><td>IV (LATE)</td><td>Relevance + exclusion + independence + monotonicity</td><td>Compliance type (unobserved)</td><td>Ratio of differences (implicit Σ)</td></tr>
+<tr><td>DiD</td><td>Parallel trends (counterfactual, untestable)</td><td>Units × time periods</td><td>Differencing (Σ as averaging)</td></tr>
+<tr><td>RDD</td><td>Continuity of E[Y(t)|R=r] at cutoff</td><td>Units within bandwidth of cutoff</td><td>Local Σ (bandwidth-limited)</td></tr>
+<tr><td>Synthetic Control</td><td>Pre-treatment fit ⇒ post-treatment counterfactual</td><td>Donor units (weighted)</td><td>Constrained optimization Σ</td></tr>
+<tr><td>do-calculus</td><td>Graphical conditions (d-separation in mutilated graphs)</td><td>C-component variables</td><td>Recursive Σ sequence</td></tr>
+</table>
+</div>
+
+<h2>7. Critical Analysis — What Σ Can and Cannot Do</h2>
 <div class="card">
 <h3>6.1 What Σ Achieves</h3>
 <p>The marginalization operation is <b>necessary and sufficient</b> for causal identification: every identified causal effect is a Σ over some set, and every Σ over a valid adjustment set identifies a causal effect. This is a deep theorem (Shpitser & Pearl 2006, Theorem 4). The Σ is the <b>only bridge</b> between the interventional and observational distributions.</p>
@@ -149,7 +184,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>This is exactly the same Σ — it is the back-door adjustment formula written in potential-outcome notation. The two frameworks converge on the same mathematical operation: <b>condition on confounders → average over their distribution</b>. The graphical approach (DAGs) tells you which variables Z to use; the potential outcomes approach tells you what assumptions (ignorability, positivity) justify the Σ.</p>
 </div>
 
-<h2>7. The Bayesian Connection — Σ as the Shared Engine</h2>
+<h2>8. The Bayesian Connection — Σ as the Shared Engine</h2>
 <div class="card">
 <h3>7.1 Bayesian Marginalization and Causal Adjustment Are the Same Σ</h3>
 <p>In Bayesian statistics, the posterior predictive distribution integrates out parameters:</p>
@@ -176,7 +211,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-warn"><b>Bridge insight:</b> Bayesian inference and causal inference share the Σ as their fundamental operation. The difference is entirely about <b>WHAT</b> you condition on and <b>WHAT</b> you sum over. Bayes conditions on everything observed; causal inference selectively conditions only on the back-door set. Bayes sums over parameters with posterior weights; causal inference sums over confounders with population weights P(Z), deliberately NOT P(Z|T). This is why the math bridge shows that "Bayes never leaves Rung 1 by itself" — it has the engine (Σ) but lacks the map (the DAG that tells it what to condition on).</div>
 </div>
 
-<h2>8. Why NOT to Adjust for Everything — The Σ Must Be Precise</h2>
+<h2>9. Why NOT to Adjust for Everything — The Σ Must Be Precise</h2>
 <div class="card">
 <table>
 <tr><th>If you Σ over...</th><th>What goes wrong</th><th>Mathematical reason</th></tr>
@@ -188,20 +223,22 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-red"><b>Key insight:</b> The Σ is a precise surgical tool, not a blunt instrument. <b>Too many variables in Z → bias. Too few variables in Z → confounding remains.</b> Only the DAG tells you exactly which Z makes the Σ produce the causal effect.</div>
 </div>
 
-<h2>8. The ID Algorithm — When Σ Alone Is Not Enough</h2>
+<h2>10. The ID Algorithm — When Σ Alone Is Not Enough</h2>
 <div class="card">
-<p>For complex graphs where no single adjustment set works, Shpitser & Pearl (2006) provide the <b>ID algorithm</b> — a complete polynomial-time procedure that expresses any identified causal effect as a sequence of Σ operations, possibly nested and interleaved with further conditioning.</p>
+<p>For complex graphs where no single adjustment set works, Shpitser & Pearl (2008) provide the <b>ID algorithm</b> — a complete polynomial-time procedure that expresses any identified causal effect as a sequence of Σ operations, possibly nested and interleaved with further conditioning.</p>
 <p>The algorithm works by decomposing the graph into <b>C-components</b> (confounded components) and constructing a sequence of Σ operations that progressively marginalize over variables in each component. The output is a formula involving only observed probabilities and Σ — but the formula may be substantially more complex than the simple back-door adjustment.</p>
 <div class="callout-warn"><b>Practical note:</b> The ID algorithm is implemented in <a href="https://github.com/ananke-developers/ananke" target="_blank">Ananke</a> (Bhattacharya et al., UCLA) and <a href="https://dagitty.net/" target="_blank">dagitty</a>. For most applied problems, the back-door or front-door criterion suffices. The ID algorithm is essential for complex longitudinal settings with time-varying confounding and treatment-confounder feedback.</div>
 </div>
 
-<h2>9. Key References</h2>
+<h2>11. Key References</h2>
 <div class="card">
-<p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a> — Introduces the back-door criterion.</p>
-<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a> — Ch.3 presents the do-calculus; Ch.4 covers identification.</p>
-<p>Shpitser, I. & Pearl, J. (2006). Complete identification methods for the causal hierarchy. <i>Journal of Machine Learning Research</i>, 9, 1941–1979. — The ID algorithm: completeness proof that every identified causal effect is a Σ expression.</p>
+<p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a> — Introduces the back-door criterion and the do-calculus (R1-R3).</p>
+<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a> — §3.3: back-door; §3.4: do-calculus R1-R3; §3.5: front-door; §4: identification.</p>
+<p>Shpitser, I. & Pearl, J. (2008). Complete identification methods for the causal hierarchy. <i>Journal of Machine Learning Research</i>, 9, 1941–1979. — The ID algorithm: completeness proof that every identified causal effect is a Σ expression. (Tech report: 2006, UCLA R-352.)</p>
 <p>Greenland, S., Pearl, J., & Robins, J. M. (1999). Causal diagrams for epidemiologic research. <i>Epidemiology</i>, 10(1), 37-48. — Unified the graphical and epidemiological approaches to adjustment.</p>
+<p>Hernán, M. A. & Robins, J. M. (2020). <i>Causal Inference: What If</i>. Chapman & Hall/CRC. <a href="https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/" target="_blank">Free online</a> — Ch.7: confounding; Ch.15: instrumental variables; Ch.16: IV estimation.</p>
 <p>Cinelli, C., Forney, A., & Pearl, J. (2022). A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>. <a href="https://doi.org/10.1177/00491241221099552" target="_blank">DOI</a> — Why "control for everything" fails; the DAG tells you which Σ to use.</p>
+<p>Angrist, J. D., Imbens, G. W., & Rubin, D. B. (1996). Identification of causal effects using instrumental variables. <i>JASA</i>, 91(434), 444–455. <a href="https://doi.org/10.1080/01621459.1996.10476902" target="_blank">DOI</a> — LATE and compliance-based identification via IV.</p>
 <p>Cartwright, N. (1999). <i>The Dappled World: A Study of the Boundaries of Science</i>. Cambridge University Press. — Philosophical foundation: "no causes in, no causes out."</p>
 <p>Pearl, J. (2011). On the bias amplification of conditioning on instruments. UCLA Cognitive Systems Laboratory, Technical Report R-421. — Why Σ over instruments amplifies bias.</p>
 </div>
@@ -220,6 +257,11 @@ document.getElementById("eq-iv2").innerHTML=M("\\text{LATE} = \\frac{E[Y \\mid Z
 document.getElementById("eq-po").innerHTML=M("E[Y(1)-Y(0)] = \\sum_z \\big(E[Y \\mid T=1, Z=z] - E[Y \\mid T=0, Z=z]\\big) P(Z=z)");
 document.getElementById("eq-bayes1").innerHTML=M("P(\\tilde{y} \\mid \\text{data}) = \\int_\\theta P(\\tilde{y} \\mid \\theta) \\cdot P(\\theta \\mid \\text{data}) \\, d\\theta");
 document.getElementById("eq-causal1").innerHTML=M("P(Y \\mid do(T=t)) = \\sum_z P(Y \\mid T=t, Z=z) \\cdot P(Z=z)");
+document.getElementById("eq-do1").innerHTML=M("P(y \\mid do(x), z, w) = P(y \\mid do(x), w) \\quad \\text{if } Y \\perp\\!\\!\\!\\perp Z \\mid X, W \\text{ in } G_{\\overline{X}}");
+document.getElementById("eq-do2").innerHTML=M("P(y \\mid do(x), do(z), w) = P(y \\mid do(x), z, w) \\quad \\text{if } Y \\perp\\!\\!\\!\\perp Z \\mid X, W \\text{ in } G_{\\overline{X}\\underline{Z}}");
+document.getElementById("eq-do3").innerHTML=M("P(y \\mid do(x), do(z), w) = P(y \\mid do(x), w) \\quad \\text{if } Y \\perp\\!\\!\\!\\perp Z \\mid X, W \\text{ in } G_{\\overline{X},\\overline{Z(W)}}");
+document.getElementById("eq-did").innerHTML=M("\\text{ATT}_{\\text{DiD}} = (E[Y_{\\text{post}} \\mid T=1] - E[Y_{\\text{pre}} \\mid T=1]) - (E[Y_{\\text{post}} \\mid T=0] - E[Y_{\\text{pre}} \\mid T=0])");
+document.getElementById("eq-rdd").innerHTML=M("\\tau_{\\text{RDD}} = \\lim_{r \\downarrow c} E[Y \\mid R=r] - \\lim_{r \\uparrow c} E[Y \\mid R=r]");
 </script>
 </body>
 </html>
