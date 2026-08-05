@@ -155,8 +155,8 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div style="text-align:center;margin:16px 0">
 <svg viewBox="0 0 600 220" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
   <defs>
-    <marker id="arR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
-    <marker id="arG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#64748b"/></marker>
+    <marker id="evArR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
+    <marker id="evArG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#64748b"/></marker>
   </defs>
   <text x="300" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">How the E-value Works</text>
 
@@ -183,17 +183,17 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
   <text x="360" y="179" text-anchor="middle" font-size="8" fill="#065f46">Outcome</text>
 
   <!-- U->T arrow -->
-  <line x1="218" y1="98" x2="332" y2="68" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arR)"/>
+  <line x1="218" y1="98" x2="332" y2="68" stroke="#dc2626" stroke-width="2.5" marker-end="url(#evArR)"/>
   <text x="275" y="75" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>TU</sub></code> ≥ 2.73</text>
 
   <!-- U->Y arrow -->
-  <line x1="218" y1="132" x2="332" y2="157" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arR)"/>
+  <line x1="218" y1="132" x2="332" y2="157" stroke="#dc2626" stroke-width="2.5" marker-end="url(#evArR)"/>
   <text x="275" y="155" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626"><code>RR<sub>UY</sub></code> ≥ 2.73</text>
 
   <!-- T->Y observed association -->
-  <line x1="360" y1="87" x2="360" y2="138" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arG)"/>
-  <text x="400" y="108" text-anchor="start" font-size="9" fill="#64748b"><code>RR<sub>obs</sub></code> = 1.67</text>
-  <text x="400" y="120" text-anchor="start" font-size="7" fill="#94a3b8">(observed)</text>
+  <line x1="360" y1="87" x2="360" y2="138" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#evArG)"/>
+  <text x="400" y="110" text-anchor="start" font-size="9" fill="#64748b"><code>RR<sub>obs</sub></code> = 1.67</text>
+  <text x="400" y="122" text-anchor="start" font-size="7" fill="#94a3b8">(P(Y|T=1)/P(Y|T=0))</text>
 
   <!-- Annotation box -->
   <rect x="445" y="42" width="145" height="112" rx="6" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
@@ -208,6 +208,13 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
   <!-- Bottom caption -->
   <text x="300" y="212" text-anchor="middle" font-size="8" fill="#64748b">X (measured covariates, already adjusted for) shown as dashed box. U is UNMEASURED (dashed border).</text>
 </svg>
+</div>
+
+<div class="callout" style="font-size:.84rem;margin-top:8px">
+<b>Concrete computation</b> (our NomNom notification→order data, after adjusting for W, rain, weekend, payday):<br>
+<code>RR<sub>obs</sub> = P(Y=1|T=1) / P(Y=1|T=0) ≈ 0.613 / 0.372 ≈ <b>1.67</b></code><br>
+<code>E-value = 1.67 + √(1.67 × (1.67 − 1)) = 1.67 + √(1.67 × 0.67) = 1.67 + √1.1189 = 1.67 + 1.058 = <b>2.73</b></code><br>
+Interpretation: an unmeasured confounder would need RR ≥ 2.73 with BOTH notification receipt AND order placement (above and beyond the 4 measured covariates) to fully explain away the observed effect.
 </div>
 
 <div class="callout-green"><b>Everyday analogy — the two-skill safe-cracker:</b> A confounder must be strong in <b>two dimensions simultaneously</b> — associated with BOTH treatment AND outcome. Think of a safe that requires <b>two hands turning two dials at once</b>. The E-value says: "To crack this safe, a thief would need to apply at least 273 lbs of pressure with EACH hand simultaneously." Your strongest friend can do 180 lbs with one hand — and almost no one can sustain that with both. The safe isn't provably uncrackable, but the thief would need to be <b>bilaterally implausible</b>. This captures the E-value's key structure: RR with T AND RR with Y, both ≥ E-value.</div>
@@ -271,7 +278,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
 <div style="text-align:center;margin:16px 0">
 <svg viewBox="0 0 600 200" style="max-width:100%;height:auto;background:#fff;border-radius:8px;border:1px solid var(--border)">
-  <defs><marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker></defs>
+  <defs><marker id="pr2Ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker></defs>
   <text x="300" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1a2e">Partial R² — Variance Explained by Confounder U</text>
   <!-- T variance bar -->
   <text x="30" y="52" font-size="9" fill="#64748b">Treatment T:</text>
