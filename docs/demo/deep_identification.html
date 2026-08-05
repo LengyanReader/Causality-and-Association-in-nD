@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dive: Causal Identification — The Mathematics of Marginalization</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--dark:#0f172a;--border:#e2e8f0;--radius:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout{background:#eff6ff;border-left:4px solid var(--blue);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.callout-red{background:#fef2f2;border-left-color:var(--red)}
+.callout-green{background:#f0fdf4;border-left-color:var(--green)}
+.callout-warn{background:#fffbeb;border-left-color:var(--orange)}
+.callout-purple{background:#f5f0ff;border-left-color:var(--purple)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left}td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.formula{background:#f1f5f9;padding:8px 14px;border-radius:4px;display:inline-block;margin:6px 0;font-size:.92em}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+nav{display:flex;gap:12px;margin-bottom:20px;font-size:.88rem;flex-wrap:wrap}
+nav a{padding:4px 12px;border:1px solid var(--border);border-radius:20px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .15s}
+nav a:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+</style></head><body>
+
+<nav>
+<a href="index.html">← Main Walkthrough</a>
+<a href="deep_dgp.html">DGP</a>
+<a href="deep_identification.html" class="current">Identification</a>
+<a href="deep_evalue.html">E-value</a>
+<a href="deep_dag_building.html">DAG Building</a>
+</nav>
+
+<h1>Deep Dive: Causal Identification — Σ (Summing Out) as the Universal Engine</h1>
+<p style="color:var(--muted)">Why every causal identification method — back-door, front-door, IV, do-calculus — is fundamentally the same operation: conditioning + marginalization over non-targeted variables.</p>
+
+<h2>1. The Core Observation</h2>
+<div class="card">
+<p>Write down the back-door adjustment formula:</p>
+<p class="formula"><span id="eq-bd"></span></p>
+<p>Now the front-door adjustment formula:</p>
+<p class="formula"><span id="eq-fd"></span></p>
+<p>Now the IV estimand (Wald estimator, simplified):</p>
+<p class="formula"><span id="eq-iv"></span></p>
+<p>Notice the pattern: <b>every formula contains Σ</b> — a sum over some set of variables. This is not a coincidence. Causal identification is, at its mathematical core, the problem of <b>marginalizing out nuisance variables</b> after appropriate conditioning. The only thing that differs between methods is <i>which</i> variables to condition on and <i>which</i> variables to sum over.</p>
+<div class="callout-purple"><b>Central thesis:</b> The <b>Σ (sum/integral)</b> is the universal engine of causal identification. It is the mathematical operation that bridges the unobservable interventional world (P(Y|do(T))) and the observable associational world (P(Y|T, X)). Every identification method is a specific recipe for which variables to condition on and which to marginalize over — but the operation itself is always a sum.</div>
+</div>
+
+<h2>2. The Mathematical Structure — Why Σ?</h2>
+<div class="card">
+<h3>2.1 The Law of Total Probability as the Foundation</h3>
+<p>Every identification formula traces back to the <b>law of total probability</b>:</p>
+<p class="formula"><span id="eq-ltp"></span></p>
+<p>Given a partition {Z} of the sample space, we can "integrate out" Z to recover the marginal distribution of Y. In causal inference, we use this law <b>after conditioning on the right variables</b> — the art is choosing Z such that the conditional probabilities become "do-free" (expressible in observational terms).</p>
+
+<h3>2.2 Truncated Factorization → Marginalization</h3>
+<p>Pearl's truncated factorization (Pearl 2009, Ch.3) is the general mechanism:</p>
+<p class="formula"><span id="eq-tf"></span></p>
+<p>After deleting the equation for T and fixing T=t, we marginalize over all variables except Y. The back-door, front-door, and IV formulas are <b>special cases</b> of this general marginalization — they just take advantage of graph structure to simplify which variables actually need to be summed over.</p>
+
+<h3>2.3 Why Not Just "Control for Everything"?</h3>
+<p>The temptation is to write: <code>P(Y|do(T)) = Σ_all P(Y|T, all_vars) P(all_vars)</code>. This fails because:</p>
+<ol style="margin-left:20px">
+<li>Conditioning on a <b>mediator</b> (M) blocks the causal path T→M→Y — you measure the <i>direct</i> effect, not the <i>total</i> effect.</li>
+<li>Conditioning on a <b>collider</b> (S where T→S←Y) OPENS a non-causal path — Berkson's bias.</li>
+<li>Conditioning on an <b>instrument</b> (Z→T only) amplifies residual confounding bias (Pearl 2011).</li>
+</ol>
+<p>The back-door criterion (and its generalizations) tells you <b>exactly which Z to sum over</b> — neither more nor less. The Σ is cheap; the hard part is choosing the right conditioning set.</p>
+</div>
+
+<h2>3. A Unified View — All Methods Are Marginalization</h2>
+<div class="card">
+<table>
+<tr><th>Method</th><th>Condition on</th><th>Marginalize (Σ) over</th><th>When it works</th></tr>
+<tr><td><b>Back-door</b></td><td>Z: set blocking all back-door paths</td><td>Z (the adjustment set)</td><td>There exists an observed set Z satisfying the back-door criterion</td></tr>
+<tr><td><b>Front-door</b></td><td>M (mediator) and T</td><td>M and T' (mediator + treatment)</td><td>T→M→Y with no direct T→Y, and no confounders for M→Y except through T</td></tr>
+<tr><td><b>IV (LATE)</b></td><td>Z (instrument), implicitly via compliance strata</td><td>Compliance type C (always-taker, never-taker, complier, defier)</td><td>Z→T (relevance), Z⊥U (independence), Z→Y only through T (exclusion)</td></tr>
+<tr><td><b>do-calculus R2</b></td><td>pa(Y) after graph surgery</td><td>Variables d-separated from Y after intervention</td><td>Graphical conditions on d-separation in mutilated graphs</td></tr>
+<tr><td><b>General ID</b></td><td>C-components derived from the graph</td><td>All variables not in the target C-component</td><td>Any identifiable causal effect (Shpitser & Pearl 2006)</td></tr>
+<tr><td><b>G-computation</b></td><td>pa(Y) — all parents of Y after removing T→Y</td><td>All post-treatment variables L and their histories</td><td>Sequential ignorability (time-varying confounding)</td></tr>
+</table>
+<div class="callout-green"><b>Unifying principle:</b> All methods reduce to <b>condition on the right set → sum over that set</b>. The difference between methods is entirely about <i>which set is right</i> — and that depends on the graph structure and the assumptions you are willing to make.</div>
+</div>
+
+<h2>4. The Back-Door Criterion — Detailed Derivation</h2>
+<div class="card">
+<h3>4.1 The Criterion (Pearl 1995, Def. 3.3.1)</h3>
+<p>A set of variables <b>Z</b> satisfies the <b>back-door criterion</b> relative to (T, Y) if:</p>
+<ol style="margin-left:20px">
+<li><b>No descendant of T is in Z.</b> This ensures we don't block causal paths or open collider paths via mediators.</li>
+<li><b>Z d-separates T from Y in the back-door graph.</b> The back-door graph is the original DAG with all edges <i>out of T</i> deleted.</li>
+</ol>
+<p>If Z satisfies the criterion, the causal effect is identified by the back-door adjustment formula:</p>
+<p class="formula"><span id="eq-bd2"></span></p>
+
+<h3>4.2 Why the Sum Works — Step by Step</h3>
+<p><b>Step 1 — Markov factorization:</b> P(V) = ∏_j P(V_j | pa(V_j)). The joint distribution factorizes over the DAG.</p>
+<p><b>Step 2 — Apply do(T=t):</b> Delete P(T|pa(T)), fix T=t. The truncated factorization is P(V \ {T} | do(T=t)) = ∏_{V_j≠T} P(V_j | pa(V_j)) |_{T=t}.</p>
+<p><b>Step 3 — Marginalize over Z (the adjustment set):</b> P(Y | do(T=t)) = Σ_z P(Y | T=t, Z=z) P(Z=z). <b>This Σ is the key operation.</b> It "integrates out" the confounders Z, weighted by their population prevalence P(Z=z). The result is a weighted average of stratum-specific associations — which, because Z blocks all back-door paths, equals the causal effect.</p>
+
+<h3>4.3 Graph Surgery Algorithm</h3>
+<div class="callout">
+<b>Find-Adjustment-Set(G, T, Y):</b><br>
+1. Form the <b>back-door graph</b> G<sub>BD</sub> by deleting all edges <b>out of</b> T.<br>
+2. Let C = all observed non-descendants of T.<br>
+3. For each subset Z ⊆ C (smallest first): if Z d-separates T from Y in G<sub>BD</sub>, return Z.<br>
+4. If no subset works: not back-door identifiable — try front-door, IV, or general ID.
+</div>
+</div>
+
+<h2>5. Beyond Back-Door — When Σ Needs a Different Route</h2>
+<div class="card">
+<h3>5.1 Front-Door — When Confounders Are Unmeasured</h3>
+<p>When the confounder U is unobserved but a mediator M intercepts ALL causal paths from T to Y AND shares no confounders with Y, the front-door criterion applies:</p>
+<p class="formula"><span id="eq-fd2"></span></p>
+<p>The Σ now appears <b>twice</b> — once over M (the mediator) and once over T' (the treatment). This double marginalization is the price of not observing the confounder: you must marginalize over BOTH the mediator distribution AND the treatment distribution.</p>
+
+<h3>5.2 Instrumental Variables — Marginalizing over Compliance</h3>
+<p>With an instrument Z, the LATE for compliers is:</p>
+<p class="formula"><span id="eq-iv2"></span></p>
+<p>Here the Σ is <b>implicit</b> — the numerator and denominator are both differences of conditional expectations, which are themselves sums over the data. The marginalization is over the <b>unobserved compliance type</b> (always-taker, never-taker, complier, defier), which is identified only for the complier subpopulation under the monotonicity assumption.</p>
+
+<h3>5.3 do-Calculus — The Complete Marginalization Calculus</h3>
+<p>Shpitser & Pearl (2006) proved that the ID algorithm is <b>complete</b>: any identifiable causal effect can be expressed as a sequence of Σ operations. Rules R1-R3 of the do-calculus are essentially rules about when you can add or remove a Σ (marginalization) or a conditioning operation. Every step of the algorithm either introduces a new Σ or eliminates a do() by replacing it with a condition + Σ.</p>
+</div>
+
+<h2>6. Critical Analysis — What Σ Can and Cannot Do</h2>
+<div class="card">
+<h3>6.1 What Σ Achieves</h3>
+<p>The marginalization operation is <b>necessary and sufficient</b> for causal identification: every identified causal effect is a Σ over some set, and every Σ over a valid adjustment set identifies a causal effect. This is a deep theorem (Shpitser & Pearl 2006, Theorem 4). The Σ is the <b>only bridge</b> between the interventional and observational distributions.</p>
+
+<h3>6.2 What Σ Cannot Do</h3>
+<ul style="margin-left:20px">
+<li><b>Σ cannot create information.</b> If the causal effect is not identified (the adjustment set does not exist), no amount of summing can produce a valid estimate. The Σ is an <b>unbiased transformer</b> of existing information, not a generator of new information.</li>
+<li><b>Σ cannot rescue a misspecified DAG.</b> If the graph is wrong — if you condition on a collider thinking it's a confounder, or omit a true confounder — the Σ produces a <b>precisely wrong</b> answer. The weighted average it computes is causally meaningless.</li>
+<li><b>Σ cannot handle unmeasured confounding in the back-door case.</b> If a confounder U is unobserved AND no proxy/mediator/instrument is available, the Σ over the observed variables does NOT equal P(Y|do(T)). This is the fundamental limitation: the Σ can only integrate out variables you <i>have</i>.</li>
+<li><b>Σ assumes positivity.</b> The sum requires P(Z=z) > 0 for all z, and P(T=t | Z=z) strictly between 0 and 1. Violations make the Σ undefined — you cannot average over empty strata.</li>
+</ul>
+
+<h3>6.3 The Epistemological Status of the Σ</h3>
+<p>Cartwright (1999) argued that "no causes in, no causes out" — the DAG encodes causal assumptions that no amount of data or Σ can replace. The Σ is a <b>truth-preserving transformation</b>: if the DAG is correct, Σ gives the right answer; if the DAG is wrong, Σ gives a wrong answer with the appearance of mathematical rigor. The Σ does not <i>validate</i> causal claims — it merely <i>transforms</i> them from interventional to observational language, conditional on the graph being correct.</p>
+
+<h3>6.4 Comparison with Potential Outcomes</h3>
+<p>In the potential outcomes framework, identification is expressed as:</p>
+<p class="formula"><span id="eq-po"></span></p>
+<p>This is exactly the same Σ — it is the back-door adjustment formula written in potential-outcome notation. The two frameworks converge on the same mathematical operation: <b>condition on confounders → average over their distribution</b>. The graphical approach (DAGs) tells you which variables Z to use; the potential outcomes approach tells you what assumptions (ignorability, positivity) justify the Σ.</p>
+</div>
+
+<h2>7. The Bayesian Connection — Σ as the Shared Engine</h2>
+<div class="card">
+<h3>7.1 Bayesian Marginalization and Causal Adjustment Are the Same Σ</h3>
+<p>In Bayesian statistics, the posterior predictive distribution integrates out parameters:</p>
+<p class="formula"><span id="eq-bayes1"></span></p>
+<p>Compare with the back-door adjustment formula:</p>
+<p class="formula"><span id="eq-causal1"></span></p>
+<p>Both formulas contain <b>Σ — the same mathematical operation</b>. But the objects being summed over differ:</p>
+<table>
+<tr><th>Aspect</th><th>Bayesian Σ</th><th>Causal Σ</th></tr>
+<tr><td>What is summed over</td><td>Parameters θ (unobserved, but inferred from data via prior→posterior)</td><td>Confounders Z (observed or proxied, weighted by P(Z=z), NOT P(Z=z|T=t))</td></tr>
+<tr><td>Weight</td><td>P(θ | data) — the posterior distribution</td><td>P(Z=z) — the population distribution of Z</td></tr>
+<tr><td>What it achieves</td><td>Uncertainty propagation: accounts for parameter uncertainty in predictions</td><td>Confounding removal: blocks back-door paths by reweighting stratum-specific associations</td></tr>
+<tr><td>Rung</td><td>Rung 1 (Association): conditions but never intervenes</td><td>Rung 2 (Intervention): conditions + marginalizes over P(Z), not P(Z|T)</td></tr>
+</table>
+<div class="callout-purple"><b>The critical difference:</b> Bayesian Σ uses <b>P(Z | T)</b> if you condition on T, or <b>P(Z)</b> if you don't. The causal Σ deliberately uses <b>P(Z)</b> — the unconditional distribution — even though T is in the model. This is exactly the difference between "seeing" (Rung 1) and "doing" (Rung 2): the intervention do(T=t) cuts the arrow into T, so Z's distribution is its natural P(Z), not the treatment-conditional P(Z|T). The Σ is the same; what changes is the weight.</div>
+
+<h3>7.2 The Math Bridge Connection — Why Bayes Never Leaves Rung 1</h3>
+<p>The Math Bridge curriculum (Levels 1-3) demonstrates this numerically:</p>
+<ul style="margin-left:20px">
+<li><b>Level 1 (Bayesian Inference):</b> Metropolis-Hastings from scratch correctly computes P(θ | data) — the posterior over parameters. But when used to estimate a treatment effect in the presence of confounding, the posterior concentrates on the <b>wrong</b> value. Bayes is doing the Σ correctly — it's just summing over the wrong weight.</li>
+<li><b>Level 2 (Bayesian Networks):</b> A BN is P(V) = ∏ P(V_j | pa(V_j)). The factorization is correct for the observational distribution. But P(Y | T) ≠ P(Y | do(T)) — the BN knows the joint, but doesn't know which arrows are causal.</li>
+<li><b>Level 3 (The Causal Step):</b> The truncated factorization replaces P(T | pa(T)) with a point mass at T=t — this changes what the Σ operates on. The Σ itself is unchanged; what's summed over and with what weight is what changes.</li>
+</ul>
+<div class="callout-warn"><b>Bridge insight:</b> Bayesian inference and causal inference share the Σ as their fundamental operation. The difference is entirely about <b>WHAT</b> you condition on and <b>WHAT</b> you sum over. Bayes conditions on everything observed; causal inference selectively conditions only on the back-door set. Bayes sums over parameters with posterior weights; causal inference sums over confounders with population weights P(Z), deliberately NOT P(Z|T). This is why the math bridge shows that "Bayes never leaves Rung 1 by itself" — it has the engine (Σ) but lacks the map (the DAG that tells it what to condition on).</div>
+</div>
+
+<h2>8. Why NOT to Adjust for Everything — The Σ Must Be Precise</h2>
+<div class="card">
+<table>
+<tr><th>If you Σ over...</th><th>What goes wrong</th><th>Mathematical reason</th></tr>
+<tr><td><b>M (mediator)</b></td><td>Blocks T→M→Y; estimate = direct effect, not total effect</td><td>The Σ over M conditions on a descendant of T — violates criterion (i)</td></tr>
+<tr><td><b>S (collider)</b></td><td>Opens T→S←Y; Berkson's bias: spurious negative association</td><td>Conditioning on S creates dependence between T and Y that is not causal</td></tr>
+<tr><td><b>Z (instrument)</b></td><td>Amplifies residual confounding bias</td><td>Z ⊥ U but Z→T; conditioning on Z forces variation in T that is correlated with U through the residual back-door path (Pearl 2011)</td></tr>
+<tr><td><b>Everything</b></td><td>Guarantees mediator + collider bias simultaneously</td><td>No graph-theoretic justification; "kitchen sink" approach</td></tr>
+</table>
+<div class="callout-red"><b>Key insight:</b> The Σ is a precise surgical tool, not a blunt instrument. <b>Too many variables in Z → bias. Too few variables in Z → confounding remains.</b> Only the DAG tells you exactly which Z makes the Σ produce the causal effect.</div>
+</div>
+
+<h2>8. The ID Algorithm — When Σ Alone Is Not Enough</h2>
+<div class="card">
+<p>For complex graphs where no single adjustment set works, Shpitser & Pearl (2006) provide the <b>ID algorithm</b> — a complete polynomial-time procedure that expresses any identified causal effect as a sequence of Σ operations, possibly nested and interleaved with further conditioning.</p>
+<p>The algorithm works by decomposing the graph into <b>C-components</b> (confounded components) and constructing a sequence of Σ operations that progressively marginalize over variables in each component. The output is a formula involving only observed probabilities and Σ — but the formula may be substantially more complex than the simple back-door adjustment.</p>
+<div class="callout-warn"><b>Practical note:</b> The ID algorithm is implemented in <a href="https://github.com/ananke-developers/ananke" target="_blank">Ananke</a> (Bhattacharya et al., UCLA) and <a href="https://dagitty.net/" target="_blank">dagitty</a>. For most applied problems, the back-door or front-door criterion suffices. The ID algorithm is essential for complex longitudinal settings with time-varying confounding and treatment-confounder feedback.</div>
+</div>
+
+<h2>9. Key References</h2>
+<div class="card">
+<p>Pearl, J. (1995). Causal diagrams for empirical research. <i>Biometrika</i>, 82(4), 669–688. <a href="https://doi.org/10.1093/biomet/82.4.669" target="_blank">DOI</a> — Introduces the back-door criterion.</p>
+<p>Pearl, J. (2009). <i>Causality: Models, Reasoning, and Inference</i> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" target="_blank">DOI</a> — Ch.3 presents the do-calculus; Ch.4 covers identification.</p>
+<p>Shpitser, I. & Pearl, J. (2006). Complete identification methods for the causal hierarchy. <i>Journal of Machine Learning Research</i>, 9, 1941–1979. — The ID algorithm: completeness proof that every identified causal effect is a Σ expression.</p>
+<p>Greenland, S., Pearl, J., & Robins, J. M. (1999). Causal diagrams for epidemiologic research. <i>Epidemiology</i>, 10(1), 37-48. — Unified the graphical and epidemiological approaches to adjustment.</p>
+<p>Cinelli, C., Forney, A., & Pearl, J. (2022). A Crash Course in Good and Bad Controls. <i>Sociological Methods & Research</i>. <a href="https://doi.org/10.1177/00491241221099552" target="_blank">DOI</a> — Why "control for everything" fails; the DAG tells you which Σ to use.</p>
+<p>Cartwright, N. (1999). <i>The Dappled World: A Study of the Boundaries of Science</i>. Cambridge University Press. — Philosophical foundation: "no causes in, no causes out."</p>
+<p>Pearl, J. (2011). On the bias amplification of conditioning on instruments. UCLA Cognitive Systems Laboratory, Technical Report R-421. — Why Σ over instruments amplifies bias.</p>
+</div>
+
+<script>
+function M(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:false})}catch(e){return'<code>'+s+'</code>'}}
+function DM(s){try{return katex.renderToString(s,{throwOnError:false,displayMode:true})}catch(e){return'<code>'+s+'</code>'}}
+document.getElementById("eq-bd").innerHTML=M("P(Y \\mid do(T=t)) = \\sum_z P(Y \\mid T=t, Z=z) \\cdot P(Z=z)");
+document.getElementById("eq-fd").innerHTML=M("P(Y \\mid do(T)) = \\sum_m P(m \\mid T) \\sum_{t'} P(Y \\mid t', m) P(t')");
+document.getElementById("eq-iv").innerHTML=M("\\text{LATE} = \\frac{E[Y \\mid Z=1] - E[Y \\mid Z=0]}{E[T \\mid Z=1] - E[T \\mid Z=0]}");
+document.getElementById("eq-ltp").innerHTML=M("P(Y) = \\sum_z P(Y \\mid Z=z) P(Z=z)");
+document.getElementById("eq-tf").innerHTML=M("P(V \\setminus \\{T\\} \\mid do(T=t)) = \\prod_{V_j \\neq T} P(V_j \\mid pa(V_j)) \\big|_{T=t}");
+document.getElementById("eq-bd2").innerHTML=M("P(y \\mid do(T=t)) = \\sum_z P(y \\mid T=t, Z=z) \\cdot P(Z=z)");
+document.getElementById("eq-fd2").innerHTML=M("P(y \\mid do(T)) = \\sum_m P(m \\mid T) \\sum_{t'} P(y \\mid T=t', M=m) P(T=t')");
+document.getElementById("eq-iv2").innerHTML=M("\\text{LATE} = \\frac{E[Y \\mid Z=1] - E[Y \\mid Z=0]}{E[T \\mid Z=1] - E[T \\mid Z=0]}");
+document.getElementById("eq-po").innerHTML=M("E[Y(1)-Y(0)] = \\sum_z \\big(E[Y \\mid T=1, Z=z] - E[Y \\mid T=0, Z=z]\\big) P(Z=z)");
+document.getElementById("eq-bayes1").innerHTML=M("P(\\tilde{y} \\mid \\text{data}) = \\int_\\theta P(\\tilde{y} \\mid \\theta) \\cdot P(\\theta \\mid \\text{data}) \\, d\\theta");
+document.getElementById("eq-causal1").innerHTML=M("P(Y \\mid do(T=t)) = \\sum_z P(Y \\mid T=t, Z=z) \\cdot P(Z=z)");
+</script>
+</body>
+</html>

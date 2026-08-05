@@ -231,6 +231,18 @@ def populate_concepts(kg):
          "definition":"Rosenbaum & Rubin (1983): e(X) = P(T=1|X). The propensity score is a balancing score — conditioning on e(X) is sufficient to remove confounding. Reduces high-dimensional X to a scalar, enabling matching, stratification, and IPW."},
         {"id":"sensitivity-analysis-epi","name":"Sensitivity Analysis in Epidemiology","rung":2,"glossary":False,
          "definition":"Rosenbaum (2002): bounding the treatment effect under hypothetical unmeasured confounding. The E-value (VanderWeele & Ding 2017) is the modern, standardized version used throughout this project."},
+        # Bayesian-causal bridge concepts
+        {"id":"bayesian-marginalization","name":"Bayesian Marginalization","rung":1,"glossary":False,
+         "definition":"P(prediction | data) = integral of P(prediction | theta) * P(theta | data) d-theta. The Bayesian engine for integrating out nuisance parameters. Structurally identical to causal adjustment (Sigma) but operates on P(Z|T) rather than P(Z) — conditions instead of intervening.",
+         "formal_def":"P(\\tilde{y} \\mid D) = \\int P(\\tilde{y} \\mid \\theta) P(\\theta \\mid D) d\\theta"},
+        {"id":"conditioning-vs-intervening","name":"Conditioning vs. Intervening","rung":2,"glossary":False,
+         "definition":"Conditioning (Bayes): P(Y | T) = sum_z P(Y | T, z) P(z | T). Intervening (causal): P(Y | do(T)) = sum_z P(Y | T, z) P(z). Same Sigma, different weight. The difference between Rung 1 and Rung 2 is entirely in whether you use P(z|T) or P(z).",
+         "formal_def":"\\text{Condition: } \\sum_z P(Y|T,z)P(z|T) \\quad \\text{vs.} \\quad \\text{Intervene: } \\sum_z P(Y|T,z)P(z)"},
+        {"id":"truncated-factorization","name":"Truncated Factorization","rung":2,"glossary":False,
+         "definition":"Pearl's formal definition of intervention: delete P(T|pa(T)) from the Markov factorization, fix T=t. P(V|do(T=t)) = prod_{Vj≠T} P(Vj | pa(Vj)) |_{T=t}. The general mechanism from which all identification formulas (back-door, front-door, IV) are derived by marginalizing over subsets of variables.",
+         "formal_def":"P(V \\setminus \\{T\\} \\mid do(T=t)) = \\prod_{V_j \\neq T} P(V_j \\mid pa(V_j)) \\big|_{T=t}"},
+        {"id":"id-algorithm","name":"ID Algorithm (Shpitser & Pearl 2006)","rung":2,"glossary":False,
+         "definition":"A complete polynomial-time algorithm that determines whether any causal effect is identifiable from a given DAG and, if so, expresses it as a sequence of Sigma (marginalization) operations over observed variables. Every identifiable causal effect is a Sigma expression."},
     ]
     for c in concepts:
         kg.run("""
@@ -333,6 +345,9 @@ def populate_references(kg):
         {"id":"rosenbaum-rubin-1983","short":"Rosenbaum & Rubin (1983)","year":1983,
          "full":"Rosenbaum, P. R. & Rubin, D. B. (1983). The central role of the propensity score in observational studies for causal effects. Biometrika, 70(1), 41-55.",
          "doi":"10.1093/biomet/70.1.41","type":"paper","proves":["propensity-score","ignorability"]},
+        {"id":"shpitser-pearl-2006","short":"Shpitser & Pearl (2006)","year":2006,
+         "full":"Shpitser, I. & Pearl, J. (2006). Complete identification methods for the causal hierarchy. Journal of Machine Learning Research, 9, 1941-1979.",
+         "type":"paper","proves":["id-algorithm","do-calculus"]},
         {"id":"robins-1986","short":"Robins (1986)","year":1986,
          "full":"Robins, J. M. (1986). A new approach to causal inference in mortality studies with sustained exposure periods. Mathematical Modelling, 7(9), 1393-1512.",
          "doi":"10.1016/0270-0255(86)90088-6","type":"paper","proves":["g-methods"]},
@@ -605,6 +620,21 @@ def populate_relationships(kg):
         ("Concept","g-methods","PREREQUISITE_FOR","Method","tmle"),
         ("Concept","propensity-score","PREREQUISITE_FOR","Method","ipw"),
         ("Concept","sensitivity-analysis-epi","PREREQUISITE_FOR","Concept","sensitivity-analysis"),
+        # Bayesian → causal bridge
+        ("Concept","bayesian-marginalization","PREREQUISITE_FOR","Concept","back-door-criterion"),
+        ("Concept","bayesian-marginalization","PREREQUISITE_FOR","Concept","conditioning-vs-intervening"),
+        ("Concept","conditioning-vs-intervening","PREREQUISITE_FOR","Concept","do-calculus"),
+        ("Concept","truncated-factorization","PREREQUISITE_FOR","Concept","back-door-criterion"),
+        ("Concept","truncated-factorization","PREREQUISITE_FOR","Concept","front-door-criterion"),
+        ("Concept","id-algorithm","PREREQUISITE_FOR","Concept","do-calculus"),
+        # Math bridge links
+        ("BridgeLevel","level-1","TEACHES","Concept","bayesian-marginalization"),
+        ("BridgeLevel","level-3","TEACHES","Concept","conditioning-vs-intervening"),
+        ("BridgeLevel","level-3","TEACHES","Concept","truncated-factorization"),
+        # Reference links
+        ("Reference","pearl-2009","PROVES","Concept","truncated-factorization"),
+        ("Reference","pearl-2009","PROVES","Concept","front-door-criterion"),
+        ("Reference","shpitser-pearl-2006","PROVES","Concept","id-algorithm"),
     ]
     for src_type, src_id, rel, tgt_type, tgt_id in edges:
         kg.run(f"""

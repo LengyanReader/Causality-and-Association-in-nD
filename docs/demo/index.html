@@ -525,7 +525,7 @@ function build(){
     h+='<li><b>'+applyTooltips('Positivity',c.assumption_tooltips)+':</b> 0 < P(T=1 | X=x) < 1 for all covariate patterns x</li>';
     h+='<li><b>'+applyTooltips('SUTVA',c.assumption_tooltips)+':</b> one user\'s notification does not affect another user\'s order</li>';
     h+='<li><b>'+applyTooltips('Consistency',c.assumption_tooltips)+':</b> the observed outcome under T=t equals the potential outcome Y(t)</li></ol></div>';}
-  h+='<h2 id="s2"><span class="cn">2</span> The Causal Graph <a href="deep_backdoor.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
+  h+='<h2 id="s2"><span class="cn">2</span> The Causal Graph <a href="deep_identification.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
   if(c.dag){
     h+='<div class="card"><p>'+c.dag.description+'</p>';
     h+='<div id="dagpopup" class="dagpop"></div>';
@@ -793,7 +793,7 @@ function buildSidebar(){
   h+='<div class="navbox"><div class="nht">📖 DEEP DIVES (separate pages)</div>';
   h+='<a href="kg_browser.html" class="nd" style="color:#fbbf24">🧠 Knowledge Graph Browser</a>';
   h+='<a href="deep_dgp.html" class="nd">🔬 How the Data Is Generated</a>';
-  h+='<a href="deep_backdoor.html" class="nd">🔍 The Back-Door Criterion</a>';
+  h+='<a href="deep_identification.html" class="nd">🔍 Causal Identification (Σ)</a>';
   h+='<a href="deep_evalue.html" class="nd">⚠️ The E-value Sensitivity</a>';
   h+='<a href="deep_dag_building.html" class="nd">📐 How Causal Graphs Are Built</a></div>';
   // On This Page navigation
