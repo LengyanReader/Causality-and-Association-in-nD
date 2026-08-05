@@ -9,7 +9,7 @@
 :root{--bg:#fafbfc;--text:#1a1a2e;--muted:#5a6a7a;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--dark:#0f172a;--border:#e2e8f0;--radius:8px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:32px 24px;background:var(--bg);color:var(--text);line-height:1.75}
-h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}
+h1{font-size:1.8rem;margin-bottom:4px}h2{font-size:1.2rem;margin:32px 0 12px;border-bottom:2px solid var(--blue);padding-bottom:4px}h3{font-size:1rem;margin:20px 0 8px}h4{font-size:.9rem;margin:16px 0 6px;color:var(--purple);font-weight:700}
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .callout{background:#eff6ff;border-left:4px solid var(--blue);padding:12px 16px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
 .callout-red{background:#fef2f2;border-left-color:var(--red)}
@@ -145,7 +145,7 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <div class="callout-green"><b>Everyday analogy — the two-skill safe-cracker:</b> A confounder must be strong in <b>two dimensions simultaneously</b> — associated with BOTH treatment AND outcome. Think of a safe that requires <b>two hands turning two dials at once</b>. The E-value says: "To crack this safe, a thief would need to apply at least 273 lbs of pressure with EACH hand simultaneously." Your strongest friend can do 180 lbs with one hand — and almost no one can sustain that with both. The safe isn't provably uncrackable, but the thief would need to be <b>bilaterally implausible</b>. This captures the E-value's key structure: RR with T AND RR with Y, both ≥ E-value.</div>
 <div class="callout-warn"><b>Where this analogy breaks — and what the E-value CANNOT do:</b> (1) <b>Multiple thieves.</b> The E-value assumes a SINGLE confounder. Two weak confounders acting together could theoretically crack the safe even when neither alone meets the threshold — the safe's two-hand test doesn't rule out a team. (2) <b>Different methods of entry.</b> The E-value measures force (RR scale). If the confounder operates through a different mechanism — e.g., an instrument-like variable that affects T through a channel the E-value's derivation doesn't cover — the analogy fails. (3) <b>You might not know the strongest person alive.</b> "Benchmarks" (strongest known confounder, strongest person you know) calibrate against your current knowledge, not against reality. Before 1950, "smoking→lung cancer: RR≈10-20" would have sounded absurd — but it was real. The E-value tells you a confounder would need to be smoking-strength; it does NOT tell you smoking-strength confounders don't exist. That judgment requires domain expertise, not math.</div>
 
-<h3>3.2 Mathematical Derivation — Step by Step</h3>
+<h3>5.2 Mathematical Derivation</h3>
 <p><b>Step 1 — The Ding-VanderWeele bound.</b> For any unmeasured confounder U, the maximum bias it can induce is bounded by:</p>
 <p class="formula"><span id="eq-dv1"></span></p>
 <p>where RR_TU = risk ratio of U on T, RR_UY = risk ratio of U on Y, both conditional on measured covariates.</p>
@@ -153,14 +153,23 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 <p class="formula"><span id="eq-dv2"></span></p>
 <p><b>Step 3 — Solve the quadratic.</b> Cross-multiply: RR_obs × (2e − 1) = e². Rearranged: e² − 2·RR_obs·e + RR_obs = 0. The larger root gives:</p>
 <p class="formula"><span id="eq-evalue"></span></p>
-<p><b>Step 4 — Why the math means what we claim: the logical chain.</b> The E-value is not just a formula — it's the endpoint of a logical argument. Here is why each step is valid and what it guarantees:</p>
-<p><b>4a. Why the Ding-VanderWeele bound holds.</b> The inequality RR_obs ≤ RR_true × (RR_TU × RR_UY)/(RR_TU + RR_UY − 1) is not an approximation — it's a <b>theorem</b>. Ding & VanderWeele (2016, <i>Epidemiology</i>) proved it from the definitions of risk ratios and the law of total probability, assuming only that U is binary or polytomous and that the measured covariates X are sufficient to block confounding from U. The proof works by: (i) expressing the observed RR as a weighted average of stratum-specific true RRs, (ii) showing that the weights are constrained by RR_TU and RR_UY, (iii) maximizing the possible bias over all distributions of U consistent with those constraints. The result is a <b>sharp bound</b> — there exists some distribution of U that achieves it, so it cannot be tightened without additional assumptions.</p>
-<p><b>4b. Why RR_true = 1 is the right "worst case."</b> We're asking: "Could confounding explain away the ENTIRE effect?" Setting RR_true = 1 means "there is zero true causal effect — everything we observe is confounding." If even THIS extreme scenario requires an implausibly strong confounder, then any PARTIAL confounding (RR_true > 1 but smaller than observed) requires an even stronger confounder to close the remaining gap. Setting RR_true = 1 gives the <b>minimum</b> confounder strength needed — it's the easiest case for the confounder to win. If the confounder can't win even in this easiest case, it certainly can't win in harder cases.</p>
-<p><b>4c. Why RR_TU = RR_UY = e is conservative.</b> The Ding-VanderWeele bound involves the product RR_TU × RR_UY. For a fixed product, the ratio (RR_TU × RR_UY)/(RR_TU + RR_UY − 1) is MAXIMIZED when RR_TU = RR_UY. So assuming equality gives the <b>largest possible bias</b> for a given product — the worst case. Any real confounder with unequal associations would produce LESS bias for the same product, or equivalently, would need a LARGER product to achieve the same bias. The E-value uses this worst case, so it's conservative: a real confounder would need to be even stronger than the E-value suggests.</p>
-<p><b>4d. What the math guarantees — and what it doesn't.</b> The E-value guarantees: <b>IF</b> an unmeasured confounder U exists, <b>AND</b> U is sufficient to explain away the entire observed association (RR_true = 1), <b>THEN</b> U must have RR ≥ E-value with both T and Y. The E-value does NOT guarantee: that such a U actually exists, that no U exists (even if E-value is large), or that the observed association is causal (even if E-value is enormous). The math is a <b>conditional statement</b>: it tells you what must be true IF confounding explains everything. Whether that conditional's antecedent is plausible is a domain judgment, not a mathematical one.</p>
-<p><b>4e. Boundary conditions — when the math stops working.</b> The E-value derivation assumes: (i) U is a single binary/polytomous variable, (ii) measured covariates X are sufficient to block all other confounding paths (only U is unmeasured), (iii) the risk ratio is the correct scale, (iv) positivity holds. It does NOT apply when: multiple unmeasured confounders act jointly (their combined effect could exceed the E-value even if each individually doesn't), the outcome is continuous (use partial R² instead), or the treatment effect is heterogeneous in ways correlated with U.</p>
 
-<h3>3.3 Calibration — What E-values Mean in Practice</h3>
+<h4>5.2a — Why the Ding-VanderWeele bound holds</h4>
+<p>The inequality RR_obs ≤ RR_true × (RR_TU × RR_UY)/(RR_TU + RR_UY − 1) is not an approximation — it's a <b>theorem</b>. Ding & VanderWeele (2016, <i>Epidemiology</i>) proved it from the definitions of risk ratios and the law of total probability, assuming only that U is binary or polytomous and that the measured covariates X are sufficient to block confounding from U. The proof works by: (i) expressing the observed RR as a weighted average of stratum-specific true RRs, (ii) showing that the weights are constrained by RR_TU and RR_UY, (iii) maximizing the possible bias over all distributions of U consistent with those constraints. The result is a <b>sharp bound</b> — there exists some distribution of U that achieves it, so it cannot be tightened without additional assumptions.</p>
+
+<h4>5.2b — Why RR_true = 1 is the right "worst case"</h4>
+<p>We're asking: "Could confounding explain away the ENTIRE effect?" Setting RR_true = 1 means "there is zero true causal effect — everything we observe is confounding." If even THIS extreme scenario requires an implausibly strong confounder, then any PARTIAL confounding (RR_true > 1 but smaller than observed) requires an even stronger confounder to close the remaining gap. Setting RR_true = 1 gives the <b>minimum</b> confounder strength needed — it's the easiest case for the confounder to win. If the confounder can't win even in this easiest case, it certainly can't win in harder cases.</p>
+
+<h4>5.2c — Why RR_TU = RR_UY = e is conservative</h4>
+<p>The Ding-VanderWeele bound involves the product RR_TU × RR_UY. For a fixed product, the ratio (RR_TU × RR_UY)/(RR_TU + RR_UY − 1) is <b>maximized</b> when RR_TU = RR_UY. So assuming equality gives the <b>largest possible bias</b> for a given product — the worst case. Any real confounder with unequal associations would produce LESS bias for the same product, or equivalently, would need a LARGER product to achieve the same bias. The E-value uses this worst case, so it's conservative: a real confounder would need to be even stronger than the E-value suggests.</p>
+
+<h4>5.2d — What the math guarantees (and doesn't)</h4>
+<p>The E-value guarantees: <b>IF</b> an unmeasured confounder U exists, <b>AND</b> U is sufficient to explain away the entire observed association (RR_true = 1), <b>THEN</b> U must have RR ≥ E-value with both T and Y. The E-value does NOT guarantee: that such a U actually exists, that no U exists (even if E-value is large), or that the observed association is causal (even if E-value is enormous). The math is a <b>conditional statement</b>: it tells you what must be true IF confounding explains everything. Whether that conditional's antecedent is plausible is a domain judgment, not a mathematical one.</p>
+
+<h4>5.2e — Boundary conditions: when the math stops working</h4>
+<p>The E-value derivation assumes: (i) U is a single binary/polytomous variable, (ii) measured covariates X are sufficient to block all other confounding paths (only U is unmeasured), (iii) the risk ratio is the correct scale, (iv) positivity holds. It does NOT apply when: multiple unmeasured confounders act jointly (their combined effect could exceed the E-value even if each individually doesn't), the outcome is continuous (use partial R² instead), or the treatment effect is heterogeneous in ways correlated with U.</p>
+
+<h3>5.3 Calibration — What E-values Mean in Practice</h3>
 <table>
 <tr><th>E-value</th><th>Interpretation</th><th>Calibration example</th></tr>
 <tr><td>1.0</td><td>Trivial — any weak confounder could explain the effect</td><td>RR=1.0 → E-value=1.0</td></tr>
@@ -174,11 +183,11 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h2>6. The Partial R² Framework — How Much Variance Does the Confounder Explain? (Cinelli & Hazlett 2020)</h2>
 <div class="card">
-<h3>4.1 Semantic Interpretation</h3>
+<h3>6.1 Semantic Interpretation</h3>
 <p>Instead of risk ratios, the partial R² framework asks: <b>"What fraction of the residual variance in treatment and outcome must a confounder explain to change the conclusion?"</b> This has two key advantages over the E-value: (1) it naturally handles <b>continuous</b> treatments and outcomes, and (2) it allows <b>benchmarking</b> against observed covariates ("a confounder 3× as strong as income would be needed").</p>
 <div class="callout-green"><b>Everyday analogy — the "how much stronger than income?" test:</b> Imagine you're debating whether a raise actually improves productivity, or whether "motivation" (which you didn't measure) confounds both. A colleague says: "Motivation is probably a confounder." You reply: "OK — <i>how much</i> stronger than income would motivation need to be to overturn my result?" Income explains 8% of the variance in getting a raise. The partial R² framework tells you: motivation would need to explain <b>24%</b> — <b>three times as much as income</b>. Now your colleague has to defend whether an unmeasured variable could really be 3× as predictive as income. The burden of proof shifts — from you having to prove there's NO confounder, to your critic having to argue that a confounder that strong could exist. This is the power of benchmarking: it makes the debate <b>concrete and calibratable</b>.</div>
 
-<h3>4.2 Mathematical Derivation</h3>
+<h3>6.2 Mathematical Derivation</h3>
 <p><b>Omitted variable bias formula.</b> In a linear model Y = τT + Xβ + Uγ + ε, omitting U biases τ̂ by:</p>
 <p class="formula"><span id="eq-ovb"></span></p>
 <p>where δ is the coefficient of U on T (after partialling X), γ is the coefficient of U on Y (after partialling X and T), and R²_{T∼X} is the R² from regressing T on X.</p>
@@ -195,11 +204,11 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h2>7. Rosenbaum Bounds — Sensitivity for Matched Designs (Rosenbaum 2002)</h2>
 <div class="card">
-<h3>5.1 Semantic Interpretation</h3>
+<h3>7.1 Semantic Interpretation</h3>
 <p>Rosenbaum bounds ask: <b>"How large would the departure from random assignment need to be (in terms of odds ratios) to render my significant result non-significant?"</b> This is the classic sensitivity analysis for matched observational studies.</p>
 <div class="callout-green"><b>Everyday analogy — the twins study:</b> You compare identical twins where one smoked and the other didn't. You match on genetics, upbringing, diet — everything you can measure. But what if the smoking twin was also more stressed (unmeasured)? Rosenbaum's Γ quantifies: "Even if the stressed twin was up to 2× more likely to smoke, my result still holds." Γ = 2 means you can tolerate a confounder that doubles the odds of treatment; Γ = 5 means your result survives even a 5× odds multiplier. The <b>sensitivity limit Γ*</b> is the breaking point: the largest Γ for which you can still reject the null. If Γ* = 3.5, your result survives anything up to a 3.5× odds departure from random assignment — a confounder stronger than that would be needed to overturn your finding. This is the matched-design analog of the E-value, and it works without assuming anything about the unmeasured confounder's distribution.</div>
 
-<h3>5.2 Mathematical Derivation</h3>
+<h3>7.2 Mathematical Derivation</h3>
 <p>In a matched pair design, two units i and j with the same observed covariates X have treatment assignment probabilities π_i and π_j. If assignment were random (no unmeasured confounding), π_i = π_j. Rosenbaum introduces Γ ≥ 1 bounding the odds ratio:</p>
 <p class="formula"><span id="eq-rosenbaum"></span></p>
 <p>Γ = 1 ⇒ random assignment (no confounding). Γ = 2 ⇒ matched individuals could differ in treatment odds by up to 2× due to an unmeasured U. For each Γ, compute the range of possible p-values. The <b>sensitivity limit Γ*</b> is the largest Γ for which the result remains significant at α = 0.05.</p>
@@ -211,45 +220,45 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h2>8. The Breakdown Frontier — The Full Sensitivity Surface (Masten & Poirier 2021)</h2>
 <div class="card">
-<h3>6.1 Semantic Interpretation</h3>
+<h3>8.1 Semantic Interpretation</h3>
 <p>Rather than a single number (E-value, RV), the breakdown frontier maps the <b>entire boundary</b> of (R²_{T∼U}, R²_{Y∼U}) combinations that would nullify the result. It answers: "What are ALL the confounder profiles that could explain away my effect?"</p>
 <div class="callout-green"><b>Everyday analogy — the "shape of danger":</b> The E-value tells you the confounder needs RR ≥ 2.73 with BOTH T and Y. But what if the confounder is <i>extremely</i> predictive of the outcome (R² = 0.50) but only <i>weakly</i> predictive of treatment (R² = 0.01)? The E-value treats these symmetrically and might say "safe." But the breakdown frontier shows that this asymmetric confounder ALSO overturns your result — it just does so from a different direction. Think of the frontier as the <b>"danger curve"</b> on a map: everything above the curve is dangerous (would overturn your result), everything below is safe. The E-value and RV are single points on this curve — useful summaries, but they don't show you the full shape of the risk. A result might survive a symmetric confounder (E-value says "safe") but be vulnerable to an asymmetric one (frontier says "danger above this curve"). The frontier gives you the <b>complete picture</b>.</div>
 
-<h3>6.2 Why a Single Number Is Not Enough</h3>
+<h3>8.2 Why a Single Number Is Not Enough</h3>
 <p>Consider two confounders: U₁ has R²_{T∼U}=0.01 but R²_{Y∼U}=0.50 (very weak with T, very strong with Y). U₂ has R²_{T∼U}=0.50 but R²_{Y∼U}=0.01 (strong with T, weak with Y). The E-value treats them symmetrically (worst case). The frontier shows that BOTH can be damaging — and which regions of the (R²_T, R²_Y) space are "dangerous" depends on the study design.</p>
 <p>The frontier is a <b>hyperbola-like curve</b> in (R²_T, R²_Y) space. Points above the curve correspond to confounders that would overturn the result. The E-value is one point on this curve (where R²_T = R²_Y). The robustness value is a perpendicular projection. The frontier is the <b>complete characterization</b>.</p>
 </div>
 
 <h2>9. How Each Method Handles Unmeasured vs. Unknown — Worked Examples</h2>
 <div class="card">
-<h3>8.1 The E-value — Handles BOTH Without Distinction</h3>
+<h3>9.1 The E-value — Handles BOTH Without Distinction</h3>
 <p><b>How it deals with unmeasured:</b> You suspect stress confounds your notification→order estimate but didn't measure it. The E-value says: "ANY confounder, whether it's stress or something else, needs RR≥2.73 with both T and Y." Since you know from the literature that stress→smoking RR≈1.5 (weaker than 2.73), even stress couldn't explain away your result. <b>The E-value doesn't need you to name the confounder — it works exactly the same for unmeasured and unknown.</b></p>
 <p><b>How it deals with unknown:</b> A critic says "maybe there's a variable you've never thought of." The E-value responds: "That variable would need RR≥2.73 with both T and Y. The strongest risk factor in this entire domain (smoking→lung cancer) has RR≈10-20. Most behavioral variables have RR<2.0. So your unknown confounder would need to be unprecedentedly strong." <b>The E-value is the only method that treats unmeasured and unknown identically — it needs no calibration in either case.</b></p>
 <p><b>How it deals with multiple confounders:</b> The E-value assumes a SINGLE unmeasured confounder. If multiple confounders exist, their joint effect could be stronger than any single one. VanderWeele & Ding note this limitation: the E-value is conservative for a single U, but multiple weak confounders acting together could theoretically explain an effect even when no single one exceeds the E-value. <b>Rule of thumb:</b> if the E-value is large (>3) and domain experts cannot name even ONE plausible confounder that strong, multiple confounders are unlikely to jointly explain the effect — but this is a judgment call, not a mathematical guarantee.</p>
 </div>
 
 <div class="card">
-<h3>8.2 Partial R² / Robustness Value — Excels at Unmeasured, Struggles with Unknown</h3>
+<h3>9.2 Partial R² / Robustness Value — Excels at Unmeasured, Struggles with Unknown</h3>
 <p><b>How it deals with unmeasured:</b> This is where Partial R² shines. You didn't measure "motivation" but you DID measure "income." Income explains 8% of residual variance in treatment. The RV says you need a confounder explaining 24%. You can definitively state: "Motivation would need to be 3× as strong as income." <b>This calibrates the debate — your critic must now argue that motivation is 3× more predictive than income, which is a concrete, disputable claim.</b></p>
 <p><b>How it deals with unknown:</b> Without a named variable, you can't calibrate against observed covariates — you don't know what to compare to. You can only benchmark against the maximum observed partial R² among ALL measured covariates: "The strongest measured variable explains 12%; an unknown confounder would need to explain 24% — twice the maximum." This is weaker than a named-variable calibration but still informative. <b>Bottom line: Partial R² is strongest when you can name the confounder; for unknown confounders, prefer the E-value.</b></p>
 <p><b>How it deals with multiple confounders:</b> The framework naturally extends to multiple confounders via the partial R² of the set {U₁, U₂, ..., U_k} jointly. The RV asks about the minimum variance a confounder SET must explain. <b>This is an advantage over the E-value:</b> you can bound the joint explanatory power of multiple unmeasured variables, not just a single one.</p>
 </div>
 
 <div class="card">
-<h3>8.3 Rosenbaum Γ — Design-Based, Handles Both Through Odds Ratios</h3>
+<h3>9.3 Rosenbaum Γ — Design-Based, Handles Both Through Odds Ratios</h3>
 <p><b>How it deals with unmeasured:</b> In a matched study of notification→order, two users with identical W, rain, weekend, payday should have equal notification probability. Γ = 2 means: even if an unmeasured confounder (stress) made one user up to 2× more likely to receive a notification, the result still holds. <b>You're saying: "I can tolerate a confounder that doubles the odds of treatment, which is stronger than any measured covariate's effect on treatment."</b></p>
 <p><b>How it deals with unknown:</b> Γ doesn't require naming the confounder — it only bounds the odds ratio of assignment. An unknown confounder with effect up to Γ on the odds ratio cannot overturn your result. <b>Like the E-value, Rosenbaum bounds are calibration-free for unknown confounders.</b></p>
 <p><b>How it deals with multiple confounders:</b> Γ bounds the COMBINED effect of all unmeasured confounders on treatment assignment odds. This is an advantage: it handles multiple confounders naturally — you don't need to assume a single U.</p>
 </div>
 
 <div class="card">
-<h3>8.4 Breakdown Frontier — Maps the Full Risk Landscape for Unknown Confounders</h3>
+<h3>9.4 Breakdown Frontier — Maps the Full Risk Landscape for Unknown Confounders</h3>
 <p><b>How it deals with unknown:</b> This is the frontier's strongest use case. You cannot name the confounder, so you cannot calibrate. The frontier shows you the COMPLETE set of (R²_T, R²_Y) pairs that would overturn your result. You can then check: does any KNOWN variable in any related field fall in the danger zone? If not, an unknown confounder would need to be stronger than anything ever documented. <b>The frontier turns "unknown" into "unprecedentedly strong" — which is as close to a refutation as you can get for an unknown unknown.</b></p>
 <p><b>How it deals with multiple confounders:</b> Like Partial R², the frontier naturally handles confounder sets. The R² values are for the JOINT effect of all unmeasured variables. The frontier shows the minimum joint explanatory power needed.</p>
 </div>
 
 <div class="card">
-<h3>8.5 Decision Heuristic — Which Method for Which Situation</h3>
+<h3>9.5 Decision Heuristic — Which Method for Which Situation</h3>
 <table>
 <tr><th>Situation</th><th>Recommended method</th><th>Why</th></tr>
 <tr><td>"I know X is a confounder but didn't measure it"</td><td><b>Partial R² + benchmarking</b></td><td>Calibrate against observed X-like covariates; make the critic defend a specific strength claim</td></tr>
