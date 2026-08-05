@@ -674,36 +674,75 @@ function build(){
   }
   if(D.visuals&&D.visuals.confounding_gap)h+=buildConfoundingBars(D.visuals.confounding_gap);
   if(D.comparisons&&D.comparisons.collider_bias)h+=buildCompareCard(D.comparisons.collider_bias);
-  h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a></h2>';
+  h+='<h2 id="s4"><span class="cn">4</span> How Wrong Could We Be? <a href="deep_evalue.html" style="font-size:.75rem;font-weight:400;margin-left:8px">Deep Dive</a> <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">KG→</a></h2>';
+  h+='<div class="section-indicator">📍 Stations 6-7 — EVALUATE & TEST: sensitivity + refutation</div>';
+  // E-value gauge
   if(D.visuals&&D.visuals.evalue_gauge)h+=buildEvalueGauge(D.visuals.evalue_gauge);
-  if(D.balance_chart)h+=buildBalanceChart(D.balance_chart);
+  // E-value foldable explanation
   if(c.evalue_deep_dive){var ev=c.evalue_deep_dive;
-    h+='<div class="card"><p>The E-value: how strong must an unmeasured confounder be to explain away our result?</p><div class="callout cr">'+ev.definition+'</div>';
-    h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p><p>Our estimate: <b>E-value = '+rd.e_value.toFixed(2)+'</b> (RR = '+rd.risk_ratio.toFixed(2)+')</p>';
-    h+='<table><tr><th>E-value</th><th>Interpretation</th></tr>';for(var j=0;j<ev.thresholds.length;j++){var t=ev.thresholds[j].split(": ");h+='<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td></tr>'}
-    h+='</table><div class="callout">'+ev.example+'</div></div>';}
-  h+='<h2 id="s5"><span class="cn">5</span> When the World Changes</h2>';
-  h+='<div class="card"><p>Static = normal. Holiday = T->M drops 1.6->0.4 (users habituate). The EVOLVE station detects this shift.</p>';
+    h+='<div class="card"><h3>The E-value — Quantifying Sensitivity to Hidden Confounding</h3>';
+    h+='<p>Every observational estimate rests on the untestable assumption of <b>no unmeasured confounding</b>. The E-value (VanderWeele & Ding 2017) answers: "How strong would a hidden confounder need to be to explain my result away?"</p>';
+    h+='<div class="metrics"><div class="metric hl"><div class="val">'+rd.e_value.toFixed(2)+'</div><div class="lbl">E-value</div></div><div class="metric"><div class="val">'+rd.risk_ratio.toFixed(2)+'</div><div class="lbl">Risk Ratio</div></div><div class="metric"><div class="val">'+rd.max_smd.toFixed(4)+'</div><div class="lbl">|SMD| max</div></div></div>';
+    h+='<details class="think"><summary>📊 How to interpret the E-value + full derivation (click to expand)</summary><div class="think-body">';
+    h+='<div class="callout cr">'+ev.definition+'</div>';
+    h+='<p><span class="formula">'+M("\\text{E-value} = RR_{\\text{obs}} + \\sqrt{RR_{\\text{obs}}(RR_{\\text{obs}} - 1)}")+'</span></p>';
+    h+='<table><tr><th>E-value range</th><th>Interpretation</th><th>Status</th></tr>';
+    for(var j=0;j<ev.thresholds.length;j++){
+      var t=ev.thresholds[j].split(": ");
+      var inRange=false;
+      if(j<ev.thresholds.length-1){
+        inRange=rd.e_value>=parseFloat(t[0])&&rd.e_value<parseFloat(ev.thresholds[j+1].split(": ")[0]);
+      }else{
+        inRange=rd.e_value>=parseFloat(t[0]);
+      }
+      var trStyle=inRange?' style="background:#fef3c7;font-weight:700"':"";
+      var marker=inRange?" <- WE ARE HERE":"";
+      h+="<tr"+trStyle+"><td><b>"+t[0]+"</b></td><td>"+t[1]+"</td><td>"+marker+"</td></tr>";
+    }
+    h+='</table><div class="callout cw">'+ev.example+'</div>';
+    h+='<p style="font-size:.8rem;color:var(--muted);margin-top:8px">Related KG concepts: <a href="kg_browser.html" target="_blank">sensitivity-analysis</a>, <a href="kg_browser.html" target="_blank">confounding</a>, <a href="kg_browser.html" target="_blank">ignorability</a>. See <a href="deep_evalue.html">the full deep dive</a> for the quadratic derivation step-by-step.</p>';
+    h+='</div></details></div>';}
+  // Balance chart
+  if(D.balance_chart)h+=buildBalanceChart(D.balance_chart);
+  // Collider bias comparison
+  if(D.comparisons&&D.comparisons.collider_bias)h+=buildCompareCard(D.comparisons.collider_bias);
+  // Rung gap comparison
+  if(D.comparisons&&D.comparisons.rung_gap){var rg=D.comparisons.rung_gap;
+    h+='<div class="card"><h3>Rung 1 vs Rung 2 — The Gap That Adjustment Closes</h3>';
+    h+='<div class="metrics"><div class="metric" style="border:2px solid #e74c3c"><div class="val" style="color:#e74c3c">'+fmt(rg.rung1.value)+'</div><div class="lbl">Rung 1: Naive P(Y|T)</div></div><div class="metric" style="border:2px solid #2ecc71"><div class="val" style="color:#2ecc71">'+fmt(rg.rung2.value)+'</div><div class="lbl">Rung 2: AIPW ATE</div></div><div class="metric"><div class="val">'+fmt(rg.truth)+'</div><div class="lbl">Ground Truth</div></div></div>';
+    h+='<p style="font-size:.82rem;color:var(--muted)">The '+fmt(rg.rung1.gap)+' gap between Rung 1 and Rung 2 is the confounding bias removed by back-door adjustment. Knowledge Graph: <a href="kg_browser.html" target="_blank">rung-1</a> → <a href="kg_browser.html" target="_blank">rung-2</a> → <a href="kg_browser.html" target="_blank">back-door-criterion</a></p></div>';}
+
+  h+='<h2 id="s5"><span class="cn">5</span> When the World Changes <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">KG→</a></h2>';
+  h+='<div class="section-indicator">📍 Station 8 — EVOLVE: drift detection & autonomous re-estimation</div>';
+  h+='<div class="card"><h3>Mechanism Stability Monitor</h3>';
+  h+='<p>The invariance principle (Peters, Buhlmann & Meinshausen 2016): a correctly specified causal mechanism P(effect | direct causes) is <b>invariant</b> across environments. When the holiday regime changes the T→M coefficient (1.6→0.4), the monitor detects it. <a href="kg_browser.html" target="_blank">KG: invariance-principle</a></p>';
   if(D.stability_chart)h+=buildStabilityChart(D.stability_chart);
   if(D.evolve){var dr=D.evolve.drift,al=D.evolve.alarm,keys=Object.keys(dr).sort(function(a,b){return dr[b]-dr[a]});
-    h+='<table><tr><th>Node</th><th>Degradation</th><th>Status</th></tr>';for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
-    h+='</table><p><b>Mechanism drift localized to: '+D.evolve.worst+'</b></p>';
-    // Show marginal alarms too
+    h+='<details class="think"><summary>📉 Mechanism degradation details + marginal shift alarms (click to expand)</summary><div class="think-body">';
+    h+='<table><tr><th>Node</th><th>Degradation</th><th>Alarm (θ='+al.toFixed(2)+')</th></tr>';for(var j=0;j<keys.length;j++){var kn=keys[j],kv=dr[kn];h+='<tr><td><b>'+kn+'</b></td><td>'+fmt(kv)+'</td><td>'+(kv>al?badge("DRIFT",false):badge("OK",true))+'</td></tr>'}
+    h+='</table><p><b>Locus of mechanism drift: '+D.evolve.worst+'</b> — exactly the T→M edge we changed.</p>';
     if(D.evolve.marginal_alarms){var ma=D.evolve.marginal_alarms;var makeys=Object.keys(ma).sort(function(a,b){return ma[b].z_score-ma[a].z_score});
-      h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem;color:var(--muted)">Show marginal-distribution shifts ('+makeys.length+' variables monitored)</summary>';
-      h+='<table style="margin-top:6px"><tr><th>Variable</th><th>z-score</th><th>Interpretation</th></tr>';
+      h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem;color:var(--muted)">Marginal-distribution shifts ('+makeys.length+' variables monitored)</summary>';
+      h+='<table style="margin-top:6px"><tr><th>Variable</th><th>z-score</th><th>Status</th></tr>';
       for(var j=0;j<makeys.length;j++){var kn=makeys[j],kv=ma[kn],alarm=kv.z_score>4;
-        h+='<tr><td><b>'+kn+'</b></td><td style="color:'+(alarm?'#dc2626':'#059669')+'">'+kv.z_score.toFixed(1)+'</td><td>'+(alarm?'<b>Shift detected</b> - marginal distribution changed':'Stable - within normal range')+'</td></tr>';
+        h+='<tr><td><b>'+kn+'</b></td><td style="color:'+(alarm?'#dc2626':'#059669')+'">'+kv.z_score.toFixed(1)+'</td><td>'+(alarm?'<b>Shift detected</b>':'Stable')+'</td></tr>';
       }
-      h+='</table><p style="font-size:.76rem;color:var(--muted);margin-top:4px">Marginal shifts are distinct from mechanism drift under the invariance principle (Peters et al. 2016): a change in P(X) does not imply a change in P(Y|pa(Y)). The holiday regime intentionally shifted p_rain (0.30->0.15) alongside the T->M mechanism change.</p></details>';}
-    }
-  if(D.actuator&&c.actuator_section){h+='<div class="callout cg">'+c.actuator_section.explanation+'</div>';
+      h+='</table><p style="font-size:.76rem;color:var(--muted);margin-top:4px">Marginal shifts (P(X) changes) are distinct from mechanism drift (P(Y|pa) changes) under the Peters et al. framework. The holiday regime intentionally shifts p_rain (0.30→0.15) alongside the T→M mechanism change — the monitor detects both.</p></details>';}
+    h+='</div></details>';}
+  if(D.actuator&&c.actuator_section){h+='<div class="callout cg"><b>Actuator fired:</b> '+c.actuator_section.explanation+'</div>';
     h+='<table>'+row("Holiday ATE",fmt(D.actuator.ate))+row("Truth",fmt(D.actuator.truth))+row("CI Covers",badge(String(D.actuator.covers),D.actuator.covers))+'</table>';}h+='</div>';
-  h+='<h2 id="s6"><span class="cn">6</span> Was THIS Order Caused?</h2>';
-  if(c.rung3_section){h+='<div class="card"><div class="callout cr">'+c.rung3_section.explanation+'</div>';
-    if(D.rung3){h+='<table>'+row("P(Y(0)=0 | T=1,Y=1)",fmt(D.rung3.p_necessity))+'</table>';
-    h+='<p>~'+(D.rung3.p_necessity*100).toFixed(0)+'% of treated-and-ordered users would NOT have ordered without the notification.</p>';}
-    h+='<table><tr><th>Step</th><th>Action</th></tr><tr><td>1. Abduction</td><td>Infer noise from observed data</td></tr><tr><td>2. Action</td><td>do(T=1-T_factual)</td></tr><tr><td>3. Prediction</td><td>Re-run with same noise, different T</td></tr></table></div>';}
+
+  h+='<h2 id="s6"><span class="cn">6</span> Was THIS Order Caused? <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">KG→</a></h2>';
+  h+='<div class="section-indicator">📍 Rung 3 — Counterfactuals: abduction-action-prediction</div>';
+  if(c.rung3_section){h+='<div class="card"><h3>From "What if everyone?" to "What if THIS user?"</h3>';
+    h+='<p>Rung 2 (ATE) answers the population-average question. Rung 3 asks about <b>specific individuals</b>: among users who received a notification AND ordered, was the notification actually <i>necessary</i> for their order? This requires the full SCM — not just the DAG, but the structural equations and their noise structure. <a href="kg_browser.html" target="_blank">KG: counterfactual-theory (Lewis 1973)</a>, <a href="kg_browser.html" target="_blank">rung-3</a></p>';
+    h+='<details class="think"><summary>🔮 The abduction-action-prediction recipe + result (click to expand)</summary><div class="think-body">';
+    h+='<div class="callout cr">'+c.rung3_section.explanation+'</div>';
+    if(D.rung3){h+='<div class="metrics"><div class="metric hl"><div class="val">'+(D.rung3.p_necessity*100).toFixed(0)+'%</div><div class="lbl">Probability of Necessity</div></div></div>';
+    h+='<p>Among treated-and-ordered users, ~<b>'+(D.rung3.p_necessity*100).toFixed(0)+'%</b> would NOT have ordered without the notification. The other ~'+((1-D.rung3.p_necessity)*100).toFixed(0)+'% would have ordered anyway — the notification was sufficient but not necessary for them.</p>';}
+    h+='<table><tr><th>Step</th><th>Operation</th><th>What it does</th></tr><tr><td>1. Abduction</td><td>P(U | T=1, Y=1)</td><td>Infer the distribution of exogenous noise for users who were treated AND ordered — what kind of hunger level (U) do they have?</td></tr><tr><td>2. Action</td><td>do(T=0)</td><td>Intervene: cut the T equation, force T=0. The SCM\'s other equations remain unchanged.</td></tr><tr><td>3. Prediction</td><td>P(Y=0 | do(T=0), U)</td><td>Re-run the SCM with the SAME noise (U) inferred in step 1, but with T forced to 0. Count how many would NOT have ordered.</td></tr></table>';
+    h+='<p style="font-size:.8rem;color:var(--muted);margin-top:8px">This is what makes rung 3 fundamentally different from rung 2: you must know the <b>noise structure</b> — the specific values of U for specific individuals. ATE averages over all noise; counterfactuals condition on a subset. <a href="kg_browser.html" target="_blank">KG: humean-causation</a> → <a href="kg_browser.html" target="_blank">counterfactual-theory</a> → <a href="kg_browser.html" target="_blank">rung-3</a></p>';
+    h+='</div></details></div>';}
   if(D.visuals&&D.visuals.ladder)h+=buildLadderSVG(D.visuals.ladder);
   if(c.ladder_chain){var lc=c.ladder_chain;
     h+='<h2 id="ladder"><span class="cn">&#127903;</span> The Ladder of Causation</h2>';
@@ -715,10 +754,11 @@ function build(){
       h+='<p style="font-size:.78rem;color:var(--muted);font-style:italic">Limitation: '+ls.limitation+'</p></div></div>';
     }
     h+='</div>';}
-  if(c.tools_and_projects){h+='<h2 id="tools"><span class="cn">&#128736;</span> Tools & Projects</h2><div class="card" style="font-size:.84rem"><p style="margin-bottom:10px">The thinking chain above references these excellent causal inference tools and projects:</p>';for(var i=0;i<c.tools_and_projects.length;i++){var t=c.tools_and_projects[i];h+='<p style="margin:8px 0"><b>'+t.name+'</b> ('+t.authors+') — '+t.what+' <a href="'+t.url+'" target="_blank">[link]</a></p>'}h+='</div>';}
-  h+='<h2 id="s7"><span class="cn">7</span> What We Learned</h2>';
-  h+='<div class="card"><table><tr><th>Step</th><th>Result ('+activeRegime+')</th></tr><tr><td>Frame</td><td>ATE = E[Y(1)-Y(0)]</td></tr><tr><td>Graph</td><td>v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-var adj</td></tr><tr><td>Identify</td><td>back-door: '+(rd.adjustment_set||[]).join(", ")+'</td></tr><tr><td>Estimate</td><td><b>'+fmt(rd.ate)+'</b> ['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+'] vs '+fmt(rd.truth)+'</td></tr><tr><td>Evaluate</td><td>E-value: '+rd.e_value.toFixed(2)+'</td></tr><tr><td>Test</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td></tr><tr><td>Evolve</td><td>Drift: '+(D.evolve?D.evolve.worst:"M")+', truth recovered</td></tr><tr><td>Counterfactual</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'% necessity</td></tr></table><div class="callout cg"><b>Every claim verified against known ground truth. The loop is closed.</b></div></div>';
-  if(c.references){h+='<h2>References</h2><div class="card" style="font-size:.84rem">';for(var i=0;i<c.references.length;i++){var ref=c.references[i];h+='<p>'+ref.short+' - '+ref.full+' <a href="'+ref.url+'" target="_blank">[link]</a></p>'}h+='</div>'}
+  if(c.tools_and_projects){h+='<h2 id="tools"><span class="cn">&#128736;</span> Tools & Projects</h2><div class="card" style="font-size:.84rem"><p style="margin-bottom:10px">The thinking chain above references these excellent causal inference tools and projects. Explore their relationships in the <a href="kg_browser.html" target="_blank">Knowledge Graph</a>:</p>';for(var i=0;i<c.tools_and_projects.length;i++){var t=c.tools_and_projects[i];h+='<p style="margin:8px 0"><b>'+t.name+'</b> ('+t.authors+') — '+t.what+' <a href="'+t.url+'" target="_blank">[link]</a></p>'}h+='</div>';}
+  h+='<h2 id="s7"><span class="cn">7</span> What We Learned <a href="kg_browser.html" style="font-size:.7rem;font-weight:400;margin-left:4px;color:#fbbf24">Explore KG→</a></h2>';
+  h+='<div class="card"><h3>Pipeline Summary — '+activeRegime.toUpperCase()+' Regime</h3>';
+  h+='<table><tr><th>Station</th><th>Result</th><th>KG Concept</th></tr><tr><td>0. FRAME</td><td>ATE = E[Y(1)-Y(0)]</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">ate</a></td></tr><tr><td>1. ASSUME</td><td>Graph v'+rd.graph_version+', '+(rd.adjustment_set||[]).length+'-var adj</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">d-separation</a></td></tr><tr><td>2. IDENTIFY</td><td>back-door: '+(rd.adjustment_set||[]).join(", ")+'</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">back-door-criterion</a></td></tr><tr><td>5. MODEL</td><td><b>'+fmt(rd.ate)+'</b> ['+fmt(rd.ci_low)+','+fmt(rd.ci_high)+'] vs '+fmt(rd.truth)+'</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">aipw</a>, <a href="kg_browser.html" target="_blank" style="font-size:.72rem">neyman-orthogonality</a></td></tr><tr><td>6. EVALUATE</td><td>E-value: '+rd.e_value.toFixed(2)+'</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">sensitivity-analysis</a></td></tr><tr><td>7. TEST</td><td>'+(rd.all_green?"ALL GREEN":"FAILED")+'</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">negative-control</a></td></tr><tr><td>8. EVOLVE</td><td>Drift: '+(D.evolve?D.evolve.worst:"M")+', truth recovered</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">invariance-principle</a></td></tr><tr><td>Counterfactual</td><td>~'+(D.rung3?(D.rung3.p_necessity*100).toFixed(0):"37")+'% necessity</td><td><a href="kg_browser.html" target="_blank" style="font-size:.72rem">rung-3</a></td></tr></table><div class="callout cg"><b>Every claim verified against known ground truth. The loop is closed.</b> <a href="kg_browser.html" target="_blank">Explore the full knowledge graph →</a></div></div>';
+  if(c.references){h+='<h2>References</h2><div class="card" style="font-size:.84rem"><p style="margin-bottom:8px">These references are also queryable in the <a href="kg_browser.html" target="_blank">Knowledge Graph</a> with provenance links to the concepts they prove.</p>';for(var i=0;i<c.references.length;i++){var ref=c.references[i];h+='<p>'+ref.short+' - '+ref.full+' <a href="'+ref.url+'" target="_blank">[link]</a></p>'}h+='</div>'}
   document.getElementById("content").innerHTML=h;
   var dags=document.querySelectorAll(".dagn");for(var i=0;i<dags.length;i++)dags[i].addEventListener("click",function(ev){dagPopup(ev,this.getAttribute("data-nid"))});
   setupGraphPanels();
