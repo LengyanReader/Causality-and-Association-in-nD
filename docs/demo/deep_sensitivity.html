@@ -160,20 +160,22 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
   <text x="260" y="145" text-anchor="middle" font-size="8" fill="#065f46">Outcome</text>
   <!-- U->T arrow -->
   <line x1="97" y1="78" x2="233" y2="52" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
-  <text x="150" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_TU ≥ E</text>
+  <text x="150" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_TU ≥ 2.73</text>
   <!-- U->Y arrow -->
   <line x1="97" y1="102" x2="233" y2="128" stroke="#dc2626" stroke-width="2.5" marker-end="url(#ar)"/>
-  <text x="150" y="135" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_UY ≥ E</text>
+  <text x="150" y="135" text-anchor="middle" font-size="9" font-weight="700" fill="#dc2626">RR_UY ≥ 2.73</text>
   <!-- T->Y observed -->
   <line x1="260" y1="75" x2="260" y2="105" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
   <text x="295" y="93" text-anchor="start" font-size="8" fill="#64748b">Observed</text>
   <text x="295" y="103" text-anchor="start" font-size="8" fill="#64748b">association</text>
   <!-- Annotation -->
-  <text x="420" y="70" text-anchor="middle" font-size="9" fill="#dc2626">BOTH arrows</text>
-  <text x="420" y="84" text-anchor="middle" font-size="9" fill="#dc2626">must be ≥ E-value</text>
-  <text x="420" y="98" text-anchor="middle" font-size="8" fill="#64748b">If either is weaker,</text>
-  <text x="420" y="110" text-anchor="middle" font-size="8" fill="#64748b">confounding cannot</text>
-  <text x="420" y="122" text-anchor="middle" font-size="8" fill="#64748b">explain the effect</text>
+  <text x="420" y="60" text-anchor="middle" font-size="9" fill="#dc2626">If U existed with</text>
+  <text x="420" y="74" text-anchor="middle" font-size="9" fill="#dc2626">RR≥2.73 on BOTH arrows</text>
+  <text x="420" y="90" text-anchor="middle" font-size="8" fill="#64748b">it could reduce the</text>
+  <text x="420" y="102" text-anchor="middle" font-size="8" fill="#64748b">true effect to zero</text>
+  <text x="420" y="118" text-anchor="middle" font-size="8" fill="#64748b">If EITHER is weaker,</text>
+  <text x="420" y="130" text-anchor="middle" font-size="8" fill="#64748b">confounding cannot</text>
+  <text x="420" y="142" text-anchor="middle" font-size="8" fill="#64748b">explain away the effect</text>
 </svg>
 </div>
 
@@ -200,6 +202,14 @@ nav a.current{background:var(--blue);color:#fff;border-color:var(--blue);font-we
 
 <h4>5.2d — What the math guarantees (and doesn't)</h4>
 <p>The E-value guarantees: <b>IF</b> an unmeasured confounder U exists, <b>AND</b> U is sufficient to explain away the entire observed association (RR_true = 1), <b>THEN</b> U must have RR ≥ E-value with both T and Y. The E-value does NOT guarantee: that such a U actually exists, that no U exists (even if E-value is large), or that the observed association is causal (even if E-value is enormous). The math is a <b>conditional statement</b>: it tells you what must be true IF confounding explains everything. Whether that conditional's antecedent is plausible is a domain judgment, not a mathematical one.</p>
+
+<h4>5.2f — Geometric interpretation: the E-value as a vector norm in association space</h4>
+<p>The E-value formula can be understood geometrically — though the literature does not routinely present it this way. Here is a geometric reading grounded in the algebra:</p>
+<p><b>The quadratic form.</b> The equation e² − 2·RR·e + RR = 0 can be written as a matrix quadratic form:</p>
+<p class="formula"><span id="eq-quad"></span></p>
+<p>This is a quadratic surface in (e, 1) space. The E-value is the larger root — the point where this surface intersects the line y=1. Geometrically, it's the major axis intercept of an ellipse defined by the confounding association matrix.</p>
+<p><b>Vector interpretation.</b> Think of confounding as two vectors in the space of probability distributions over the outcome: (i) the <b>treatment-assignment vector</b> a_T — how strongly U shifts the probability of T, and (ii) the <b>outcome vector</b> a_Y — how strongly U shifts the probability of Y. The strength of each vector is its RR (multiplicative shift), not its additive difference. The "confounding product" a_T ⊗ a_Y measures how these two shifts combine to create spurious T-Y association. The denominator RR_TU + RR_UY − 1 is the <b>interference penalty</b>: the two shifts compete for the same probability mass — you cannot simultaneously make U strongly predictive of both T and Y without them overlapping in the probability simplex. The E-value solves: what is the minimum vector norm ‖a‖ such that a_T = a_Y = a produces a confounding product sufficient to explain RR_obs? The answer is ‖a‖_E = RR_obs + √(RR_obs(RR_obs−1)).</p>
+<p><b>Why this reading is valid.</b> The Ding-VanderWeele bound comes from maximizing bias over all possible distributions of U — this is an optimization over the simplex of probability distributions. The constraint RR_TU = RR_UY reduces this to a one-dimensional optimization; the quadratic emerges from the product-sum structure of the bound; the square root is the solution. The "vector" here is the pair (RR_TU, RR_UY) in the positive quadrant of ℝ² — the E-value is the point on the line RR_TU = RR_UY where the confounded region (points above the hyperbola RR_TU × RR_UY / (RR_TU + RR_UY − 1) ≥ RR_obs) first intersects the identity line. This is a <b>bona fide geometric problem</b> in the first quadrant: find the minimum r such that the point (r, r) lies in the confounded region.</p>
 
 <h4>5.2e — Boundary conditions: when the math stops working</h4>
 <p>The E-value derivation assumes: (i) U is a single binary/polytomous variable, (ii) measured covariates X are sufficient to block all other confounding paths (only U is unmeasured), (iii) the risk ratio is the correct scale, (iv) positivity holds. It does NOT apply when: multiple unmeasured confounders act jointly (their combined effect could exceed the E-value even if each individually doesn't), the outcome is continuous (use partial R² instead), or the treatment effect is heterogeneous in ways correlated with U.</p>
@@ -420,6 +430,7 @@ document.getElementById("eq-ovb").innerHTML=M("\\text{Bias}(\\hat{\\tau}) = \\de
 document.getElementById("eq-pr2").innerHTML=M("\\text{Bias} \\propto \\sqrt{R^2_{T\\sim U|X} \\cdot R^2_{Y\\sim U|X,T}}");
 document.getElementById("eq-rv").innerHTML=DM("RV = \\frac{1}{2}\\left(\\sqrt{f^2 + 4f^2} - f^2\\right) \\text{ where } f^2 = f_{Y\\sim T|X}");
 document.getElementById("eq-rosenbaum").innerHTML=M("\\frac{1}{\\Gamma} \\leq \\frac{\\pi_i/(1-\\pi_i)}{\\pi_j/(1-\\pi_j)} \\leq \\Gamma");
+document.getElementById("eq-quad").innerHTML=M("[e \\quad 1] \\begin{bmatrix} 1 & -RR \\\\ -RR & RR \\end{bmatrix} \\begin{bmatrix} e \\\\ 1 \\end{bmatrix} = 0");
 </script>
 </body>
 </html>
